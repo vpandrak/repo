@@ -1,0 +1,23 @@
+﻿{
+    S7_BlockNumber := "200";
+    S7_Optimized := "FALSE";
+    S7_StandardRetain := "FALSE";
+    S7_Version := "0.1"
+}
+DATA_BLOCK Hmi
+    VAR
+        "Time_Of_Day" : DTL;
+        { S7_MLC := "MLC_3QQ" }
+        PLCLoaded : Bool;
+        { S7_MLC := "MLC_335" }
+        TP_Coordination : Word;
+        Initialization_Text : Bool;
+        Initialization_Settings : Bool;
+        Initialization_AI : Bool;
+    END_VAR
+
+    Initialization_Text := false;
+    Initialization_Settings := false;
+    Initialization_AI := false;
+
+END_DATA_BLOCK

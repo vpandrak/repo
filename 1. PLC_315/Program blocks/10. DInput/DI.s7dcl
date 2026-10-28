@@ -1,0 +1,467 @@
+﻿{
+    S7_BlockNumber := "10";
+    S7_Optimized := "TRUE";
+    S7_StandardRetain := "FALSE";
+    S7_Version := "0.1"
+}
+DATA_BLOCK "DI"
+    VAR
+        "-DI1" : STRUCT
+            { S7_MLC := "MLC_4ur" }
+            "+31151A-FSA_313511" : Bool;
+            { S7_MLC := "MLC_35w" }
+            "+31151B-FSA_313521" : Bool;
+            { S7_MLC := "MLC_4F9" }
+            "+31161-FSA_313531" : Bool;
+            { S7_MLC := "MLC_37Q" }
+            "+31171-FSA_313541" : Bool;
+            { S7_MLC := "MLC_4xT" }
+            "+31181-FSA_313551" : Bool;
+            { S7_MLC := "MLC_44S" }
+            "+31191-FSA_313561" : Bool;
+            { S7_MLC := "MLC_3Y4" }
+            "+31131-FSA_313571" : Bool;
+            { S7_MLC := "MLC_3fw" }
+            "+31331-FSA_313581" : Bool;
+            { S7_MLC := "MLC_3H9" }
+            "+31341-FSA_313591" : Bool;
+            { S7_MLC := "MLC_QH" }
+            "+31151A-H_318511_Start" : Bool;
+            { S7_MLC := "MLC_4Qr" }
+            "+31151A-H_318511_Stop" : Bool;
+            { S7_MLC := "MLC_4QQ" }
+            "+31151A-H_318511_Remote" : Bool;
+            { S7_MLC := "MLC_St" }
+            "+3115.11A-H_318512_Start" : Bool;
+            { S7_MLC := "MLC_3TU" }
+            "+3115.11A-H_318512_Stop" : Bool;
+            { S7_MLC := "MLC_4Rn" }
+            "+3115.11A-H_318512_Remote" : Bool;
+            { S7_MLC := "MLC_3uf" }
+            "+31151B-H_318521_Start" : Bool;
+        END_STRUCT;
+        "-DI2" : STRUCT
+            { S7_MLC := "MLC_3P6" }
+            "+31151B-H_318521_Stop" : Bool;
+            { S7_MLC := "MLC_4ax" }
+            "+31151B-H_318521_Remote" : Bool;
+            { S7_MLC := "MLC_3vY" }
+            "+3115.11B-H_318522_Start" : Bool;
+            { S7_MLC := "MLC_qw" }
+            "+3115.11B-H_318522_Stop" : Bool;
+            { S7_MLC := "MLC_4jF" }
+            "+3115.11B-H_318522_Remote" : Bool;
+            { S7_MLC := "MLC_3Kt" }
+            "+31161-H_318531_Start" : Bool;
+            { S7_MLC := "MLC_3W2" }
+            "+31161-H_318531_Stop" : Bool;
+            { S7_MLC := "MLC_4VZ" }
+            "+31161-H_318531_Remote" : Bool;
+            { S7_MLC := "MLC_wd" }
+            "+31171-H_318541_Start" : Bool;
+            { S7_MLC := "MLC_47V" }
+            "+31171-H_318541_Stop" : Bool;
+            { S7_MLC := "MLC_4nR" }
+            "+31171-H_318541_Remote" : Bool;
+            { S7_MLC := "MLC_53C" }
+            "+31181-H_318551_Start" : Bool;
+            { S7_MLC := "MLC_3H5" }
+            "+31181-H_318551_Stop" : Bool;
+            { S7_MLC := "MLC_5AY" }
+            "+31181-H_318551_Remote" : Bool;
+            { S7_MLC := "MLC_nL" }
+            "+31191-H_318561_Start" : Bool;
+            { S7_MLC := "MLC_3bW" }
+            "+31191-H_318561_Stop" : Bool;
+        END_STRUCT;
+        "-DI3" : STRUCT
+            { S7_MLC := "MLC_3Qt" }
+            "+31191-H_318561_Remote" : Bool;
+            { S7_MLC := "MLC_3Zt" }
+            "+31131-H_318571_Start" : Bool;
+            { S7_MLC := "MLC_4nP" }
+            "+31131-H_318571_Stop" : Bool;
+            { S7_MLC := "MLC_33h" }
+            "+31131-H_318571_Remote" : Bool;
+            { S7_MLC := "MLC_4fp" }
+            "+31331-H_318581_Start" : Bool;
+            { S7_MLC := "MLC_3jT" }
+            "+31331-H_318581_Stop" : Bool;
+            { S7_MLC := "MLC_3VK" }
+            "+31331-H_318581_Remote" : Bool;
+            { S7_MLC := "MLC_52w" }
+            "+31341-H_318591_Start" : Bool;
+            { S7_MLC := "MLC_4Sd" }
+            "+31341-H_318591_Stop" : Bool;
+            { S7_MLC := "MLC_4zm" }
+            "+31341-H_318591_Remote" : Bool;
+            { S7_MLC := "MLC_3kG" }
+            "+31351A-H_318592_Start" : Bool;
+            { S7_MLC := "MLC_4LX" }
+            "+31351A-H_318592_Stop" : Bool;
+            { S7_MLC := "MLC_3gU" }
+            "+31351A-H_318592_Remote" : Bool;
+            { S7_MLC := "MLC_4CZ" }
+            "+31351B-H_318593_Start" : Bool;
+            { S7_MLC := "MLC_u4" }
+            "+31351B-H_318593_Stop" : Bool;
+            { S7_MLC := "MLC_328" }
+            "+31351B-H_318593_Remote" : Bool;
+        END_STRUCT;
+        "-DI4" : STRUCT
+            { S7_MLC := "MLC_3hu" }
+            "+31351C-H_318594_Start" : Bool;
+            { S7_MLC := "MLC_3km" }
+            "+31351C-H_318594_Stop" : Bool;
+            { S7_MLC := "MLC_4Sg" }
+            "+31351C-H_318594_Remote" : Bool;
+            { S7_MLC := "MLC_kc" }
+            "+31151A-LVSA_316511_Opened" : Bool;
+            { S7_MLC := "MLC_3VA" }
+            "+31151A-LVSA_316511_Closed" : Bool;
+            { S7_MLC := "MLC_3qc" }
+            "+31151A-LVSA_316513_Opened" : Bool;
+            { S7_MLC := "MLC_nV" }
+            "+31151A-LVSA_316513_Closed" : Bool;
+            { S7_MLC := "MLC_3up" }
+            "+31151B-LVSA_316521_Opened" : Bool;
+            { S7_MLC := "MLC_4kV" }
+            "+31151B-LVSA_316521_Closed" : Bool;
+            { S7_MLC := "MLC_4w9" }
+            "+31151B-LVSA_316523_Opened" : Bool;
+            { S7_MLC := "MLC_Ud" }
+            "+31151B-LVSA_316523_Closed" : Bool;
+            { S7_MLC := "MLC_3Bp" }
+            "+31161-LVSA_316531_Opened" : Bool;
+            { S7_MLC := "MLC_4SZ" }
+            "+31161-LVSA_316531_Closed" : Bool;
+            { S7_MLC := "MLC_3hR" }
+            "+31161-LVSA_316535_Opened" : Bool;
+            { S7_MLC := "MLC_ij" }
+            "+31161-LVSA_316535_Closed" : Bool;
+            { S7_MLC := "MLC_3K9" }
+            "+31171-LVSA_316541_Opened" : Bool;
+        END_STRUCT;
+        "-DI5" : STRUCT
+            { S7_MLC := "MLC_4nV" }
+            "+31171-LVSA_316541_Closed" : Bool;
+            { S7_MLC := "MLC_39D" }
+            "+31171-LVSA_316542_Opened" : Bool;
+            { S7_MLC := "MLC_3KN" }
+            "+31171-LVSA_316542_Closed" : Bool;
+            { S7_MLC := "MLC_45Z" }
+            "+31171-LVSA_316546_Opened" : Bool;
+            { S7_MLC := "MLC_3rd" }
+            "+31171-LVSA_316546_Closed" : Bool;
+            { S7_MLC := "MLC_3hw" }
+            "+31181-LVSA_316551_Opened" : Bool;
+            { S7_MLC := "MLC_4RQ" }
+            "+31181-LVSA_316551_Closed" : Bool;
+            { S7_MLC := "MLC_4qC" }
+            "+31181-LVSA_316555_Opened" : Bool;
+            { S7_MLC := "MLC_3RV" }
+            "+31181-LVSA_316555_Closed" : Bool;
+            { S7_MLC := "MLC_47B" }
+            "+31181-LVSA_316556_Opened" : Bool;
+            { S7_MLC := "MLC_3as" }
+            "+31181-LVSA_316556_Closed" : Bool;
+            { S7_MLC := "MLC_4w3" }
+            "+31191-LVSA_316561_Opened" : Bool;
+            { S7_MLC := "MLC_4kC" }
+            "+31191-LVSA_316561_Closed" : Bool;
+            { S7_MLC := "MLC_4N3" }
+            "+31191-LVSA_316564_Opened" : Bool;
+            { S7_MLC := "MLC_38w" }
+            "+31191-LVSA_316564_Closed" : Bool;
+            { S7_MLC := "MLC_3wc" }
+            "+31131-LRCA_316571_Opened" : Bool;
+        END_STRUCT;
+        "-DI6" : STRUCT
+            { S7_MLC := "MLC_3XK" }
+            "+31131-LRCA_316571_Closed" : Bool;
+            { S7_MLC := "MLC_48A" }
+            "+31131-LVSA_316573_Opened" : Bool;
+            { S7_MLC := "MLC_3dA" }
+            "+31131-LVSA_316573_Closed" : Bool;
+            { S7_MLC := "MLC_4gq" }
+            "+31331-LVSA_316582_Opened" : Bool;
+            { S7_MLC := "MLC_33i" }
+            "+31331-LVSA_316582_Closed" : Bool;
+            { S7_MLC := "MLC_Ma" }
+            "+31331-LVSA_316583_Opened" : Bool;
+            { S7_MLC := "MLC_SE" }
+            "+31331-LVSA_316583_Closed" : Bool;
+            { S7_MLC := "MLC_4kq" }
+            "+31331-LVSA_316584_Opened" : Bool;
+            { S7_MLC := "MLC_37G" }
+            "+31331-LVSA_316584_Closed" : Bool;
+            { S7_MLC := "MLC_3DS" }
+            "+31341-LVSA_316591_Opened" : Bool;
+            { S7_MLC := "MLC_3Tm" }
+            "+31341-LVSA_316591_Closed" : Bool;
+            { S7_MLC := "MLC_4wF" }
+            "+31341-LVSA_316592_Opened" : Bool;
+            { S7_MLC := "MLC_3af" }
+            "+31341-LVSA_316592_Closed" : Bool;
+            { S7_MLC := "MLC_dN" }
+            "+31341-LVSA_316594_Opened" : Bool;
+            { S7_MLC := "MLC_uE" }
+            "+31341-LVSA_316594_Closed" : Bool;
+            { S7_MLC := "MLC_356" }
+            "+3115.11A-NCSA_3115.11A_Run" : Bool;
+        END_STRUCT;
+        "-DI7" : STRUCT
+            { S7_MLC := "MLC_4at" }
+            "+3115.11A-NCSA_3115.11A_Fault" : Bool;
+            { S7_MLC := "MLC_ky" }
+            "+3115.11B-NCSA_3115.11B_Run" : Bool;
+            { S7_MLC := "MLC_4ia" }
+            "+3115.11B-NCSA_3115.11B_Fault" : Bool;
+            { S7_MLC := "MLC_t9" }
+            "+31351A-NCSA_31351A_Run" : Bool;
+            { S7_MLC := "MLC_3D4" }
+            "+31351A-NCSA_31351A_Fault" : Bool;
+            { S7_MLC := "MLC_434" }
+            "+31351B-NCSA_31351B_Run" : Bool;
+            { S7_MLC := "MLC_4M4" }
+            "+31351B-NCSA_31351B_Fault" : Bool;
+            { S7_MLC := "MLC_5CW" }
+            "+31351C-NCSA_31351C_Run" : Bool;
+            { S7_MLC := "MLC_4Xw" }
+            "+31351C-NCSA_31351C_Fault" : Bool;
+            { S7_MLC := "MLC_4p5" }
+            "+31161-AVSA_316533_Opened" : Bool;
+            { S7_MLC := "MLC_4Xf" }
+            "+31161-AVSA_316533_Closed" : Bool;
+            { S7_MLC := "MLC_4aY" }
+            "+31161-AVSA_316536_Opened" : Bool;
+            { S7_MLC := "MLC_Zc" }
+            "+31161-AVSA_316536_Closed" : Bool;
+            { S7_MLC := "MLC_353" }
+            "+31171-AVSA_316544_Opened" : Bool;
+            { S7_MLC := "MLC_4MC" }
+            "+31171-AVSA_316544_Closed" : Bool;
+            { S7_MLC := "MLC_iK" }
+            "+31181-AVSA_316553_Opened" : Bool;
+        END_STRUCT;
+        "-DI8" : STRUCT
+            { S7_MLC := "MLC_495" }
+            "+31181-AVSA_316553_Closed" : Bool;
+            { S7_MLC := "MLC_3ia" }
+            "+31131-AVSA_316574_Opened" : Bool;
+            { S7_MLC := "MLC_4r5" }
+            "+31131-AVSA_316574_Closed" : Bool;
+            { S7_MLC := "MLC_eG" }
+            "+3115.11A-HVSA_316514_Opened" : Bool;
+            { S7_MLC := "MLC_Q8" }
+            "+3115.11A-HVSA_316514_Closed" : Bool;
+            { S7_MLC := "MLC_3ET" }
+            "+3115.11A-HVSA_316515_Opened" : Bool;
+            { S7_MLC := "MLC_bH" }
+            "+3115.11A-HVSA_316515_Closed" : Bool;
+            { S7_MLC := "MLC_4km" }
+            "+3115.11B-HVSA_316524_Opened" : Bool;
+            { S7_MLC := "MLC_32q" }
+            "+3115.11B-HVSA_316524_Closed" : Bool;
+            { S7_MLC := "MLC_3j7" }
+            "+31351A-HVSA_316594_Opened" : Bool;
+            { S7_MLC := "MLC_3JA" }
+            "+31351A-HVSA_316594_Closed" : Bool;
+            { S7_MLC := "MLC_y5" }
+            "+31351B-HVSA_316595_Opened" : Bool;
+            { S7_MLC := "MLC_a3" }
+            "+31351B-HVSA_316595_Closed" : Bool;
+            { S7_MLC := "MLC_4fh" }
+            "+31351B-HVSA_316596_Opened" : Bool;
+            { S7_MLC := "MLC_3ZN" }
+            "+31351B-HVSA_316596_Closed" : Bool;
+            { S7_MLC := "MLC_37z" }
+            "+31351C-HVSA_316597_Opened" : Bool;
+        END_STRUCT;
+        "-DI9" : STRUCT
+            { S7_MLC := "MLC_3Wn" }
+            "+31351C-HVSA_316597_Closed" : Bool;
+            { S7_MLC := "MLC_rd" }
+            "+31151A-TVSA_316512_Opened" : Bool;
+            { S7_MLC := "MLC_ez" }
+            "+31151A-TVSA_316512_Closed" : Bool;
+            { S7_MLC := "MLC_4K5" }
+            "+31151B-TVSA_316522_Opened" : Bool;
+            { S7_MLC := "MLC_4q2" }
+            "+31151B-TVSA_316522_Closed" : Bool;
+            { S7_MLC := "MLC_Ze" }
+            "+31161-TVSA_316532_Opened" : Bool;
+            { S7_MLC := "MLC_35R" }
+            "+31161-TVSA_316532_Closed" : Bool;
+            { S7_MLC := "MLC_4xf" }
+            "+31161-TVSA_316534_Opened" : Bool;
+            { S7_MLC := "MLC_3dC" }
+            "+31161-TVSA_316534_Closed" : Bool;
+            { S7_MLC := "MLC_Uj" }
+            "+31171-TVSA_316543_Opened" : Bool;
+            { S7_MLC := "MLC_3RD" }
+            "+31171-TVSA_316543_Closed" : Bool;
+            { S7_MLC := "MLC_32T" }
+            "+31171-TVSA_316545_Opened" : Bool;
+            { S7_MLC := "MLC_34E" }
+            "+31171-TVSA_316545_Closed" : Bool;
+            { S7_MLC := "MLC_4X6" }
+            "+31181-TVSA_316552_Opened" : Bool;
+            { S7_MLC := "MLC_N7" }
+            "+31181-TVSA_316552_Closed" : Bool;
+            { S7_MLC := "MLC_44n" }
+            "+31181-TVSA_316554_Opened" : Bool;
+        END_STRUCT;
+        "-DI10" : STRUCT
+            { S7_MLC := "MLC_35L" }
+            "+31181-TVSA_316554_Closed" : Bool;
+            { S7_MLC := "MLC_394" }
+            "+31191-TVSA_316562_Opened" : Bool;
+            { S7_MLC := "MLC_54e" }
+            "+31191-TVSA_316562_Closed" : Bool;
+            { S7_MLC := "MLC_ys" }
+            "+31191-TVSA_316563_Opened" : Bool;
+            { S7_MLC := "MLC_Zq" }
+            "+31191-TVSA_316563_Closed" : Bool;
+            { S7_MLC := "MLC_yq" }
+            "+31131-TVSA_316572_Opened" : Bool;
+            { S7_MLC := "MLC_3gJ" }
+            "+31131-TVSA_316572_Closed" : Bool;
+            { S7_MLC := "MLC_VY" }
+            "+31331-TVSA_316581_Opened" : Bool;
+            { S7_MLC := "MLC_5AN" }
+            "+31331-TVSA_316581_Closed" : Bool;
+            { S7_MLC := "MLC_54r" }
+            "+31331-TVSA_316585_Opened" : Bool;
+            { S7_MLC := "MLC_4eW" }
+            "+31331-TVSA_316585_Closed" : Bool;
+            { S7_MLC := "MLC_34j" }
+            "+31341-TVSA_316593_Opened" : Bool;
+            { S7_MLC := "MLC_3gq" }
+            "+31341-TVSA_316593_Closed" : Bool;
+            res15 : Bool;
+            res16 : Bool;
+            res17 : Bool;
+        END_STRUCT;
+        "-DI11" : STRUCT
+            res00 : Bool;
+            res01 : Bool;
+            res02 : Bool;
+            res03 : Bool;
+            res04 : Bool;
+            res05 : Bool;
+            res06 : Bool;
+            res07 : Bool;
+            res10 : Bool;
+            res11 : Bool;
+            res12 : Bool;
+            res13 : Bool;
+            res14 : Bool;
+            res15 : Bool;
+            res16 : Bool;
+            res17 : Bool;
+        END_STRUCT;
+        "-DI81" : STRUCT
+            { S7_MLC := "MLC_4wM" }
+            "+31151A-HVZA_316951_Opened" : Bool;
+            { S7_MLC := "MLC_54m" }
+            "+31151A-HVZA_316951_Closed" : Bool;
+            { S7_MLC := "MLC_3ZY" }
+            "+31161-HVZA_316953_Opened" : Bool;
+            { S7_MLC := "MLC_3jY" }
+            "+31161-HVZA_316953_Closed" : Bool;
+            { S7_MLC := "MLC_3Pb" }
+            "+31151B-HVZA_316952_Opened" : Bool;
+            { S7_MLC := "MLC_4uY" }
+            "+31151B-HVZA_316952_Closed" : Bool;
+            { S7_MLC := "MLC_ht" }
+            "+31191-HVZA_316957_Opened" : Bool;
+            { S7_MLC := "MLC_My" }
+            "+31191-HVZA_316957_Closed" : Bool;
+            { S7_MLC := "MLC_36s" }
+            "+31131-HVZA_316958_Opened" : Bool;
+            { S7_MLC := "MLC_3tG" }
+            "+31131-HVZA_316958_Closed" : Bool;
+            { S7_MLC := "MLC_z2" }
+            "+31341-HVZA_316955_Opened" : Bool;
+            { S7_MLC := "MLC_U7" }
+            "+31341-HVZA_316955_Closed" : Bool;
+            { S7_MLC := "MLC_3xU" }
+            "+31341-HVZA_31695C_Opened" : Bool;
+            { S7_MLC := "MLC_35Z" }
+            "+31341-HVZA_31695C_Closed" : Bool;
+            { S7_MLC := "MLC_4Nc" }
+            "+31151A-LZA_314951A" : Bool;
+            { S7_MLC := "MLC_46B" }
+            "+31151A-LZA_314951B" : Bool;
+        END_STRUCT;
+        "-DI82" : STRUCT
+            { S7_MLC := "MLC_5BB" }
+            "+31161-LZA_314953A" : Bool;
+            { S7_MLC := "MLC_4Qa" }
+            "+31161-LZA_314953B" : Bool;
+            { S7_MLC := "MLC_3Fv" }
+            "+31171-LZA_314954A" : Bool;
+            { S7_MLC := "MLC_47p" }
+            "+31171-LZA_314954B" : Bool;
+            { S7_MLC := "MLC_4hF" }
+            "+31181-LZA_314955A" : Bool;
+            { S7_MLC := "MLC_3sX" }
+            "+31181-LZA_314955B" : Bool;
+            "+31331-LZA_314958A" : Bool;
+            "+31331-LZA_314958B" : Bool;
+            { S7_MLC := "MLC_3hH" }
+            "+31151B-LZA_314952A" : Bool;
+            { S7_MLC := "MLC_Sz" }
+            "+31151B-LZA_314952B" : Bool;
+            { S7_MLC := "MLC_3Gq" }
+            "+31191-LZA_314956A" : Bool;
+            { S7_MLC := "MLC_55N" }
+            "+31191-LZA_314956B" : Bool;
+            { S7_MLC := "MLC_4BF" }
+            "+31131-LZA_314957A" : Bool;
+            { S7_MLC := "MLC_49N" }
+            "+31131-LZA_314957B" : Bool;
+            { S7_MLC := "MLC_4sC" }
+            "+31341-LZA_31495AA" : Bool;
+            { S7_MLC := "MLC_hM" }
+            "+31341-LZA_31495AB" : Bool;
+        END_STRUCT;
+        "-DI83" : STRUCT
+            "+ЩАПДК" : Bool;
+            res01 : Bool;
+            res02 : Bool;
+            res03 : Bool;
+            res04 : Bool;
+            res05 : Bool;
+            res06 : Bool;
+            res07 : Bool;
+            res10 : Bool;
+            res11 : Bool;
+            res12 : Bool;
+            res13 : Bool;
+            res14 : Bool;
+            res15 : Bool;
+            res16 : Bool;
+            res17 : Bool;
+        END_STRUCT;
+        "-DI84" : STRUCT
+            res00 : Bool;
+            res01 : Bool;
+            res02 : Bool;
+            res03 : Bool;
+            res04 : Bool;
+            res05 : Bool;
+            res06 : Bool;
+            res07 : Bool;
+            res10 : Bool;
+            res11 : Bool;
+            res12 : Bool;
+            res13 : Bool;
+            res14 : Bool;
+            res15 : Bool;
+            res16 : Bool;
+            res17 : Bool;
+        END_STRUCT;
+    END_VAR
+END_DATA_BLOCK

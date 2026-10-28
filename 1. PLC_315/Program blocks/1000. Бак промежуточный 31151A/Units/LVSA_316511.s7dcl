@@ -1,0 +1,8 @@
+﻿{
+    S7_BlockNumber := "1013";
+    S7_Optimized := "TRUE";
+    S7_StandardRetain := "FALSE";
+    S7_Version := "0.1"
+}
+DATA_BLOCK LVSA_316511 : ValveUnit
+END_DATA_BLOCK

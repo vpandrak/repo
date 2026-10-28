@@ -1,0 +1,86 @@
+﻿{
+    S7_BlockNumber := "20";
+    S7_Optimized := "TRUE";
+    S7_StandardRetain := "FALSE";
+    S7_Version := "0.1"
+}
+DATA_BLOCK "DO"
+    VAR
+        "-DO1" : STRUCT
+            { S7_MLC := "MLC_53h" }
+            "+31151A-HL318518_HighLevel" : Bool;
+            res01 : Bool;
+            res02 : Bool;
+            res03 : Bool;
+            res04 : Bool;
+            res05 : Bool;
+            res06 : Bool;
+            res07 : Bool;
+            res10 : Bool;
+            { S7_MLC := "MLC_56r" }
+            "+31151A-LVSA_316511_Open" : Bool;
+            { S7_MLC := "MLC_4Mh" }
+            "+31151A-LVSA_316511_Close" : Bool;
+            res13 : Bool;
+            res14 : Bool;
+            res15 : Bool;
+            res16 : Bool;
+            res17 : Bool;
+        END_STRUCT;
+        "-DO2" : STRUCT
+            res00 : Bool;
+            res01 : Bool;
+            res02 : Bool;
+            res03 : Bool;
+            res04 : Bool;
+            res05 : Bool;
+            res06 : Bool;
+            res07 : Bool;
+            res10 : Bool;
+            res11 : Bool;
+            res12 : Bool;
+            res13 : Bool;
+            res14 : Bool;
+            res15 : Bool;
+            res16 : Bool;
+            res17 : Bool;
+        END_STRUCT;
+        "-DO3" : STRUCT
+            res00 : Bool;
+            res01 : Bool;
+            res02 : Bool;
+            res03 : Bool;
+            res04 : Bool;
+            res05 : Bool;
+            res06 : Bool;
+            res07 : Bool;
+            res10 : Bool;
+            res11 : Bool;
+            res12 : Bool;
+            res13 : Bool;
+            res14 : Bool;
+            res15 : Bool;
+            res16 : Bool;
+            res17 : Bool;
+        END_STRUCT;
+        "-DO4" : STRUCT
+            res00 : Bool;
+            res01 : Bool;
+            res02 : Bool;
+            res03 : Bool;
+            res04 : Bool;
+            { S7_MLC := "MLC_MB" }
+            "+3115.11A-NCSA_3115.11A_Turn" : Bool;
+            res06 : Bool;
+            res07 : Bool;
+            res10 : Bool;
+            res11 : Bool;
+            res12 : Bool;
+            res13 : Bool;
+            res14 : Bool;
+            res15 : Bool;
+            res16 : Bool;
+            res17 : Bool;
+        END_STRUCT;
+    END_VAR
+END_DATA_BLOCK

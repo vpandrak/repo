@@ -1,0 +1,8 @@
+﻿{
+    S7_BlockNumber := "1012";
+    S7_Optimized := "TRUE";
+    S7_StandardRetain := "FALSE";
+    S7_Version := "0.1"
+}
+DATA_BLOCK "NCSA_3115.11A" : OnOffUnit
+END_DATA_BLOCK

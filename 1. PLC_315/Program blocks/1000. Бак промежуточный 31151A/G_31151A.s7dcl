@@ -1,0 +1,8 @@
+﻿{
+    S7_BlockNumber := "1001";
+    S7_Optimized := "TRUE";
+    S7_StandardRetain := "FALSE";
+    S7_Version := "0.1"
+}
+DATA_BLOCK G_31151A : Group
+END_DATA_BLOCK

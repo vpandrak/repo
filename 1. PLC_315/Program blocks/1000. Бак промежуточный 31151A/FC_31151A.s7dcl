@@ -1,0 +1,208 @@
+﻿{
+    S7_BlockNumber := "1001";
+    S7_Optimized := "TRUE";
+    S7_PreferredLanguage := "LAD";
+    S7_Version := "0.1"
+}
+FUNCTION "FC_31151A" : Void
+    {
+        S7_Language := "SCL";
+        S7_NetworkTitle := "MLC_Kt"
+    }
+    NETWORK
+        REGION Настройки группы
+            IF "Hmi".Initialization_Settings THEN
+                "G_31151A".Settings.Name := WSTRING#'31151А. Бак промежуточный';
+                "G_31151A"._initialized := FALSE;
+                
+                "G_31151A".Settings.UNIT_UB := 10;
+                "G_31151A".Settings.AUTOMATIC_UB := 1;
+                
+                "G_31151A".Settings.StopAutomatic_NotReadyOperationAUnits := FALSE;
+                "G_31151A".Settings.StopAutomatic_FaultAUnits := FALSE;
+            END_IF;
+        END_REGION
+            
+        "G_31151A"(LampPulse :="LampPulses".Pulse,
+                   Notice := "Notice");
+    END_NETWORK
+    {
+        S7_Language := "SCL";
+        S7_NetworkTitle := "MLC_SZ"
+    }
+    NETWORK
+        REGION Настройка датчиков
+            IF "Hmi".Initialization_AI THEN
+                "LRCA_314511".Settings.Name := WSTRING#'Бак 31151A. LRCA_314511';
+               
+            END_IF;
+        END_REGION
+        
+        "LRCA_314511"(PeripheralValue := 0,
+                      AckFault := "G_31151A".ToUnit.ResetFault);
+        
+        "TRCA_311511"(PeripheralValue := 0,
+                      AckFault := "G_31151A".ToUnit.ResetFault);
+        
+        "PRCA_312511"(PeripheralValue := 0,
+                      AckFault := "G_31151A".ToUnit.ResetFault);
+    END_NETWORK
+    {
+        S7_Language := "SCL";
+        S7_NetworkTitle := "MLC_4yv"
+    }
+    NETWORK
+        REGION Настройка механизмов
+            IF "Hmi".Initialization_Settings THEN
+                
+                REGION Насос 3115.11A
+                    "NCSA_3115.11A".Settings."TypeCmd_2/3_Point" := TRUE;
+                    
+                    
+                END_REGION
+                
+                
+            END_IF;
+        END_REGION
+        
+        REGION Тексты имен, интерлоков, защит, входных сигналов
+            IF "Hmi".Initialization_Text THEN
+                REGION Мешалка 31151A (управление по сети Modbus RTU)
+                    "NCSA_3115.11A".Settings.Name := WSTRING#'3115.11A. Насос';
+                    "NCSA_3115.11A"._name._initialized := FALSE;
+                    
+                    "NCSA_3115.11A".InterlockRunning[0].Reason := WSTRING#'';
+                    "NCSA_3115.11A".ProtectGeneral[0].Reason := WSTRING#'';
+                    
+                    "NCSA_3115.11A".Ready.Reason := WSTRING#'Нет готовноcти ЧРП 231UZ1 в +2ЩСУ1.2';
+                    "NCSA_3115.11A".Fault.Reason := WSTRING#'Ошибка ЧРП 231UZ1 в +2ЩСУ1.2';
+                    "NCSA_3115.11A".Qf.Reason := WSTRING#'250QF1 в шкафу +2ЩСУ2.3';
+                END_REGION
+                
+                REGION Насос 3115.11A
+                    "NCSA_3115.11A".Settings.Name := WSTRING#'3115.11A. Насос';
+                    "NCSA_3115.11A"._name._initialized := FALSE;
+                    
+                    "NCSA_3115.11A".InterlockRunning[0].Reason := WSTRING#'';
+                    "NCSA_3115.11A".ProtectGeneral[0].Reason := WSTRING#'';
+                    
+                    "NCSA_3115.11A".Ready.Reason := WSTRING#'Нет готовноcти ЧРП 231UZ1 в +2ЩСУ1.2';
+                    "NCSA_3115.11A".Fault.Reason := WSTRING#'Ошибка ЧРП 231UZ1 в +2ЩСУ1.2';
+                    "NCSA_3115.11A".Qf.Reason := WSTRING#'250QF1 в шкафу +2ЩСУ2.3';
+                END_REGION
+                
+                
+            END_IF;
+        END_REGION
+        
+        REGION Мешалка 31151A (управление по сети Modbus RTU)
+            // Блокировки/защиты работы насоса:
+            // 0. Уровень в баке 31151А нижний
+            // 1. 
+            // 2. 
+            // 3. 
+            "SIRCA_31151A".InterlockRunning1D[0].Active := FALSE;
+            "SIRCA_31151A".InterlockRunning2D[0].Active := FALSE;
+            "SIRCA_31151A".ProtectGeneral[0].Active := FALSE;
+            
+            REGION H318512. Пульт локального управления
+                "SIRCA_31151A".Local.Key := NOT "DI"."-DI1"."+31151A-H_318511_Remote";
+                "SIRCA_31151A".Local.Pu.Start1D := "DI"."-DI1"."+31151A-H_318511_Start";
+                "SIRCA_31151A".Local.Pu.Basic.Stop := "DI"."-DI1"."+31151A-H_318511_Stop";
+            END_REGION
+            
+            "NCSA_3115.11A".KM := FALSE;
+            "NCSA_3115.11A".Ready.Active := FALSE;
+            "NCSA_3115.11A".Fault.Active := FALSE;
+            
+            "SIRCA_31151A"(Group := "G_31151A".ToUnit,
+                           Notice := "Notice");
+            
+            // := "SIRCA_31151A".Turn1D;
+            // := "SIRCA_31151A".Speed;
+            // := "SIRCA_31151A".Reset;
+        END_REGION
+        
+        REGION Насос 3115.11A
+            // Блокировки/защиты работы насоса:
+            // 0. Задвижка LVSA_316513 не закрыта
+            // 1. Уровень в баке 31151А не нижний
+            // 2. 
+            // 3. 
+            "NCSA_3115.11A".InterlockRunning[0].Active := FALSE;
+            "NCSA_3115.11A".ProtectGeneral[0].Active := FALSE;
+            
+            REGION H318512. Пульт локального управления
+                "NCSA_3115.11A".Local.Key := NOT "DI"."-DI1"."+3115.11A-H_318512_Remote";
+                "NCSA_3115.11A".Local.Pu.Start := "DI"."-DI1"."+3115.11A-H_318512_Start";
+                "NCSA_3115.11A".Local.Pu.Basic.Stop := "DI"."-DI1"."+3115.11A-H_318512_Stop";
+            END_REGION
+            
+            "NCSA_3115.11A".KM := "DI"."-DI6"."+3115.11A-NCSA_3115.11A_Run";
+            "NCSA_3115.11A".Fault.Active := "DI"."-DI7"."+3115.11A-NCSA_3115.11A_Fault";
+            
+            "NCSA_3115.11A"(Group := "G_31151A".ToUnit,
+                            Notice := "Notice");
+            
+            "DO"."-DO4"."+3115.11A-NCSA_3115.11A_Turn" := "NCSA_3115.11A".Turn;
+        END_REGION
+        
+        REGION Задвижка 316511 подачи суспензии
+            // Блокировки/защиты работы:
+            // 0. 
+            // 1. 
+            "LVSA_316511".InterlockMovingToOpen[0].Active := FALSE;
+            "LVSA_316511".InterlockMovingToClose[0].Active := FALSE;
+            
+            "LVSA_316511".Sensor.Opened := "DI"."-DI4"."+31151A-LVSA_316511_Opened";
+            "LVSA_316511".Sensor.Closed := "DI"."-DI4"."+31151A-LVSA_316511_Closed";
+            
+            "LVSA_316511"(Group := "G_31151A".ToUnit,
+                          Notice := "Notice");
+            
+            "DO"."-DO1"."+31151A-LVSA_316511_Open" := "LVSA_316511".Open;
+            "DO"."-DO1"."+31151A-LVSA_316511_Close" := "LVSA_316511".Close;
+        END_REGION
+        
+        REGION Задвижка 316512 подачи пара перегретого
+            // Блокировки/защиты работы:
+            // 0.  
+            // 1. 
+            "TVSA_316512".InterlockMovingToOpen[0].Active := FALSE;
+            "TVSA_316512".InterlockMovingToClose[0].Active := FALSE;
+            
+            "TVSA_316512".Sensor.Opened := "___testbool___";
+            "TVSA_316512".Sensor.Closed := "___testbool___";
+            
+            "TVSA_316512"(Group := "G_31151A".ToUnit,
+                          Notice := "Notice");
+            
+            "___testbool___" := "TVSA_316512".Open;
+            "___testbool___" := "TVSA_316512".Close;
+         END_REGION
+         
+        REGION Задвижка 316513 слива суспензии
+             // Блокировки/защиты работы:
+             // 0. 
+             // 1. 
+             "LVSA_316513".InterlockMovingToOpen[0].Active := FALSE;
+             "LVSA_316513".InterlockMovingToClose[0].Active := FALSE;
+             
+             "LVSA_316513".Sensor.Opened := "DI"."-DI4"."+31151A-LVSA_316513_Opened";
+             "LVSA_316513".Sensor.Closed := "DI"."-DI4"."+31151A-LVSA_316513_Closed";
+            
+             "LVSA_316513"(Group := "G_31151A".ToUnit,
+                           Notice := "Notice");
+            
+             "___testbool___" := "LVSA_316513".Open;
+             "___testbool___" := "LVSA_316513".Close;
+        END_REGION
+    END_NETWORK
+    {
+        S7_Language := "SCL";
+        S7_NetworkTitle := "MLC_3nV"
+    }
+    NETWORK
+        
+    END_NETWORK
+END_FUNCTION
