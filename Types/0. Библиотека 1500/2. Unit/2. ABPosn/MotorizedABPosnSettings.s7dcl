@@ -1,0 +1,32 @@
+﻿TYPE
+    MotorizedABPosnSettings : STRUCT
+        { S7_MLC := "MLC_4CG" }
+        APosnLimitSwitch : Bool := true;
+        { S7_MLC := "MLC_WY" }
+        MoveToAMaxTime : Time := T#10s;
+        { S7_MLC := "MLC_4i9" }
+        APosnLSLostControl : Bool;
+        { S7_MLC := "MLC_4pm" }
+        BPosnLimitSwitch : Bool := true;
+        { S7_MLC := "MLC_bG" }
+        MoveToBMaxTime : Time := T#10s;
+        { S7_MLC := "MLC_pB" }
+        BPosnLSLostControl : Bool;
+        { S7_MLC := "MLC_zx" }
+        APosnName : WString[20] := WSTRING#'А';
+        { S7_MLC := "MLC_3YS" }
+        BPosnName : WString[20] := WSTRING#'В';
+        { S7_MLC := "MLC_3wC" }
+        EventABPosnOn : Bool;
+        { S7_MLC := "MLC_3eV" }
+        SimulationOn : Bool;
+        Actuator : _.MotorSettings;
+        DriveSettings : STRUCT
+            NSpeed : Real;
+            NCurrent : Real;
+            NVoltage : Real;
+            NPower : Real;
+            NTorgue : Real;
+        END_STRUCT;
+    END_STRUCT;
+END_TYPE

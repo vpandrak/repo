@@ -1,0 +1,17 @@
+﻿DocumentHash:
+  - FileName: HmiCylindricalABPosnUnit.s7dcl
+    Hash: UGu/l4cpvXuiofJtWUoAuJgCsPkQd4WByT9O2WJtnq8=
+LibraryMetaFileHash: +R7UvI9jxnnR3lo0UwWsjMhYkzWeN2hTzQmiTMhruWQ=
+LibraryVersion:
+  Guid: 08215b08-2c7e-4b8a-9310-eaf57c4beae0
+  DependsOn:
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: HmiControl
+      VersionNumber: 0.0.1
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1

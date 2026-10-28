@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: OnOffState.s7dcl
+    Hash: lwDCsSHPTFdhI0QlDCTjIC6GJFDdW1taA8HHF2meDqE=
+  - FileName: OnOffState.s7res
+    Hash: ZTJZrZbVoC++83x1v8T9jzCoHWfVaW4aT54WpZK/Nhw=
+LibraryMetaFileHash: WxdCB9OEZyQ9BruBpBzpqIzVT8qppLH6oAw7xXfix5A=
+LibraryVersion:
+  Guid: 2b491a7e-7608-4f5a-b8a8-6430bb914573
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14

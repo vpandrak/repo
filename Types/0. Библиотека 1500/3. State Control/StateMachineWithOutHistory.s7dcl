@@ -1,0 +1,76 @@
+﻿{
+    S7_BlockComment := "MLC_3LD";
+    S7_BlockNumber := "10303";
+    S7_BlockTitle := "MLC_485";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "StateMachineWithOutHistory"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_s9";
+            S7_Visibility := "Hidden := External"
+        }
+        ChangeStateTo : Int;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        StateTime : Time;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        StateChanged : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Xn";
+            S7_Visibility := "Hidden := External"
+        }
+        _prevState : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _time_begin : Time;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _time_current : Time;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        IF #ChangeStateTo <> #State THEN
+            #State := #ChangeStateTo;
+            #StateChanged := true;
+        ELSE
+            #StateChanged := false;
+        END_IF;
+        
+        // Считаем время нахождения в одном состоянии
+        IF #_prevState <> #State THEN
+            #_prevState := #State;    // Сохраняем предыдущее состояние
+            #StateTime := T#0ms;
+            #_time_begin := TIME_TCK();
+        ELSE
+            #_time_current := TIME_TCK();
+            IF #_time_begin > #_time_current THEN
+                #_time_begin := #_time_current;
+            END_IF;
+            #StateTime := #_time_current - #_time_begin;
+        END_IF;
+    END_NETWORK
+END_FUNCTION_BLOCK

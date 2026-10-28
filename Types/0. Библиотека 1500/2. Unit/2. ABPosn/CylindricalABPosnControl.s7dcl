@@ -1,0 +1,667 @@
+﻿{
+    S7_BlockNumber := "10322";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "CylindricalABPosnControl"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Sensor : _.ABPosnSensor;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        PermitMovingToA : _.BitDescription := (
+            Active := true
+        );
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        InterlockMovingToA : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        PermitMovingToB : _.BitDescription := (
+            Active := true
+        );
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        InterlockMovingToB : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ProtectStart : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ProtectGeneral : _.BitDescription;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.ABPosnState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ActuatorCmd : _.ABPosnCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampA : _.LampCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampB : _.LampCommand;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        Hmi : _.HmiControl;
+        Settings : _.CylindricalABPosnSettings;
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+        Cmd : _.ABPosnCmd;
+        Jog : _.ABPosnJog;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        EventOn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Program_Alarm_Off : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        SimulationOn : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smState : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smRecharge : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_fault : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _readyJog : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _readyMoveA : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _readyMoveB : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _p_MoveToA : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _p_MoveToB : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "timer" : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            TOFF_APosn : TON_TIME;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            TOFF_BPosn : TON_TIME;
+        END_STRUCT;
+    END_VAR
+    VAR_TEMP
+        _resetFault : Bool;
+    END_VAR
+    VAR CONSTANT
+        ST_UNDEFINED : Int := 0;
+        { S7_MLC := "MLC_3wf" }
+        ST_MIDDLE : Int := 1;
+        { S7_MLC := "MLC_4iv" }
+        ST_B_POSN : Int := 2;
+        { S7_MLC := "MLC_5Bu" }
+        ST_MOVE_TO_A : Int := 3;
+        ST_MOVE_TO_A_ON_LS : Int := 4;
+        { S7_MLC := "MLC_59C" }
+        ST_A_POSN : Int := 5;
+        { S7_MLC := "MLC_3GF" }
+        ST_MOVE_TO_B : Int := 6;
+        ST_MOVE_TO_B_ON_LS : Int := 7;
+        ST_QUICK_STOP : Int := 900;
+        "______________" : Int;
+        SRC_NO_RECHARGE : Int := 0;
+        SRC_PAUSE : Int := 1;
+        SRC_RECHARGE : Int := 2;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        REGION Таймеры конечных положений
+            #timer.TOFF_APosn(IN := NOT #Sensor.APosn, PT := #Settings.MoveToAMaxTime);
+            #timer.TOFF_BPosn(IN := NOT #Sensor.BPosn, PT := #Settings.MoveToBMaxTime);
+        END_REGION
+        
+        REGION Аварии
+            #_resetFault := #Cmd.Basic.ResetFault;
+            
+            // Аварийный останов    
+            IF (#_smState.State = #ST_MOVE_TO_A OR #_smState.State = #ST_MOVE_TO_A_ON_LS
+                OR #_smState.State = #ST_MOVE_TO_B OR #_smState.State = #ST_MOVE_TO_B_ON_LS)
+                AND #Cmd.Basic.QuickStop
+            THEN
+                #Hmi.State.Alarm.%X0 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := wstring#'Аварийный останов';
+                
+            // Сработала основная защита
+            ELSIF #ProtectGeneral.Active THEN
+                #Hmi.State.Alarm.%X1 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сработала основная защита:', IN2 := #ProtectGeneral.Reason);
+                
+            // Сработала защита от запуска    
+            ELSIF #ProtectStart.Active AND #State.Basic.Stopped THEN
+                #Hmi.State.Alarm.%X2 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сработала защита от старта:', IN2 := #ProtectStart.Reason);
+                
+            // Аварии во время работы  
+            ELSIF #_smState.State = #ST_MOVE_TO_A AND (#Cmd.MoveToA OR #Settings.OneWaySolMoveToB)
+                AND #_smState.StateTime > #Settings.MoveToAMaxTime
+                AND #Settings.APosnLimitSwitch
+                AND NOT #SimulationOn
+            THEN
+                #Hmi.State.Alarm.%X3 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Превышено время движения в позицию ', IN2 := #Settings.APosnName);
+                
+            ELSIF #_smState.State = #ST_MOVE_TO_B AND (#Cmd.MoveToB OR #Settings.OneWaySolMoveToA)
+                AND #_smState.StateTime > #Settings.MoveToBMaxTime
+                AND #Settings.BPosnLimitSwitch
+                AND NOT #SimulationOn
+            THEN
+                #Hmi.State.Alarm.%X4 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Превышено время движения в позицию ', IN2 := #Settings.BPosnName);
+                
+            // Аварии положений    
+            ELSIF #_smState.State = #ST_A_POSN
+                AND #timer.TOFF_APosn.Q
+                AND #Settings.APosnLimitSwitch
+                AND #Settings.APosnLSLostControl
+                AND NOT #SimulationOn
+            THEN
+                #Hmi.State.Alarm.%X5 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сход с конечного выключателя позиции ', IN2 := #Settings.APosnName);
+                
+            ELSIF #_smState.State = #ST_B_POSN
+                AND #timer.TOFF_BPosn.Q
+                AND #Settings.BPosnLimitSwitch
+                AND #Settings.BPosnLSLostControl
+                AND NOT #SimulationOn
+            THEN
+                #Hmi.State.Alarm.%X6 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сход с конечного выключателя позиции ', IN2 := #Settings.BPosnName);
+                
+            ELSIF #Sensor.APosn AND #Sensor.BPosn THEN
+                #Hmi.State.Alarm.%X7 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := wstring#'Сработали оба крайних конечных выключателей';
+                
+            ELSE
+                #_f_fault.SET := false;
+            END_IF;
+            
+            // Формирование программных аварий
+            IF NOT #Program_Alarm_Off THEN
+                #_f_fault(Name := #Name,
+                          RESET := #_resetFault);
+            END_IF;
+            
+            // Сброс слова аварий
+            IF #_resetFault THEN
+                #Hmi.State.Alarm := 0;
+            END_IF;
+            
+            // Формирование статуса общей аварии механизма с описанием причины
+            IF #Hmi.State.Alarm > 0 THEN
+                #State.Fault.Active := true;
+                #State.Fault.Reason := #_f_fault.Text;
+            ELSE
+                IF #State.Fault.Active THEN
+                    #State.Fault.Reason := wstring#'';
+                END_IF;
+                #State.Fault.Active := false;
+            END_IF;
+        END_REGION
+        
+        REGION Готовность
+            IF #Group.Mode = 0 THEN
+                #_readyJog := #_readyMoveA := #_readyMoveB := false;
+                #State.ReadyMoveToA.Reason := #State.ReadyMoveToB.Reason := wstring#'Выведен из работы';
+            ELSIF #Cmd.Basic.QuickStop THEN
+                #_readyJog := #_readyMoveA := #_readyMoveB := false;
+                #State.ReadyMoveToA.Reason := #State.ReadyMoveToB.Reason := wstring#'Активен быстрый останов';
+            ELSIF NOT #Group.SafetyOk THEN
+                #_readyJog := #_readyMoveA := #_readyMoveB := false;
+                #State.ReadyMoveToA.Reason := #State.ReadyMoveToB.Reason := wstring#'Открыты калитки безопасности';
+            ELSIF #ProtectGeneral.Active THEN
+                #_readyJog := #_readyMoveA := #_readyMoveB := false;
+                #State.ReadyMoveToA.Reason := #State.ReadyMoveToB.Reason := #ProtectGeneral.Reason;
+            ELSIF #ProtectStart.Active AND #State.Basic.Stopped THEN
+                #_readyJog := #_readyMoveA := #_readyMoveB := false;
+                #State.ReadyMoveToA.Reason := #State.ReadyMoveToB.Reason := #ProtectStart.Reason;
+            ELSE
+                // "Нулевая блокировка"
+                IF (#Jog.MoveToA OR #Jog.MoveToB) AND NOT #_readyJog THEN
+                    #State.ReadyMoveToA.Reason := #State.ReadyMoveToB.Reason := wstring#'Нулевая блокировка (JOG)';
+                ELSE
+                    #_readyJog := true;
+                    
+                    IF #State.Fault.Active THEN
+                        #_readyMoveA := false;
+                        #State.ReadyMoveToA.Reason := #State.Fault.Reason;
+                    ELSIF #InterlockMovingToA.Active THEN
+                        #_readyMoveA := false;
+                        #State.ReadyMoveToA.Reason := #InterlockMovingToA.Reason;
+                    ELSIF NOT #PermitMovingToA.Active AND #State.Basic.Stopped THEN
+                        #_readyMoveA := false;
+                        #State.ReadyMoveToA.Reason := #PermitMovingToA.Reason;
+                    ELSE
+                        // "Нулевая блокировка"
+                        IF (#Cmd.MoveToA AND NOT #_readyMoveA) THEN
+                            #State.ReadyMoveToA.Reason := wstring#'Нулевая блокировка';
+                        ELSE
+                            IF NOT #_readyMoveA THEN
+                                #State.ReadyMoveToA.Reason := wstring#'';
+                            END_IF;
+                            #_readyMoveA := true;
+                        END_IF;
+                    END_IF;
+                    
+                    IF #State.Fault.Active THEN
+                        #_readyMoveB := false;
+                        #State.ReadyMoveToB.Reason := #State.Fault.Reason;
+                    ELSIF #InterlockMovingToB.Active THEN
+                        #_readyMoveB := false;
+                        #State.ReadyMoveToB.Reason := #InterlockMovingToA.Reason;
+                    ELSIF NOT #PermitMovingToB.Active AND #State.Basic.Stopped THEN
+                        #_readyMoveB := false;
+                        #State.ReadyMoveToB.Reason := #PermitMovingToA.Reason;
+                    ELSE
+                        // "Нулевая блокировка"
+                        IF (#Cmd.MoveToB AND NOT #_readyMoveB) THEN
+                            #State.ReadyMoveToB.Reason := wstring#'Нулевая блокировка';
+                        ELSE
+                            IF NOT #_readyMoveB THEN
+                                #State.ReadyMoveToB.Reason := wstring#'';
+                            END_IF;
+                            #_readyMoveB := true;
+                        END_IF;
+                    END_IF;
+                END_IF;
+            END_IF;
+            
+            REGION Если есть команды и нет готовности, формируем сообщение
+                IF #_p_MoveToA.Q AND NOT #_readyMoveA THEN
+                    #Notice(Name := #Name,
+                            Text := CONCAT_WSTRING(IN1 := wstring#'Команда отклонена. ', IN2 := #State.ReadyMoveToA.Reason));
+                END_IF;
+                IF #_p_MoveToB.Q AND NOT #_readyMoveB THEN
+                    #Notice(Name := #Name,
+                            Text := CONCAT_WSTRING(IN1 := wstring#'Команда отклонена. ', IN2 := #State.ReadyMoveToB.Reason));
+                END_IF;
+            END_REGION
+        END_REGION
+        
+        REGION Управление
+            #_p_MoveToA(CLK:= #Cmd.MoveToA);
+            #_p_MoveToB(CLK := #Cmd.MoveToB);
+            
+            CASE #_smState.State OF
+                #ST_UNDEFINED:
+                    IF #Sensor.APosn AND #Sensor.BPosn THEN
+                        ;
+                    ELSIF #Sensor.APosn THEN
+                        #_smState.ChangeStateTo := #ST_A_POSN;
+                    ELSIF #Sensor.BPosn THEN
+                        #_smState.ChangeStateTo := #ST_B_POSN;
+                    ELSE
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    END_IF;
+                    
+                #ST_MIDDLE:
+                    IF (#Jog.MoveToA AND #_readyJog) OR (#Cmd.MoveToA AND #_readyMoveA) THEN
+                        #_smState.ChangeStateTo := #ST_MOVE_TO_A;
+                    ELSIF (#Jog.MoveToB AND #_readyJog) OR (#Cmd.MoveToB AND #_readyMoveB) THEN
+                        #_smState.ChangeStateTo := #ST_MOVE_TO_B;
+                    ELSIF #Settings.OneWaySolMoveToB THEN
+                        IF #Sensor.APosn THEN
+                            #_smState.ChangeStateTo := #ST_A_POSN;
+                        ELSIF NOT #Jog.MoveToB AND NOT #Cmd.MoveToB AND #_readyMoveA THEN
+                            #_smState.ChangeStateTo := #ST_MOVE_TO_A;
+                        END_IF;
+                    ELSIF #Settings.OneWaySolMoveToA THEN
+                        IF #Sensor.BPosn THEN
+                            #_smState.ChangeStateTo := #ST_B_POSN;
+                        ELSIF NOT #Jog.MoveToA AND NOT #Cmd.MoveToA AND #_readyMoveB THEN
+                            #_smState.ChangeStateTo := #ST_MOVE_TO_B;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_MOVE_TO_A:
+                    IF NOT #Jog.MoveToA AND NOT #Cmd.MoveToA AND NOT #Settings.OneWaySolMoveToB THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF #Jog.MoveToB OR #Cmd.MoveToB THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                        
+                    ELSIF #Sensor.APosn AND #Settings.APosnLimitSwitch AND #Settings.MoveToAOnLSTime > T#0ms THEN
+                        #_smState.ChangeStateTo := #ST_MOVE_TO_A_ON_LS;
+                    ELSIF #Sensor.APosn AND #Settings.APosnLimitSwitch AND #Settings.MoveToAOnLSTime <= T#0ms THEN
+                        #_smState.ChangeStateTo := #ST_A_POSN;
+                    ELSIF ((NOT #Settings.APosnLimitSwitch OR #SimulationOn) AND #_smState.StateTime > #Settings.MoveToAMaxTime) THEN
+                        #_smState.ChangeStateTo := #ST_A_POSN;
+                    END_IF;
+                        
+                #ST_MOVE_TO_A_ON_LS: // После сработки концевика, давим еще чуть-чуть
+                    IF NOT #Jog.MoveToA AND NOT #Cmd.MoveToA AND NOT #Settings.OneWaySolMoveToB THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF #Jog.MoveToB OR #Cmd.MoveToB THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF #_smState.StateTime > #Settings.MoveToAOnLSTime THEN
+                        #_smState.ChangeStateTo := #ST_A_POSN;
+                    END_IF;
+                    
+                #ST_A_POSN:
+                    IF #_smState.StateChanged
+                       AND #EventOn
+                    THEN
+                        #_event(Name := #Name,
+                                Text := #Settings.APosnName);
+                    END_IF;
+                    IF #_p_MoveToA.Q THEN
+                        #Notice(Name := #Name,
+                                Text := CONCAT_WSTRING(IN1:= wstring#'Механизм достиг позиции ',IN2:= #Settings.APosnName));
+                    END_IF;
+                    
+                    IF #Settings.OneWaySolMoveToA AND NOT #Jog.MoveToA AND NOT #Cmd.MoveToA THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF (#Jog.MoveToB AND #_readyJog) OR (#Cmd.MoveToB AND #_readyMoveB) THEN
+                        #_smState.ChangeStateTo := #ST_MOVE_TO_B;
+                    END_IF;
+                    
+                #ST_MOVE_TO_B:
+                    IF NOT #Jog.MoveToB AND NOT #Cmd.MoveToB AND NOT #Settings.OneWaySolMoveToA THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF #Jog.MoveToA OR #Cmd.MoveToA THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF #Sensor.BPosn AND #Settings.BPosnLimitSwitch AND #Settings.MoveToBOnLSTime > T#0ms THEN
+                        #_smState.ChangeStateTo := #ST_MOVE_TO_B_ON_LS;
+                    ELSIF #Sensor.BPosn AND #Settings.BPosnLimitSwitch AND #Settings.MoveToBOnLSTime <= T#0ms THEN
+                        #_smState.ChangeStateTo := #ST_B_POSN;
+                    ELSIF ( (NOT #Settings.BPosnLimitSwitch OR #SimulationOn) AND #_smState.StateTime > #Settings.MoveToBMaxTime ) THEN
+                        #_smState.ChangeStateTo := #ST_B_POSN;
+                    END_IF;
+                    
+                #ST_MOVE_TO_B_ON_LS: // После сработки концевика, давим еще чуть-чуть
+                    IF NOT #Jog.MoveToB AND NOT #Cmd.MoveToB AND NOT #Settings.OneWaySolMoveToA THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF #Jog.MoveToA OR #Cmd.MoveToA THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF #_smState.StateTime > #Settings.MoveToBOnLSTime THEN
+                        #_smState.ChangeStateTo := #ST_B_POSN;
+                    END_IF;
+                    
+                #ST_B_POSN:
+                    IF #_smState.StateChanged
+                       AND #EventOn
+                    THEN
+                        #_event(Name := #Name,
+                                Text := #Settings.BPosnName);
+                    END_IF;
+                    IF #_p_MoveToB.Q THEN
+                        #Notice(Name := #Name,
+                                Text := CONCAT_WSTRING(IN1 := wstring#'Механизм достиг позиции ', IN2 := #Settings.BPosnName));
+                    END_IF;
+                    
+                    IF #Settings.OneWaySolMoveToB AND NOT #Jog.MoveToB AND NOT #Cmd.MoveToB THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    ELSIF (#Jog.MoveToA AND #_readyJog) OR (#Cmd.MoveToA AND #_readyMoveA) THEN
+                        #_smState.ChangeStateTo := #ST_MOVE_TO_A;
+                    END_IF;
+            END_CASE;
+            
+            // Автомат внештатных ситуаций
+            CASE #_smState.State OF
+                #ST_QUICK_STOP:
+                    IF NOT #Cmd.Basic.QuickStop THEN
+                        IF #EventOn THEN
+                            #_event(Name := #Name,
+                                    Text := wstring#'Остановлен аварийно');
+                        END_IF;
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    END_IF;
+                    
+                #ST_MOVE_TO_A, #ST_MOVE_TO_B, #ST_MOVE_TO_A_ON_LS, #ST_MOVE_TO_B_ON_LS:
+                    IF #Cmd.Basic.QuickStop THEN
+                        #_smState.ChangeStateTo := #ST_QUICK_STOP;
+                        
+                    ELSIF ((#Jog.MoveToA OR #Jog.MoveToB) AND NOT #_readyJog)
+                        OR (#Cmd.MoveToA AND NOT #_readyMoveA)
+                        OR (#Cmd.MoveToB AND NOT #_readyMoveB)
+                        OR (#Sensor.APosn AND #Sensor.BPosn AND NOT #SimulationOn)
+                    THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    END_IF;
+                    
+                #ST_A_POSN:
+                    IF #timer.TOFF_APosn.Q
+                       AND #Settings.APosnLimitSwitch
+                       AND #Settings.APosnLSLostControl
+                       AND NOT #SimulationOn
+                    THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    END_IF;
+                    
+                #ST_B_POSN:
+                    IF #timer.TOFF_BPosn.Q
+                        AND #Settings.BPosnLimitSwitch
+                        AND #Settings.BPosnLSLostControl
+                        AND NOT #SimulationOn
+                     THEN
+                        #_smState.ChangeStateTo := #ST_MIDDLE;
+                    END_IF;
+            END_CASE;
+            
+            #_smState();
+        END_REGION
+        
+        REGION Подпитка
+            //Алгоритм подпитки (периодическое открытие клапана в конечном положении)
+            CASE #_smRecharge.State OF
+                #SRC_NO_RECHARGE:
+                    IF (#Settings.APosnRepeatSupply AND #_smState.State = #ST_A_POSN AND NOT #Settings.OneWaySolMoveToB)
+                        OR (#Settings.BPosnRepeatSupply AND #_smState.State = #ST_B_POSN AND NOT #Settings.OneWaySolMoveToA)
+                    THEN
+                        #_smRecharge.ChangeStateTo := #SRC_PAUSE;
+                    END_IF;
+                    
+                #SRC_PAUSE:
+                    IF NOT (
+                        (#Settings.APosnRepeatSupply AND #_smState.State = #ST_A_POSN AND NOT #Settings.OneWaySolMoveToB)
+                        OR (#Settings.BPosnRepeatSupply AND #_smState.State = #ST_B_POSN AND NOT #Settings.OneWaySolMoveToA)
+                        )
+                    THEN
+                        #_smRecharge.ChangeStateTo := #SRC_NO_RECHARGE;
+                    ELSIF (#_smRecharge.StateTime > #Settings.RepeatSupplyPause) THEN
+                        #_smRecharge.ChangeStateTo := #SRC_RECHARGE;
+                    END_IF;
+                    
+                #SRC_RECHARGE:
+                    IF NOT (
+                        (#Settings.APosnRepeatSupply AND #_smState.State = #ST_A_POSN AND NOT #Settings.OneWaySolMoveToB)
+                        OR (#Settings.BPosnRepeatSupply AND #_smState.State = #ST_B_POSN AND NOT #Settings.OneWaySolMoveToA)
+                        )
+                    THEN
+                        #_smRecharge.ChangeStateTo := #SRC_NO_RECHARGE;
+                    ELSIF (#_smRecharge.StateTime > #Settings.RepeatSupplyTime) THEN
+                        #_smRecharge.ChangeStateTo := #SRC_PAUSE;
+                    END_IF;
+            END_CASE;
+            #_smRecharge();
+        END_REGION
+        
+        REGION Формирование выходных команд
+            // Сброс всех комманд перед установкой
+            #ActuatorCmd.MoveToA := false;
+            #ActuatorCmd.MoveToB := false;
+            #ActuatorCmd.Basic.Stop :=
+            #ActuatorCmd.Basic.QuickStop := false;
+            
+            CASE #_smState.State OF
+                #ST_MOVE_TO_A, #ST_MOVE_TO_A_ON_LS:
+                    #ActuatorCmd.MoveToA := true;
+                    
+                #ST_A_POSN:
+                    IF #_readyJog THEN
+                        IF #Jog.MoveToA OR #Settings.HoldOnA OR #_smRecharge.State = #SRC_RECHARGE
+                        THEN
+                            #ActuatorCmd.MoveToA := true;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_MOVE_TO_B,#ST_MOVE_TO_B_ON_LS:
+                    #ActuatorCmd.MoveToB := true;
+                    
+                #ST_B_POSN:
+                    IF #_readyJog THEN
+                        IF #Jog.MoveToB OR #Settings.HoldOnB OR #_smRecharge.State = #SRC_RECHARGE
+                        THEN
+                            #ActuatorCmd.MoveToB := true;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_QUICK_STOP:
+                    #ActuatorCmd.Basic.QuickStop := true;
+                    
+                ELSE
+                    #ActuatorCmd.Basic.Stop := true;
+            END_CASE;
+        END_REGION
+        
+        REGION Состояния для автоматики
+            #State.Basic.ReadyOperation := #_readyJog AND NOT #State.Fault.Active;
+            #State.ReadyMoveToA.Active := #_readyMoveA;
+            #State.ReadyMoveToB.Active := #_readyMoveB;
+            #State.Basic.Fault := #State.Fault.Active;
+            #State.Basic.Running := #State.MovingToA OR #State.MovingToB;
+            #State.Basic.Stopped := NOT (#State.MovingToA OR #State.MovingToB);
+            
+            #State.SafePosn := #State.Basic.Stopped;
+            #State.MovingToA := #_smState.State = #ST_MOVE_TO_A OR #_smState.State = #ST_MOVE_TO_A_ON_LS;
+            #State.MovingToB := #_smState.State = #ST_MOVE_TO_B OR #_smState.State = #ST_MOVE_TO_B_ON_LS;
+            #State.APosn := #_smState.State = #ST_A_POSN;
+            #State.BPosn := #_smState.State = #ST_B_POSN;
+        END_REGION
+        
+        REGION #Hmi
+            #Hmi.State.Status.%X0 := #State.Basic.ReadyOperation;
+            #Hmi.State.Status.%X1 := #State.ReadyMoveToA.Active;
+            #Hmi.State.Status.%X2 := #State.ReadyMoveToB.Active;
+            #Hmi.State.Status.%X3 := #State.Basic.Fault;
+            #Hmi.State.Status.%X4 := #State.Basic.Stopped;
+            #Hmi.State.Status.%X5 := #_smState.State = #ST_MOVE_TO_A OR #_smState.State = #ST_MOVE_TO_A_ON_LS;
+            #Hmi.State.Status.%X6 := #_smState.State = #ST_MOVE_TO_A_ON_LS;
+            #Hmi.State.Status.%X7 := #State.APosn;
+            #Hmi.State.Status.%X8 := #_smState.State = #ST_MOVE_TO_B OR #_smState.State = #ST_MOVE_TO_B_ON_LS;
+            #Hmi.State.Status.%X9 := #_smState.State = #ST_MOVE_TO_B_ON_LS;
+            #Hmi.State.Status.%X10 := #State.BPosn;
+            #Hmi.State.Status.%X11 := NOT (#State.APosn OR #State.BPosn);
+            #Hmi.State.Status.%X12 := false;
+            #Hmi.State.Status.%X13 := false;
+            #Hmi.State.Status.%X14 := false;
+            #Hmi.State.Status.%X15 := false;
+            
+            #Hmi.State.Feature1.%X0 := NOT (NOT #PermitMovingToA.Active AND #State.Basic.Stopped);
+            #Hmi.State.Feature1.%X1 := #InterlockMovingToA.Active;
+            #Hmi.State.Feature1.%X2 := NOT (NOT #PermitMovingToB.Active AND #State.Basic.Stopped);
+            #Hmi.State.Feature1.%X3 := #InterlockMovingToB.Active;
+            #Hmi.State.Feature1.%X4 := #ProtectStart.Active;
+            #Hmi.State.Feature1.%X5 := #ProtectGeneral.Active;
+            // #Hmi.State.Feature1.%X6 := FALSE; // "InterlockFC".MaskOn - toA
+            // #Hmi.State.Feature1.%X7 := FALSE; // "InterlockFC".MaskOn - toB
+            // #Hmi.State.Feature1.%X8 := FALSE; // "ProtectFC".MaskOn
+            #Hmi.State.Feature1.%X9 := FALSE;
+            #Hmi.State.Feature1.%X10 := FALSE;
+            #Hmi.State.Feature1.%X11 := FALSE;
+            #Hmi.State.Feature1.%X12 := FALSE;
+            #Hmi.State.Feature1.%X13 := FALSE;
+            #Hmi.State.Feature1.%X14 := FALSE;
+            #Hmi.State.Feature1.%X15 := FALSE;
+            
+            #Hmi.State.Feature2.%X0 := #_resetFault;
+            #Hmi.State.Feature2.%X1 := #Cmd.Basic.QuickStop;
+            #Hmi.State.Feature2.%X2 := #ActuatorCmd.MoveToA;
+            #Hmi.State.Feature2.%X3 := #ActuatorCmd.MoveToB;
+            #Hmi.State.Feature2.%X4 := #Sensor.APosn;
+            #Hmi.State.Feature2.%X5 := #Sensor.BPosn;
+            
+            #Hmi.State.Feature3 := #_smState.State;
+        END_REGION
+        
+        REGION Лампы
+            #LampA.Fast := #State.MovingToA;
+            #LampA.Cont := #State.APosn;
+            
+            #LampB.Fast := #State.MovingToB;
+            #LampB.Cont := #State.BPosn;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

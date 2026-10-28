@@ -1,0 +1,19 @@
+﻿TYPE
+    OnOffInterface : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.OnOffState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Cmd : _.OnOffCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OperatorCommand : _.OnOffCmd;
+    END_STRUCT;
+END_TYPE

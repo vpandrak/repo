@@ -1,0 +1,25 @@
+﻿DocumentHash:
+  - FileName: ValveCommand.s7dcl
+    Hash: uyPASuUdYg2uCEVAezEgYLu0N/TjpJNtJ/CI7MV33/w=
+LibraryMetaFileHash: 2BwGtNAsHbtH4f+UIjG62yvtkRC0ti59LU7U9XtwwZc=
+LibraryVersion:
+  Guid: c50ca5fc-fce5-49a2-ba3e-ac224030e135
+  DependsOn:
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: ValveJog
+      VersionNumber: 0.0.1
+    - TypeName: HmiCommandValve
+      VersionNumber: 0.0.1
+    - TypeName: HmiValveSettings
+      VersionNumber: 0.0.1
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
+    - TypeName: ValveCmd
+      VersionNumber: 0.0.1

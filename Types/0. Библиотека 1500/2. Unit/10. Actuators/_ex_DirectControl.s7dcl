@@ -1,0 +1,146 @@
+﻿{
+    S7_BlockNumber := "10331";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "_ex_DirectControl"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Turn1D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Turn2D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3Ds";
+            S7_Visibility := "Hidden := External"
+        }
+        SpeedPQW : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_ZB";
+            S7_Visibility := "Hidden := External"
+        }
+        Speed : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Reset : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        QuickStop : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.MotorState;
+    END_VAR
+    VAR_IN_OUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        FeedBack : Bool;
+        Fault : _.BitDescription;
+        Ready : _.BitDescription;
+        DriveSettings : STRUCT
+            { S7_MLC := "MLC_Pa" }
+            NSpeed : Real;
+            { S7_MLC := "MLC_X5" }
+            NCurrent : Real;
+            { S7_MLC := "MLC_4dW" }
+            NVoltage : Real;
+            { S7_MLC := "MLC_V3" }
+            NPower : Real;
+            { S7_MLC := "MLC_4fG" }
+            NTorgue : Real;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Simulation : Bool;
+        Cmd : _.MotorCmd;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _speed : Real;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        IF #Ready.Active THEN
+            IF NOT #State.Basic.ReadyOperation THEN
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := WSTRING#'';
+            END_IF;
+            #State.Basic.ReadyOperation := #State.ReadyToRun1D.Active := #State.ReadyToRun2D.Active := TRUE;
+        ELSE
+            #State.Basic.ReadyOperation := #State.ReadyToRun1D.Active := #State.ReadyToRun2D.Active := FALSE;
+            #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := #Ready.Reason;
+        END_IF;
+        
+        IF #Fault.Active THEN
+            #State.Basic.Fault := TRUE;
+            #State.Fault.Active := TRUE;
+            #State.Fault.Reason := #Fault.Reason;
+        ELSE
+            IF #State.Basic.Fault THEN
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := WSTRING#'';
+            END_IF;
+            #State.Basic.Fault := FALSE;
+            #State.Fault.Active := FALSE;
+        END_IF;
+        
+        #State.Running1D := #FeedBack AND #Cmd.Start1D;
+        #State.Running2D := #FeedBack AND #Cmd.Start2D;
+        #State.Basic.Stopped := NOT #State.Running1D AND NOT #State.Running2D;
+        IF #FeedBack AND NOT #Cmd.Start1D AND NOT #Cmd.Start2D THEN
+            #State.Running1D := TRUE;
+        END_IF;
+        
+        #Turn1D := #Cmd.Start1D;
+        #Turn2D := #Cmd.Start2D;
+        IF #Cmd.SetSpeed AND (#Cmd.Start1D OR #Cmd.Start2D)
+        THEN
+            #Speed := #Cmd.Speed;
+            #SpeedPQW := REAL_TO_INT((#Cmd.Speed / #DriveSettings.NSpeed) * 27648);
+        ELSE
+            #Speed := 0;
+            #SpeedPQW := 0;
+        END_IF;
+        #Reset := #Cmd.Basic.ResetFault;
+        #QuickStop := #Cmd.Basic.QuickStop;
+        
+        REGION Симуляция работы
+            IF #Simulation THEN
+                #State.Basic.ReadyOperation := #State.ReadyToRun1D.Active := #State.ReadyToRun2D.Active := TRUE;
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := WSTRING#'';
+                
+                #State.Basic.Fault := FALSE;
+                #State.Fault.Reason := WSTRING#'';
+                
+                #State.Running1D := #Cmd.Start1D;
+                #State.Running2D := #Cmd.Start2D;
+                #State.Basic.Stopped := NOT #State.Running1D AND NOT #State.Running2D;
+                
+                IF #State.Basic.Stopped THEN
+                    #State.ActualSpeed := 0;
+                ELSE
+                    #State.ActualSpeed := #Cmd.Speed;
+                END_IF;
+            END_IF;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

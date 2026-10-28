@@ -1,0 +1,7 @@
+﻿MultiLingualTexts:
+  - id: MLC_yy
+    en-US: Hysteresys %
+  - id: MLC_3gB
+    en-US: smoothing factor
+  - id: MLC_4gx
+    en-US: simulation value

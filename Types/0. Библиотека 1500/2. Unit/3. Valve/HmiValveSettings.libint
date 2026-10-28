@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: HmiValveSettings.s7dcl
+    Hash: bXgLgoO6DVgG95DHHEsNEvfYUNQzLtAlD1M8OFZQuAs=
+  - FileName: HmiValveSettings.s7res
+    Hash: qC7Jp3WIq7TV07sWjfxs0BqBMgJmRwOcprnE/PT+VEI=
+LibraryMetaFileHash: Q+95qIdx/0LdwrCn279oFhgSKAOHbr4ZDf/mK222P1o=
+LibraryVersion:
+  Guid: 065d51c7-5010-4c66-83cd-9a92a8c032c0
+  DependsOn:
+    - TypeName: ValveSettings
+      VersionNumber: 0.0.1

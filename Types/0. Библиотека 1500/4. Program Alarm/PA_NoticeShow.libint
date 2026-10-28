@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: PA_NoticeShow.s7dcl
+    Hash: CstFBXmQvswr8y2XAJTRX0R2+cOsKpJnrOq0MM9NzWQ=
+  - FileName: PA_NoticeShow.s7res
+    Hash: 8HMubHaOX+L8Q/1/kHuzgleP+Aa/yXQPqf4oDZ1vkj4=
+LibraryMetaFileHash: w8O/y7OxYR3yqvoX49hDKgFrx2LKir9X9zs+W0ifPE4=
+LibraryVersion:
+  Guid: f3d866cf-ebd6-434c-b56c-14e0bf9e4cf3
+  DependsOn:
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1

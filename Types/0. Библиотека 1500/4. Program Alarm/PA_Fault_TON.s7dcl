@@ -1,0 +1,72 @@
+﻿{
+    S7_BlockNumber := "10403";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PA_Fault_TON"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3ra";
+            S7_Visibility := "Hidden := External"
+        }
+        Text : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4au";
+            S7_Visibility := "Hidden := External"
+        }
+        SET : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3r2";
+            S7_Visibility := "Hidden := External"
+        }
+        RESET : Bool := true;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "Time" : Time;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_mC";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.BitDescription;
+    END_VAR
+    VAR_IN_OUT
+        { S7_MLC := "MLC_3VR" }
+        "Name" : WString;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _fault : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _timer : TON_TIME;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        //Авария активна
+        #_timer(IN := #SET,
+                PT := #Time);
+        
+        #_fault(SET := #_timer.Q,
+                RESET := #RESET,
+                Text := #Text,
+                Name := #Name
+        );
+        
+        #State := #_fault.State;
+    END_NETWORK
+END_FUNCTION_BLOCK

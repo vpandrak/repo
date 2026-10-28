@@ -1,0 +1,47 @@
+﻿DocumentHash:
+  - FileName: Group.s7dcl
+    Hash: T7zYK9M/kQacVV5+k/Bhe4XxBXRkz+0MKk21d/vDq50=
+  - FileName: Group.s7res
+    Hash: wrd62rc5J6l4tcvXcZYo8pVTfhYUNfQ9sThml9WSbAI=
+LibraryMetaFileHash: r0lmCFzeBRzntmsoRewWfkZR50cluOGjN23WeAp/b+E=
+LibraryVersion:
+  Guid: 853756e2-2aef-4060-8d7b-e5ea2c35c2c2
+  DependsOn:
+    - TypeName: ModeSwitches
+      VersionNumber: 0.0.1
+    - TypeName: LampPulse
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: IGate
+      VersionNumber: 0.0.1
+    - TypeName: Permit
+      VersionNumber: 0.0.1
+    - TypeName: StateMachineWithOutHistory
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: HmiGroup
+      VersionNumber: 0.0.3
+    - TypeName: Lamp
+      VersionNumber: 0.0.1
+    - TypeName: StateMachineDefaultStates
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event_State
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14
+    - TypeName: AutomaticCommand
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: ResetAlarmTestLamp
+      VersionNumber: 0.0.1
+    - TypeName: GroupSettings
+      VersionNumber: 0.0.1
+    - TypeName: GroupState
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event_Mode
+      VersionNumber: 0.0.1

@@ -1,0 +1,9 @@
+﻿MultiLingualTexts:
+  - id: MLC_382
+    en-US: value of HH alarm limit
+  - id: MLC_52f
+    en-US: value of H alarm limit
+  - id: MLC_WB
+    en-US: value of L alarm limit
+  - id: MLC_4gC
+    en-US: value of LL alarm limit

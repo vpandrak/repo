@@ -1,0 +1,13 @@
+﻿TYPE
+    HmiCylindricalABPosnUnit : STRUCT
+        "Name" : WString;
+        Mode : _.HmiMode;
+        Command : _.HmiCommand;
+        Control : _.HmiControl;
+        InterlockMovingToA : _.HmiInterlock;
+        InterlockMovingToB : _.HmiInterlock;
+        ReadyMoveToA : _.BitDescription;
+        ReadyMoveToB : _.BitDescription;
+        Fault : _.BitDescription;
+    END_STRUCT;
+END_TYPE

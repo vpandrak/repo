@@ -1,0 +1,8 @@
+﻿TYPE
+    ABPosnInterface : STRUCT
+        "Name" : WString;
+        State : _.ABPosnState;
+        Cmd : _.ABPosnCmd;
+        OperatorCommand : _.ABPosnCmd;
+    END_STRUCT;
+END_TYPE

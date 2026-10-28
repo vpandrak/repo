@@ -1,0 +1,41 @@
+﻿{
+    S7_BlockNumber := "10201";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "UnitFullName"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Full : WString[70];
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        HmiName : WString;
+        Group : _.GroupToUnit;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _initialized : Bool;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        IF NOT #_initialized THEN
+            IF #Group.Name <> wstring#'' THEN
+                #Full := CONCAT_WSTRING(IN1 := CONCAT_WSTRING(IN1 := #Group.Name, IN2 := WSTRING#'. '), IN2 := #Name);
+            ELSE
+                #Full := #Name;
+            END_IF;
+            
+            #HmiName := #Name;
+            #_initialized := true;
+        END_IF;
+    END_NETWORK
+END_FUNCTION_BLOCK

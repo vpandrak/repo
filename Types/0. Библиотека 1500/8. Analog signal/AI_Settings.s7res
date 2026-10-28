@@ -1,0 +1,18 @@
+﻿MultiLingualTexts:
+  - id: MLC_37W
+    en-US: enable hh alarms
+    ru-RU: enable hh alarms
+  - id: MLC_3Ei
+    en-US: enable h alarms
+    ru-RU: enable h alarms
+  - id: MLC_dx
+    en-US: enable l alarms
+    ru-RU: enable l alarms
+  - id: MLC_4SS
+    en-US: enable ll alarms
+    ru-RU: enable ll alarms
+  - id: MLC_aM
+    en-US: enable simulation
+    ru-RU: enable simulation
+  - id: MLC_3mN
+    en-US: enable smoothing

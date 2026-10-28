@@ -1,0 +1,41 @@
+﻿DocumentHash:
+  - FileName: MotorizedABPosnControl.s7dcl
+    Hash: nna1dD+WrxbKxq9UDJaf5KSK/3komTLIESyWc9GSVHc=
+  - FileName: MotorizedABPosnControl.s7res
+    Hash: 4UWD4bi3pap42LlGN5qW15nSrCjX24nxqhIMCNQko5k=
+LibraryMetaFileHash: U21gmKOMf/Z2cBsoojKcv/HsyHNpxKwKVldMYjGhoek=
+LibraryVersion:
+  Guid: d6da1de5-c801-47c9-8a19-16c14a32006b
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnSensor
+      VersionNumber: 0.0.1
+    - TypeName: HmiControl
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnCmd
+      VersionNumber: 0.0.1
+    - TypeName: LampCommand
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnState
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnJog
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: MotorCmd
+      VersionNumber: 0.0.1
+    - TypeName: MotorState
+      VersionNumber: 0.0.1
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
+    - TypeName: MotorizedABPosnSettings
+      VersionNumber: 0.0.1
+    - TypeName: MotorJog
+      VersionNumber: 0.0.1

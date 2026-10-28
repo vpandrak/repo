@@ -1,0 +1,27 @@
+﻿DocumentHash:
+  - FileName: SafetyRelay.s7dcl
+    Hash: QjapwePrtWTg7L5f0MfXFjmEgkVjcpa40Hij4mRYIVA=
+  - FileName: SafetyRelay.s7res
+    Hash: 0ohhOOU3v/RIqQC0NHPHxGhYRw4VI1hVJ18duKsoo10=
+LibraryMetaFileHash: nqN50i5mEHf8lMP79A7Ik9SDbjL0D8oUrZSSf9F0O9E=
+LibraryVersion:
+  Guid: 0b00ce11-08e8-4d91-bddd-5ffe73e9cea0
+  DependsOn:
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: HmiSafetyRelay
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: PA_Warning
+      VersionNumber: 0.0.1
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: UnitFullName
+      VersionNumber: 0.0.1

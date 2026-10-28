@@ -1,0 +1,28 @@
+﻿TYPE
+    AI_Limits : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_LV";
+            S7_Visibility := "Hidden := External"
+        }
+        PerhH_Limit : DInt := 0;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3Fy";
+            S7_Visibility := "Hidden := External"
+        }
+        PerhL_Limit : DInt := 0;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_h5";
+            S7_Visibility := "Hidden := External"
+        }
+        PerhLZH_Limit : DInt := 0;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_mU";
+            S7_Visibility := "Hidden := External"
+        }
+        PerhLZL_Limit : DInt := 0;
+    END_STRUCT;
+END_TYPE

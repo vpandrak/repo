@@ -1,0 +1,99 @@
+﻿{
+    S7_BlockComment := "MLC_4vJ";
+    S7_BlockNumber := "10301";
+    S7_BlockTitle := "MLC_nE";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "StateMachine"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3XH";
+            S7_Visibility := "Hidden := External"
+        }
+        ChangeStateTo : Int;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        StateTime : Time;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        StateChanged : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3WS";
+            S7_Visibility := "Hidden := External"
+        }
+        _prevState : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _time_begin : Time;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _time_current : Time;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _historyOn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _stateHistory : Array[0..#STATE_HISTORY_LEN] of Int;
+    END_VAR
+    VAR_TEMP
+        "i" : Int;
+        j : Int;
+    END_VAR
+    VAR CONSTANT
+        STATE_HISTORY_LEN : Int := 9;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        IF #ChangeStateTo <> #State THEN
+            IF #_historyOn THEN
+                FOR #i := #STATE_HISTORY_LEN TO 1 BY -1 DO
+                    #_stateHistory[#i] := #_stateHistory[#i - 1];
+                END_FOR;
+                #_stateHistory[0] := #State;
+            END_IF;
+            #State := #ChangeStateTo;
+            #StateChanged := true;
+        ELSE
+            #StateChanged := false;
+        END_IF;
+        
+        // Считаем время нахождения в одном состоянии
+        IF #_prevState <> #State THEN
+            #_prevState := #State;    // Сохраняем предыдущее состояние
+            #StateTime := T#0ms;
+            #_time_begin := TIME_TCK();
+        ELSE
+            #_time_current := TIME_TCK();
+            IF #_time_begin > #_time_current THEN
+                #_time_begin := #_time_current;
+            END_IF;
+            #StateTime := #_time_current - #_time_begin;
+        END_IF;
+    END_NETWORK
+END_FUNCTION_BLOCK

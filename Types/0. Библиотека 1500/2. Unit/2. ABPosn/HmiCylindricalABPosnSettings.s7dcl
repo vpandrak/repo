@@ -1,0 +1,12 @@
+﻿TYPE
+    HmiCylindricalABPosnSettings : STRUCT
+        "Name" : WString[30];
+        { S7_MLC := "MLC_4kF" }
+        SimulationOn : Bool;
+        { S7_MLC := "MLC_yK" }
+        EventOn : Bool;
+        { S7_MLC := "MLC_3hW" }
+        Program_Alarm_Off : Bool;
+        Control : _.CylindricalABPosnSettings;
+    END_STRUCT;
+END_TYPE

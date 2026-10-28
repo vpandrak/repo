@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: HmiCylindricalABPosn.s7dcl
+    Hash: hjeXrE9UDSrH5OIogwYw4QMyaNeXsY4shHyyeYvOnUI=
+LibraryMetaFileHash: PIpE2TQJnxnTfQLdd2IkSgjraZMBHzY9CZ86CkXU37E=
+LibraryVersion:
+  Guid: 96eb5611-325c-4d5b-be7a-b7efb38c1615
+  DependsOn:
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1
+    - TypeName: HmiCylindricalABPosnUnit
+      VersionNumber: 0.0.2

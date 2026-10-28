@@ -1,0 +1,264 @@
+﻿{
+    S7_BlockNumber := "10325";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "MotorizedABPosnUnit"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "Name" : WString[30];
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pu1 : _.ABPosnCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pu2 : _.ABPosnCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Sensor : _.ABPosnSensor;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        KM : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4XW";
+            S7_Visibility := "Hidden := External"
+        }
+        Qf : _.BitDescription := (
+            Active := true
+        );
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3ct";
+            S7_Visibility := "Hidden := External"
+        }
+        Ready : _.BitDescription := (
+            Active := true
+        );
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4nP";
+            S7_Visibility := "Hidden := External"
+        }
+        Fault : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        InterlockMovingToA : Array[0..3] of _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        InterlockMovingToB : Array[0..3] of _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ProtectGeneral : Array[0..3] of _.BitDescription;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        TurnToA : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        TurnToB : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4zS";
+            S7_Visibility := "Hidden := External"
+        }
+        Speed : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_45P";
+            S7_Visibility := "Hidden := External"
+        }
+        SpeedPQW : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Reset : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampAPosn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampBPosn : Bool;
+    END_VAR
+    VAR_IN_OUT
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+    END_VAR
+    VAR
+        Hmi : _.HmiMotorizedABPosnUnit;
+    END_VAR
+    VAR RETAIN
+        Settings : _.MotorizedABPosnSettings;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Unit : _.ABPosnInterface;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _name : _.UnitFullName;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _command : _.ABPosnCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _control : _.MotorizedABPosnControl;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _actuator : _.MotorControl;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _executor : _._ex_DirectControl;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampAPosn : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampBPosn : _.Lamp;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        "InterlockFC"(Hmi := #Hmi.InterlockMovingToA,
+                     Conditions := #InterlockMovingToA,
+                     First := #_control.InterlockMovingToA,
+                     MaskOn := #Hmi.Control.State.Feature2.%X7
+        );
+        "InterlockFC"(Hmi := #Hmi.InterlockMovingToB,
+                     Conditions := #InterlockMovingToB,
+                     First := #_control.InterlockMovingToB,
+                     MaskOn := #Hmi.Control.State.Feature2.%X9
+        );
+        "ProtectFC"(Hmi := #Hmi.ProtectGeneral,
+                    Conditions := #ProtectGeneral,
+                    First := #_control.ProtectGeneral,
+                    DeLockAll := #_command.ControlCmd.Basic.ResetFault,
+                    NotCheck := FALSE,
+                    MaskOn := #Hmi.Control.State.Feature2.%X11
+        );
+        
+        #_name(Group := #Group,
+               Name := #Name,
+               HmiName := #Hmi.Name
+        );
+        
+        #_command(Name := #_name.Full,
+                  HmiMode := #Hmi.Mode,
+                  HmiCommand := #Hmi.Command,
+                  Group := #Group,
+                  Notice := #Notice,
+                  Pu1 := #Pu1,
+                  Pu2 := #Pu2,
+                  AutoCmd := #Unit.Cmd,
+                  OperatorCommand => #Unit.OperatorCommand
+        );                
+        
+        #_control.Sensor := #Sensor;
+        #_control(Name := #_name.Full,
+                  Hmi := #Hmi.Control,
+                  Settings := #Settings,
+                  Group := #Group,
+                  Notice := #Notice,
+                  Cmd := #_command.ControlCmd,
+                  Jog := #_command.ControlJog,
+                  State => #Unit.State,
+                  ActuatorState := #_actuator.State
+        );
+        
+        #_actuator.Qf := #Qf;
+        // #_actuator(Name := #_name.Full,
+        //            Hmi    := #Hmi.Actuator,
+        //            Settings := #Settings.Actuator,
+        //            Group  := #Group,
+        //            Notice := #Notice,
+        //            Cmd := #_control.ActuatorCmd,
+        //            Jog := #_control.ActuatorJog,
+        //            ExecutorState := #_executor.State
+        // );
+        
+        // #_executor(Cmd := #_actuator.ExecutorCmd,
+        //            Fault := #Fault,
+        //            Ready := #Ready,
+        //            FeedBack := #KM,
+        //            Simulation := #Settings.SimulationOn,
+        //            DriveSetting := #Settings.DriveSettings,
+        //            Turn1D => #TurnToA,
+        //            Turn2D => #TurnToB,
+        //            SpeedPQW => #SpeedPQW,
+        //            Speed => #Speed,
+        //            Reset => #Reset
+        // );
+        
+        #_lampAPosn(Control := #_control.LampA,
+                    TurnLamp => #LampAPosn,
+                    TestLamp := #Group.TestLamp,
+                    Pulse := #Group.HLPulses);
+        #_lampBPosn(Control := #_control.LampB,
+                    TurnLamp => #LampBPosn,
+                    TestLamp := #Group.TestLamp,
+                    Pulse := #Group.HLPulses);
+        
+        REGION #Hmi
+            #Hmi.ReadyMoveToA := #_control.State.ReadyMoveToA;
+            #Hmi.ReadyMoveToB := #_control.State.ReadyMoveToB;
+            #Hmi.Fault := #_control.State.Fault;
+            
+            #Hmi.Control.State.Feature2.%X0 := FALSE;
+            #Hmi.Control.State.Feature2.%X1 := #_control.InterlockMovingToA.Active;
+            #Hmi.Control.State.Feature2.%X2 := FALSE;
+            #Hmi.Control.State.Feature2.%X3 := #_control.InterlockMovingToB.Active;
+            #Hmi.Control.State.Feature2.%X4 := FALSE;
+            #Hmi.Control.State.Feature2.%X5 := FALSE;
+            #Hmi.Control.State.Feature2.%X6 := FALSE;
+            //#Hmi.Control.State.Feature2.%X7 := #_interlockMovingToA.MaskOn;
+            #Hmi.Control.State.Feature2.%X8 := FALSE;
+            //#Hmi.Control.State.Feature2.%X9 := #_interlockMovingToB.MaskOn;
+            #Hmi.Control.State.Feature2.%X10 := FALSE;
+            //#Hmi.Control.State.Feature2.%X11 := #_protectGeneral.MaskOn;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

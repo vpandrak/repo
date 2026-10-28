@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: PA_Event_Mode.s7dcl
+    Hash: EjsknTQZY22Ei9ArDjyOKy8ZbjSyLmX7wJ58AGqP3tM=
+LibraryMetaFileHash: GAGYaOrhD17lqFrDUY4pVh6NOyPDMVizANRY/Wts+wE=
+LibraryVersion:
+  Guid: 25d71449-2c21-4e23-90bb-5711268587a0
+  DependsOn:
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1

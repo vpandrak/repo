@@ -1,0 +1,18 @@
+﻿TYPE
+    HmiDigitalModule : STRUCT
+        { S7_MLC := "MLC_4bh" }
+        Control : Word;
+        { S7_MLC := "MLC_mx" }
+        State : Word;
+        { S7_MLC := "MLC_fY" }
+        ActualState : DWord;
+        { S7_MLC := "MLC_58Z" }
+        ForceInvert : DWord;
+        { S7_MLC := "MLC_3UC" }
+        ForceTrue : DWord;
+        { S7_MLC := "MLC_4z5" }
+        ForceFalse : DWord;
+        { S7_MLC := "MLC_3jV" }
+        ModifiedState : DWord;
+    END_STRUCT;
+END_TYPE

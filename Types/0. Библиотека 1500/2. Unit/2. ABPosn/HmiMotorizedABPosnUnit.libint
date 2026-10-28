@@ -1,0 +1,21 @@
+﻿DocumentHash:
+  - FileName: HmiMotorizedABPosnUnit.s7dcl
+    Hash: INMkn/UAnPJdKGXF1GMmaWZtbFNuPOpkIhZZRxNlK9A=
+LibraryMetaFileHash: ctbBhERR461eNBjz10gi9rs7Qq9OoL2EQS+UUsX35hQ=
+LibraryVersion:
+  Guid: 4616b6a9-4d7a-4b8d-9060-0528fe84ae9d
+  DependsOn:
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1
+    - TypeName: HmiControl
+      VersionNumber: 0.0.1
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: HmiMotor
+      VersionNumber: 0.0.1
+    - TypeName: HmiProtect
+      VersionNumber: 0.0.1

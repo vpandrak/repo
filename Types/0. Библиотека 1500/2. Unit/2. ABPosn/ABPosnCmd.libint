@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: ABPosnCmd.s7dcl
+    Hash: ysae4k036EvrUQf9pqkr36+2iupUrhGOZBJ102Uv1zA=
+  - FileName: ABPosnCmd.s7res
+    Hash: fC+Hxbcvydpid8idgs1X139FhAV9ra1tbnBWbN6TK3s=
+LibraryMetaFileHash: jg3jo2XhYjkQXL6ohS0dFWC0nsAzwZV2vurWNGnRzmU=
+LibraryVersion:
+  Guid: ae9b7193-af74-4f61-9e76-51fe8f091f75
+  DependsOn:
+    - TypeName: BasicCmd
+      VersionNumber: 0.0.2

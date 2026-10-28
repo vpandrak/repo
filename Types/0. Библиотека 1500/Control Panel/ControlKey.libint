@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: ControlKey.s7dcl
+    Hash: Rd7ARUp3y8tuvm2HmicDh/tm+rX7DKu852YJpDkCpAs=
+LibraryMetaFileHash: in7IsDE0LUzGdIqWafh3HCvWnyKqCNITsdZFOkFAfQQ=
+LibraryVersion:
+  Guid: 9addb0b8-4762-44f7-a65f-f6ec92b11ad1
+  DependsOn:
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1

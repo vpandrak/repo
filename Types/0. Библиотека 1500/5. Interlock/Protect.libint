@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: Protect.s7dcl
+    Hash: ZX78MTb+12ICcAOE3lhYS/uiCUIeWecVCNItWQAB84I=
+  - FileName: Protect.s7res
+    Hash: B1WRlL9fKbug0VN3wKeFKhlmnTFm63729AKIzjujADc=
+LibraryMetaFileHash: y+UEeD9AHwKM51dCmMx8DnuhDAx5h8UWbq6okRDuvHo=
+LibraryVersion:
+  Guid: a5216ef4-f6c4-4a51-ae8e-3f13bd72f942
+  DependsOn:
+    - TypeName: HmiProtect
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1

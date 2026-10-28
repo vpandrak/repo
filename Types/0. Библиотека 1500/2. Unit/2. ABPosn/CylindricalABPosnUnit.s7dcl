@@ -1,0 +1,189 @@
+﻿{
+    S7_BlockNumber := "10323";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "CylindricalABPosnUnit"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pu1 : _.ABPosnCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pu2 : _.ABPosnCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Sensor : _.ABPosnSensor;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4Mp";
+            S7_Visibility := "Hidden := External"
+        }
+        Ready : _.BitDescription := (
+            Active := true
+        );
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        InterlockMovingToA : Array[0..1] of _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        InterlockMovingToB : Array[0..1] of _.BitDescription;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OpenSolToA : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OpenSolToB : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampAPosn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampBPosn : Bool;
+    END_VAR
+    VAR_IN_OUT
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+    END_VAR
+    VAR
+        Hmi : _.HmiCylindricalABPosnUnit;
+    END_VAR
+    VAR RETAIN
+        Settings : _.HmiCylindricalABPosnSettings;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Unit : _.ABPosnInterface;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _name : _.UnitFullName;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _command : _.ABPosnCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _control : _.CylindricalABPosnControl;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampAPosn : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampBPosn : _.Lamp;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        "InterlockFC"(Hmi := #Hmi.InterlockMovingToA,
+                     Conditions := #InterlockMovingToA,
+                     First := #_control.InterlockMovingToA,
+                     MaskOn := #Hmi.Control.State.Feature2.%X6
+        );
+        "InterlockFC"(Hmi := #Hmi.InterlockMovingToB,
+                     Conditions := #InterlockMovingToB,
+                     First := #_control.InterlockMovingToB,
+                     MaskOn := #Hmi.Control.State.Feature2.%X7
+        );
+        
+        #_name(Group := #Group,
+               Name := #Settings.Name,
+               HmiName := #Hmi.Name
+        );
+        
+        #_command(Name := #_name.Full,
+                  HmiMode := #Hmi.Mode,
+                  HmiCommand := #Hmi.Command,
+                  Group := #Group,
+                  Notice := #Notice,
+                  Pu1 := #Pu1,
+                  Pu2 := #Pu2,
+                  AutoCmd := #Unit.Cmd,
+                  OperatorCommand => #Unit.OperatorCommand
+        );                
+        
+        #_control.Sensor := #Sensor;
+        #_control(Name := #_name.Full,
+                  Hmi := #Hmi.Control,
+                  Settings := #Settings.Control,
+                  Group := #Group,
+                  Notice := #Notice,
+                  Cmd := #_command.ControlCmd,
+                  Jog := #_command.ControlJog,
+                  EventOn := #Settings.EventOn,
+                  Program_Alarm_Off := #Settings.Program_Alarm_Off,
+                  State => #Unit.State
+        );
+        
+        #OpenSolToA := #_control.ActuatorCmd.MoveToA;
+        #OpenSolToB := #_control.ActuatorCmd.MoveToB;
+        
+        #_lampAPosn(Control := #_control.LampA,
+                    TurnLamp => #LampAPosn,
+                    TestLamp := #Group.TestLamp,
+                    Pulse := #Group.HLPulses);
+        #_lampBPosn(Control := #_control.LampB,
+                    TurnLamp => #LampBPosn,
+                    TestLamp := #Group.TestLamp,
+                    Pulse := #Group.HLPulses);
+        
+        REGION #Hmi
+            IF #Unit.State.ReadyMoveToA.Active THEN
+                IF NOT #Hmi.ReadyMoveToA.Active THEN
+                    #Hmi.ReadyMoveToA.Reason := WSTRING#'';
+                END_IF;
+                #Hmi.ReadyMoveToA.Active := TRUE;
+            ELSE
+                #Hmi.ReadyMoveToA := #Unit.State.ReadyMoveToA;
+            END_IF;
+            IF #Unit.State.ReadyMoveToB.Active THEN
+                IF NOT #Hmi.ReadyMoveToB.Active THEN
+                    #Hmi.ReadyMoveToB.Reason := WSTRING#'';
+                END_IF;
+                #Hmi.ReadyMoveToB.Active := TRUE;
+            ELSE
+                #Hmi.ReadyMoveToB := #Unit.State.ReadyMoveToB;
+            END_IF;
+            IF NOT #Unit.State.Fault.Active THEN
+                IF #Hmi.Fault.Active THEN
+                    #Hmi.Fault.Reason := WSTRING#'';
+                END_IF;
+                #Hmi.Fault.Active := FALSE;
+            ELSE
+                #Hmi.Fault := #Unit.State.Fault;
+            END_IF;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

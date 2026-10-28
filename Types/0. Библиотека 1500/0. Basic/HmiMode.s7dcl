@@ -1,0 +1,8 @@
+﻿TYPE
+    HmiMode : STRUCT
+        { S7_MLC := "MLC_3bT" }
+        Mode : Int;
+        { S7_MLC := "MLC_3xw" }
+        Place : Int;
+    END_STRUCT;
+END_TYPE

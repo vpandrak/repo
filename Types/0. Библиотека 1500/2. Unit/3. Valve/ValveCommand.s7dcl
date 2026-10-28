@@ -1,0 +1,496 @@
+﻿{
+    S7_BlockNumber := "10340";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "ValveCommand"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OperatorCommand : _.ValveCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ControlCmd : _.ValveCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ControlJog : _.ValveJog;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        HmiMode : _.HmiMode;
+        HmiCommand : _.HmiCommandValve;
+        Settings : _.HmiValveSettings;
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+        Pu1 : _.ValveCmd;
+        Pu2 : _.ValveCmd;
+        AutoCmd : _.ValveCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ResetCmdSetPosition : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smMode : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1MoveToOpen_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1MoveToClose_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1MoveToOpen_N : F_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1MoveToClose_N : F_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu2MoveToOpen_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu2MoveToClose_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _resetFault_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _cmd : Int;
+    END_VAR
+    VAR CONSTANT
+        MODE_DISABLE : Int := 0;
+        MODE_SERVICE : Int := 1;
+        MODE_MANUAL : Int := 2;
+        MODE_SEMIAUTO : Int := 4;
+        MODE_AUTO : Int := 8;
+        PLACE_PU1 : Int := 0;
+        PLACE_PU2 : Int := 1;
+        PLACE_DISPATCHER : Int := 2;
+        "------------------------0" : Int;
+        NO_COMMAND : Int := 0;
+        STOP : Int := 1;
+        MOVE_TO_OPEN : Int := 2;
+        MOVE_TO_CLOSE : Int := 3;
+        MOVE_TO_POSITION : Int := 4;
+        "------------------------1" : Int;
+        "2POINT" : Int := 0;
+        "3POINT" : Int := 1;
+        ANALOG : Int := 2;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        #_smMode(ChangeStateTo := #Group.Mode);
+        
+        REGION Фронты
+            #_pu1MoveToOpen_P(CLK := #Pu1.Open);
+            #_pu1MoveToClose_P(CLK := #Pu1.Close);
+            #_pu1MoveToOpen_N(CLK := #Pu1.Open);
+            #_pu1MoveToClose_N(CLK := #Pu1.Close);
+            
+            #_pu2MoveToOpen_P(CLK := #Pu2.Open);
+            #_pu2MoveToClose_P(CLK := #Pu2.Close);
+        END_REGION
+        
+        REGION Если есть команды запуска одновременно в оба направления, формируем сообщение
+            IF (#Pu1.Open AND #Pu1.Close)
+                OR (#Pu2.Open AND #Pu2.Close)
+            THEN
+                #Notice(Text := WSTRING#'Предупреждение. Команды запуска в оба направления',
+                        Name := #Name);
+                #_event(Text := WSTRING#'Предупреждение. Команды запуска в оба направления',
+                        Name := #Name);
+            END_IF;
+        END_REGION
+        
+        // Инициализация выходных команд
+        #ControlCmd.Basic.QuickStop := false;
+        
+        IF #Group.QuickStop THEN
+            #ControlCmd.Basic.QuickStop := true;
+            #ControlJog.Open := false;
+            #ControlJog.Close := false;
+            #OperatorCommand.Open := false;
+            #OperatorCommand.Close := false;
+            #OperatorCommand.Basic.Stop := false;
+            #ControlCmd.Open := false;
+            #ControlCmd.Close := false;
+            #ControlCmd.Basic.Stop := false;
+            
+            REGION События на визуализацию
+                IF #_pu1MoveToOpen_P.Q OR #_pu1MoveToClose_P.Q
+                    OR #_pu2MoveToOpen_P.Q OR #_pu2MoveToClose_P.Q
+                THEN
+                    #Notice(Name := #Name,
+                            Text := wstring#'Команда отклонена. Активен аварийный останов');
+                END_IF;
+            END_REGION
+        ELSE
+            IF #_smMode.StateChanged THEN
+                // При смене режима на любой, кроме на автоматический, сбрасываем команды
+                IF #_smMode.State <> #MODE_AUTO THEN
+                    #ControlJog.Open := false;
+                    #ControlJog.Close := false;
+                    #OperatorCommand.Open := false;
+                    #OperatorCommand.Close := false;
+                    #ControlCmd.Open := false;
+                    #ControlCmd.Close := false;
+                    #_cmd := #STOP;
+                END_IF;
+                
+                // При смене режима на автоматический, первоначально сохраняем команды 
+                IF #_smMode.State = #MODE_AUTO THEN
+                    #AutoCmd := #ControlCmd;
+                END_IF;
+            END_IF;
+            
+            CASE #_smMode.State OF
+                #MODE_DISABLE:
+                    #ControlJog.Open := false;
+                    #ControlJog.Close := false;
+                    #OperatorCommand.Open := false;
+                    #OperatorCommand.Close := false;
+                    #OperatorCommand.Basic.Stop := false;
+                    #ControlCmd.Open := false;
+                    #ControlCmd.Close := false;
+                    #ControlCmd.Basic.Stop := true;
+                    #_cmd := #STOP;
+                    
+                    REGION События на визуализацию
+                        IF #_pu1MoveToOpen_P.Q OR #_pu1MoveToClose_P.Q
+                            OR #_pu2MoveToOpen_P.Q OR #_pu2MoveToClose_P.Q
+                        THEN
+                            #Notice(Text := wstring#'Команда отклонена т.к. механизм выведен из работы',
+                                    Name := #Name);
+                            #_event(Text := WSTRING#'Команда отклонена т.к. механизм выведен из работы',
+                                    Name := #Name);
+                        END_IF;
+                    END_REGION
+                    
+                #MODE_SERVICE:
+                    REGION Операции с пульта Jog'aми
+                        #OperatorCommand.Open := false;
+                        #OperatorCommand.Close := false;
+                        #OperatorCommand.Basic.Stop := false;
+                        #ControlCmd.Open := false;
+                        #ControlCmd.Close := false;
+                        #ControlCmd.Basic.Stop := false;
+                        
+                        CASE #Group.Place OF
+                            #PLACE_PU1:
+                                CASE #_cmd OF
+                                    #STOP:
+                                        #ControlJog.Open := false;
+                                        #ControlJog.Close := false;
+                                        
+                                        IF #Pu1.Open THEN
+                                            #_cmd := #MOVE_TO_OPEN;
+                                        ELSIF #Pu1.Close THEN
+                                            #_cmd := #MOVE_TO_CLOSE;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_OPEN:
+                                        #ControlJog.Open := true;
+                                        #ControlJog.Close := false;
+                                        
+                                        IF #Pu1.Basic.Stop OR NOT #Pu1.Open THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_CLOSE:
+                                        #ControlJog.Open := false;
+                                        #ControlJog.Close := true;
+                                        
+                                        IF #Pu1.Basic.Stop OR NOT #Pu1.Close THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                END_CASE;
+                                
+                            #PLACE_PU2:
+                                CASE #_cmd OF
+                                    #STOP:
+                                        #ControlJog.Open := false;
+                                        #ControlJog.Close := false;
+                                        
+                                        IF #Pu2.Open THEN
+                                            #_cmd := #MOVE_TO_OPEN;
+                                        ELSIF #Pu2.Close THEN
+                                            #_cmd := #MOVE_TO_CLOSE;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_OPEN:
+                                        #ControlJog.Open := true;
+                                        #ControlJog.Close := false;
+                                        
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.Open THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_CLOSE:
+                                        #ControlJog.Open := false;
+                                        #ControlJog.Close := true;
+                                        
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.Close THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            #PLACE_DISPATCHER:
+                                ;
+                        END_CASE;
+                    END_REGION
+                    
+                #MODE_MANUAL:
+                    REGION Операции с пульта или Hmi
+                        #ControlJog.Open := false;
+                        #ControlJog.Close := false;
+                        #OperatorCommand.Open := false;
+                        #OperatorCommand.Close := false;
+                        #OperatorCommand.Basic.Stop := false;
+                        
+                        CASE #Group.Place OF
+                            #PLACE_PU1:
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.Open := false;
+                                        #ControlCmd.Close := false;
+                                        #ControlCmd.SetPosition := false;
+                                        #ResetCmdSetPosition := false;
+                                        
+                                        IF #Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1 THEN
+                                            #_cmd := #STOP;
+                                        ELSIF  #_pu1MoveToOpen_P.Q OR #HmiCommand.FromHMI.%X0 THEN
+                                            #_cmd := #MOVE_TO_OPEN;
+                                        ELSIF #_pu1MoveToClose_P.Q OR #HmiCommand.FromHMI.%X2 THEN
+                                            #_cmd := #MOVE_TO_CLOSE;
+                                        ELSIF #HmiCommand.FromHMI.%X3 THEN
+                                            #_cmd := #MOVE_TO_POSITION;
+                                        END_IF;
+                                        
+                                    #STOP:
+                                        #ControlCmd.Basic.Stop := true;
+                                        #ControlCmd.Open := false;
+                                        #ControlCmd.Close := false;
+                                        #ControlCmd.SetPosition := false;
+                                        
+                                        IF NOT #Pu1.Basic.Stop AND NOT #HmiCommand.FromHMI.%X1 THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_OPEN:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.Open := true;
+                                        #ControlCmd.Close := false;
+                                        #ControlCmd.SetPosition := false;
+                                        
+                                        IF (#Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1) OR (#Pu1.Close OR #HmiCommand.FromHMI.%X2) THEN
+                                            #_cmd := #STOP;
+                                        // аналоговое управление    
+                                        ELSIF #Settings.Control.TypeInputCmd = #ANALOG THEN
+                                            #_cmd := #STOP;
+                                        // при 2-х точечном управлении    
+                                        ELSIF #_pu1MoveToOpen_N.Q AND #Settings.Control.TypeInputCmd = #"2POINT" THEN
+                                            #_cmd := #STOP;
+                                        // при 3-х точечном управлении
+                                        ELSIF #_pu1MoveToOpen_N.Q AND #Settings.Control.TypeInputCmd = #"3POINT" THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_CLOSE:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.Open := false;
+                                        #ControlCmd.Close := true;
+                                        #ControlCmd.SetPosition := false;
+                                        
+                                        IF (#Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1) OR (#Pu1.Open OR #HmiCommand.FromHMI.%X0) THEN
+                                            #_cmd := #STOP;
+                                        // аналоговое управление    
+                                        ELSIF #Settings.Control.TypeInputCmd = #ANALOG THEN
+                                            #_cmd := #STOP;
+                                        // при 2-х точечном управлении    
+                                        ELSIF #_pu1MoveToClose_N.Q AND #Settings.Control.TypeInputCmd = #"2POINT" THEN
+                                            #_cmd := #STOP;
+                                        // при 3-х точечном управлении
+                                        ELSIF #_pu1MoveToClose_N.Q AND #Settings.Control.TypeInputCmd = #"3POINT" THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_POSITION:
+                                        // Команда двигаться в позицию возможна только с Hmi
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.Open := false;
+                                        #ControlCmd.Close := false;
+                                        #ControlCmd.SetPosition := true;
+                                        #ControlCmd.Position := #HmiCommand.PositionHmi;
+                                        
+                                        IF (#Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1) THEN
+                                            #_cmd := #STOP;
+                                        // сброс команды из "_control"    
+                                        ELSIF #ResetCmdSetPosition THEN
+                                            #_cmd := #STOP;
+                                        // не аналоговое управление
+                                        ELSIF #Settings.Control.TypeInputCmd <> #ANALOG THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            #PLACE_PU2:
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.Open := false;
+                                        #ControlCmd.Close := false;
+                                        #ControlCmd.SetPosition := false;
+                                        
+                                        IF #Pu2.Basic.Stop THEN
+                                            #_cmd := #STOP;
+                                        ELSIF #_pu2MoveToOpen_P.Q THEN
+                                            #_cmd := #MOVE_TO_OPEN;
+                                        ELSIF #_pu2MoveToClose_P.Q THEN
+                                            #_cmd := #MOVE_TO_CLOSE;
+                                        END_IF;
+                                        
+                                    #STOP:
+                                        #ControlCmd.Basic.Stop := true;
+                                        #ControlCmd.Open := false;
+                                        #ControlCmd.Close := false;
+                                        #ControlCmd.SetPosition := false;
+                                        
+                                        IF NOT #Pu2.Basic.Stop THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_OPEN:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.Open := true;
+                                        #ControlCmd.Close := false;
+                                        #ControlCmd.SetPosition := false;
+                                        
+                                        IF #Pu2.Basic.Stop OR #Pu2.Close THEN
+                                            #_cmd := #STOP;
+                                        // при 2-х точечном управлении    
+                                        ELSIF NOT #Pu2.Open AND #Settings.Control.TypeInputCmd = #"2POINT" THEN
+                                            #_cmd := #STOP;
+                                        // при 3-х точечном управлении
+                                        ELSIF NOT #Pu2.Open AND #Settings.Control.TypeInputCmd = #"3POINT" THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #MOVE_TO_CLOSE:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.Open := false;
+                                        #ControlCmd.Close := true;
+                                        #ControlCmd.SetPosition := false;
+                                        
+                                        IF #Pu2.Basic.Stop OR #Pu2.Open THEN
+                                            #_cmd := #STOP;
+                                        // при 2-х точечном управлении    
+                                        ELSIF NOT #Pu2.Close AND #Settings.Control.TypeInputCmd = #"2POINT" THEN
+                                            #_cmd := #STOP;
+                                        // при 3-х точечном управлении
+                                        ELSIF NOT #Pu2.Close AND #Settings.Control.TypeInputCmd = #"3POINT" THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                END_CASE;
+                                
+                            #PLACE_DISPATCHER:
+                                ;
+                        END_CASE;
+                    END_REGION
+                    
+                #MODE_AUTO, #MODE_SEMIAUTO:
+                    #ControlJog.Open := false;
+                    #ControlJog.Close := false;
+                    
+                    #ControlCmd := #AutoCmd;
+                    
+                    CASE #Group.Place OF
+                        #PLACE_PU1:
+                            IF #_pu1MoveToOpen_P.Q THEN
+                                #OperatorCommand.Open := true;
+                            ELSIF NOT #Pu1.Open THEN
+                                #OperatorCommand.Open := false;
+                            END_IF;
+                            IF #_pu1MoveToClose_P.Q THEN
+                                #OperatorCommand.Close := true;
+                            ELSIF NOT #Pu1.Close THEN
+                                #OperatorCommand.Close := false;
+                            END_IF;
+                            IF #Pu1.Basic.Stop THEN
+                                #OperatorCommand.Basic.Stop := true;
+                                #OperatorCommand.Open := false;
+                                #OperatorCommand.Close := false;
+                            ELSE
+                                #ControlCmd.Basic.Stop := false;
+                            END_IF;
+                        #PLACE_PU2:
+                            ;
+                        #PLACE_DISPATCHER:
+                            ;
+                    END_CASE;
+            END_CASE;
+        END_IF;
+        
+        REGION #Hmi
+            #HmiMode.Mode := #Group.Mode;
+            #HmiMode.Place := #Group.Place;
+            
+            // Содержание слова управления с Hmi (аналогично с Dispatcher)
+            // #Hmi.Control.FromHMI.%X0 - команда "Двигаться в позицию OPEN"
+            // #Hmi.Control.FromHMI.%X1 - команда "СТОП" 
+            // #Hmi.Control.FromHMI.%X2 - команда "Двигаться в позицию CLOSE"
+            // #Hmi.Control.FromHMI.%X3 - команда "Двигаться в позицию POSITION"
+            // 
+            // #Hmi.Control.FromHMI.%X15 - сброс аварий с HMI
+            
+            #_resetFault_P(CLK := #HmiCommand.FromHMI.%X15 OR #HmiCommand.FromDispatcher.%X15);
+            IF (#_resetFault_P.Q AND NOT #Group.ControlKey) THEN
+                #Notice(Name := #Name,
+                        Text := wstring#'Команда сброса аварий отклонена. Включите ключ-бирку');
+            ELSIF #_resetFault_P.Q THEN
+                #Notice(Name := #Name,
+                        Text := WSTRING#'Сброс аварий');
+            END_IF;
+            #ControlCmd.Basic.ResetFault := #Group.ResetFault OR ((#HmiCommand.FromHMI.%X15 OR #HmiCommand.FromDispatcher.%X15) AND #Group.ControlKey);
+            
+            #HmiCommand.FromHMI :=
+            #HmiCommand.FromDispatcher :=
+            0;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

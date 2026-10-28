@@ -1,0 +1,70 @@
+﻿{
+    S7_BlockNumber := "10601";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "ControlKey"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Key : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Active : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _name : WString;
+    END_VAR
+    VAR CONSTANT
+        ST_INITIAL : Int := 0;
+        ST_TURNED_OFF : Int := 1;
+        ST_TURNED_ON : Int := 2;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        CASE #_sm OF
+            #ST_INITIAL:
+                IF NOT #Key THEN
+                    #_sm := #ST_TURNED_OFF;
+                END_IF;
+                
+            #ST_TURNED_OFF:
+                IF #Key THEN
+                    #_sm := #ST_TURNED_ON;
+                    #_event(Name := #_name,
+                            Text := wstring#'Ключ-бирка включена');
+                END_IF;
+                
+            #ST_TURNED_ON:
+                IF NOT #Key THEN
+                    #_sm := #ST_TURNED_OFF;
+                    #_event(Name := #_name,
+                            Text := wstring#'Ключ-бирка отключена');
+                END_IF;
+        END_CASE;
+        
+        #Active := #_sm = #ST_TURNED_ON;
+    END_NETWORK
+END_FUNCTION_BLOCK

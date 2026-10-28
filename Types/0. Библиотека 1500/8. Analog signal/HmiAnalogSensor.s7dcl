@@ -1,0 +1,10 @@
+﻿TYPE
+    HmiAnalogSensor : STRUCT
+        "Name" : WString;
+        Value : Real;
+        State : Int;
+        Status : Word;
+        Settings : Word;
+        Control : Word;
+    END_STRUCT;
+END_TYPE

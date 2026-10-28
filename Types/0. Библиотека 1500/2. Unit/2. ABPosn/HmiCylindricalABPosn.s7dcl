@@ -1,0 +1,8 @@
+﻿TYPE
+    HmiCylindricalABPosn : STRUCT
+        "Name" : WString;
+        Mode : _.HmiMode;
+        Command : _.HmiCommand;
+        Unit : _.HmiCylindricalABPosnUnit;
+    END_STRUCT;
+END_TYPE

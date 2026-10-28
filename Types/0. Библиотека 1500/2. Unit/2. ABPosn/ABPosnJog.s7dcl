@@ -1,0 +1,8 @@
+﻿TYPE
+    ABPosnJog : STRUCT
+        { S7_MLC := "MLC_4gR" }
+        MoveToA : Bool;
+        { S7_MLC := "MLC_32j" }
+        MoveToB : Bool;
+    END_STRUCT;
+END_TYPE

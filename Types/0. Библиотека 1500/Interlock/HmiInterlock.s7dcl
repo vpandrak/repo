@@ -1,0 +1,8 @@
+﻿TYPE
+    HmiInterlock : STRUCT
+        { S7_MLC := "MLC_qd" }
+        Input : Word;
+        { S7_MLC := "MLC_4tF" }
+        Mask : Word;
+    END_STRUCT;
+END_TYPE

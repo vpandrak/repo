@@ -1,0 +1,25 @@
+﻿TYPE
+    GroupSettings : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4nu";
+            S7_Visibility := "Hidden := External"
+        }
+        "Name" : WString[30] := WSTRING#'Не задано';
+        { S7_MLC := "MLC_3aA" }
+        EventOn : Bool := true;
+        HornEnable : Bool;
+        HornTime : Time := T#3s;
+        StartUpDelayTime : Time;
+        ShutDownDelayTime : Time;
+        StartFBTime : Time := T#30s;
+        StopFBTime : Time := T#30s;
+        RestartEnableTime : Time;
+        QuickStopMaxTime : Time := T#3s;
+        StopAutomatic_NotReadyOperationAUnits : Bool;
+        StopAutomatic_FaultAUnits : Bool;
+        GATE_UB : Int := 5;
+        UNIT_UB : Int := 31;
+        AUTOMATIC_UB : Int := 31;
+    END_STRUCT;
+END_TYPE

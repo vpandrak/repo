@@ -1,0 +1,90 @@
+﻿TYPE
+    AI_Status : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        AlarmIncLZ : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4Vp";
+            S7_Visibility := "Hidden := External"
+        }
+        AlarmInc : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_xS";
+            S7_Visibility := "Hidden := External"
+        }
+        WarningInc : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Yu";
+            S7_Visibility := "Hidden := External"
+        }
+        OK : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        HH_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        H_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        L_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LL_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4dV";
+            S7_Visibility := "Hidden := External"
+        }
+        LZ_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4MR";
+            S7_Visibility := "Hidden := External"
+        }
+        SimulationActivated : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_zE";
+            S7_Visibility := "Hidden := External"
+        }
+        SmoothingActivated : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        MeasuringTypeIsNormal : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "12" : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "13" : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "14" : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "15" : Bool;
+    END_STRUCT;
+END_TYPE

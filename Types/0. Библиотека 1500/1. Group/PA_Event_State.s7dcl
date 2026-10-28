@@ -1,0 +1,108 @@
+﻿{
+    S7_BlockNumber := "10103";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PA_Event_State"
+    VAR_IN_OUT
+        "Name" : WString;
+        State : _.BasicState;
+        Notice : _.PA_Notice;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        EventOn : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachineWithOutHistory;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Event : _.PA_Event;
+    END_VAR
+    VAR CONSTANT
+        ST_INITIAL : Int := 0;
+        ST_STOPPED : Int := 1;
+        ST_STARTUP : Int := 2;
+        ST_RUNNING : Int := 3;
+        ST_SHUTDOWN : Int := 4;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        CASE #_sm.State OF
+            #ST_INITIAL: // Состояние при запуске контроллера. Из него нет перехода в ОСТАНОВЛЕН
+                IF #State.Startup THEN
+                    #_sm.ChangeStateTo := #ST_STARTUP;
+                ELSIF #State.Running THEN
+                    #_sm.ChangeStateTo := #ST_RUNNING;
+                ELSIF #State.Shutdown THEN
+                    #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                END_IF;
+                
+            #ST_STOPPED, #ST_RUNNING, #ST_SHUTDOWN, #ST_STARTUP:
+                IF #State.Startup THEN
+                    #_sm.ChangeStateTo := #ST_STARTUP;
+                ELSIF #State.Running THEN
+                    #_sm.ChangeStateTo := #ST_RUNNING;
+                ELSIF #State.Shutdown THEN
+                    #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                ELSIF #State.Stopped THEN
+                    #_sm.ChangeStateTo := #ST_STOPPED;
+                END_IF;
+                
+        END_CASE;
+        #_sm();
+        CASE #_sm.State OF
+            #ST_INITIAL:
+                ;
+                
+            #ST_STOPPED:
+                IF #_sm.StateChanged THEN
+                    #Notice(Name := #Name,
+                            Text := wstring#'Автоматика остановлена');
+                    IF #EventOn THEN
+                        #Event(Name := #Name,
+                               Text := wstring#'Автоматика остановлена');
+                    END_IF;
+                END_IF;
+                
+            #ST_STARTUP:
+                IF #_sm.StateChanged THEN
+                    #Notice(Name := #Name,
+                            Text := wstring#'Запуск автоматики');
+                    IF #EventOn THEN
+                        #Event(Name := #Name,
+                               Text := wstring#'Запуск автоматики');
+                    END_IF;
+                END_IF;
+                
+            #ST_RUNNING:
+                IF #_sm.StateChanged THEN
+                    #Notice(Name := #Name,
+                            Text := wstring#'Автоматика запущена');
+                    IF #EventOn THEN
+                        #Event(Name := #Name,
+                               Text := wstring#'Автоматика запущена');
+                    END_IF;
+                END_IF;
+                
+            #ST_SHUTDOWN:
+                IF #_sm.StateChanged THEN
+                    #Notice(Name := #Name,
+                            Text := wstring#'Останов автоматики');
+                    IF #EventOn THEN
+                        #Event(Name := #Name,
+                               Text := wstring#'Останов автоматики');
+                    END_IF;
+                END_IF;
+        END_CASE;
+    END_NETWORK
+END_FUNCTION_BLOCK

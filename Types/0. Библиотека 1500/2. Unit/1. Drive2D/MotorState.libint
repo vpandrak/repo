@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: MotorState.s7dcl
+    Hash: v9nYsRo66nrNpPGPupIsDMJ2rOzHXDTulmAYZGgkgoU=
+  - FileName: MotorState.s7res
+    Hash: bkqRlTI4VQ779Plai6AcSAjwEGoKdHUlUZwDI2S/Fww=
+LibraryMetaFileHash: eQIQDjhhmDjsms4dBzNAARngCKNAOhf3chnqGUf5C5Q=
+LibraryVersion:
+  Guid: 31864134-3e3a-4d56-9487-e46c143781bf
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14

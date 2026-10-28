@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: PA_Fault_TON.s7dcl
+    Hash: qstEeM/TFI2azAevbwEjJQcv00asRU6PMKyE1ZQgWTI=
+  - FileName: PA_Fault_TON.s7res
+    Hash: 83oCQoHNkedLtJ7l2hMq6SNM2Ng8FHuSut1XKW7gNJg=
+LibraryMetaFileHash: LpZqDZbzBg8RoNm/0LpQy80Ks9x3O++PoB0CKgiyPbk=
+LibraryVersion:
+  Guid: 3feef0eb-a2fc-4b8c-a5b9-8698cef07f73
+  DependsOn:
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1

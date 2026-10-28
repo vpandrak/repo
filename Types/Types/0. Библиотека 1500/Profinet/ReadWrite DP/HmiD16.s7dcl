@@ -1,0 +1,14 @@
+﻿TYPE
+    HmiD16 : STRUCT
+        { S7_MLC := "MLC_3cN" }
+        ActualState : Word;
+        { S7_MLC := "MLC_52E" }
+        ForceInvert : Word;
+        { S7_MLC := "MLC_4Ct" }
+        ForceTrue : Word;
+        { S7_MLC := "MLC_gn" }
+        ForceFalse : Word;
+        { S7_MLC := "MLC_3a9" }
+        ModifiedState : Word;
+    END_STRUCT;
+END_TYPE

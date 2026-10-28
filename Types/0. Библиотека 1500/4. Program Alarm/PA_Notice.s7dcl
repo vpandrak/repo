@@ -1,0 +1,119 @@
+﻿{
+    S7_BlockNumber := "10404";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PA_Notice"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4Nw";
+            S7_Visibility := "Hidden := External"
+        }
+        Text : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_rR";
+            S7_Visibility := "Hidden := External"
+        }
+        Read : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4Yd";
+            S7_Visibility := "Hidden := External"
+        }
+        Empty : Bool := true;
+    END_VAR
+    VAR_IN_OUT
+        { S7_MLC := "MLC_XL" }
+        "Name" : WString;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Notice : Array[0..#NOTICE_POOL_UB] of WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _top : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _nextFree : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lastText : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _currentText : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lastCall : Time;
+    END_VAR
+    VAR_TEMP
+        "i" : Int;
+    END_VAR
+    VAR CONSTANT
+        NOTICE_POOL_UB : Int := 10;
+        FLOOD_FILTER : Time := T#1s500ms;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        //Если функция была вызвана, то добавляем в стек аварию. Размер стека определяет UPPER_BOUND
+        //функция PA_NoticeShow вызывается в каждом цикле и показывает сообщения из стека. 
+        //Функция PA_NoticeShow вызывает функцию PA_Notice с параметром Read := True.
+        
+        IF NOT #Read THEN //Добавляем сообщение в стек
+            //Если имя не задано, то показываем только текст
+            IF #Name <> wstring#'' THEN
+                #_currentText := CONCAT(IN1 := CONCAT_WSTRING(IN1 := #Name, IN2 := WSTRING#'. '), IN2 := #Text);
+            ELSE
+                #_currentText := #Text;
+            END_IF;
+            //Фильтруем флуд. (повторяющиеся сообщения при нажатии одной и той же кнопки, например)
+            IF (#_currentText <> #_lastText)
+                OR (TIME_TCK() - #_lastCall) > #FLOOD_FILTER
+            THEN
+                #_lastCall := TIME_TCK();
+                #_lastText := #_currentText;
+                
+                #_top := #_nextFree;
+                #Notice[#_top] := #_currentText;
+                #_nextFree := #_nextFree + 1;
+                
+                //Если стек переполнен, то затираем старое сообщение и освобождаем место
+                IF #_nextFree > #NOTICE_POOL_UB THEN
+                    FOR #i := 0 TO #NOTICE_POOL_UB - 1 DO
+                        #Notice[#i] := #Notice[#i + 1];
+                    END_FOR;
+                    #_top := #NOTICE_POOL_UB - 1;
+                    #_nextFree := #NOTICE_POOL_UB;
+                END_IF;
+            END_IF;
+            
+        ELSE //Считываем сообщение из стека
+            IF NOT #Empty THEN
+                FOR #i := 0 TO #_nextFree - 1 DO
+                    #Notice[#i] := #Notice[#i + 1];
+                END_FOR;
+                #_nextFree := #_nextFree - 1;
+            END_IF;
+            #Read := false;
+        END_IF;
+        #Empty := #_nextFree = 0;
+    END_NETWORK
+END_FUNCTION_BLOCK

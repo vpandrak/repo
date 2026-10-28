@@ -1,0 +1,12 @@
+﻿TYPE
+    HmiOnOffUnit : STRUCT
+        "Name" : WString[70];
+        Mode : _.HmiMode;
+        Command : _.HmiCommand;
+        State : _.HmiState;
+        InterlockRunning : _.HmiInterlock;
+        ProtectGeneral : _.HmiProtect;
+        ReadyToRun : _.BitDescription;
+        Fault : _.BitDescription;
+    END_STRUCT;
+END_TYPE

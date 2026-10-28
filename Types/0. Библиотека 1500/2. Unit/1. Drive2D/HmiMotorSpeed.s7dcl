@@ -1,0 +1,9 @@
+﻿TYPE
+    HmiMotorSpeed : STRUCT
+        SPManual : Real;
+        SPAuto : Real;
+        Out : Real;
+        { S7_MLC := "MLC_4Du" }
+        Actual : Real;
+    END_STRUCT;
+END_TYPE

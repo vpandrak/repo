@@ -1,0 +1,21 @@
+﻿MultiLingualTexts:
+  - id: MLC_472
+    ru-RU: слово состояния
+  - id: MLC_4Pv
+    ru-RU: слово управления
+  - id: MLC_4pq
+    ru-RU: уставка скорости
+  - id: MLC_qN
+    ru-RU: актуальная скорость
+  - id: MLC_w4
+    ru-RU: положение
+  - id: MLC_vz
+    ru-RU: ток
+  - id: MLC_4RS
+    ru-RU: активная можность
+  - id: MLC_sF
+    ru-RU: код предупреждения
+  - id: MLC_3vS
+    ru-RU: код ошибки
+  - id: MLC_4k5
+    ru-RU: состояние входов

@@ -1,0 +1,15 @@
+﻿DocumentHash:
+  - FileName: HmiMotorizedABPosn.s7dcl
+    Hash: 4E4Wrl/Nt9GX8Ztiix0eoY45IP6oivrNY74jnmBYU7c=
+LibraryMetaFileHash: 7qPbaJ1rrGvPFIfPDrOTfDCJQ9fOvTogAVpRgE+uwFw=
+LibraryVersion:
+  Guid: 7f9e1d22-c55a-4bea-b699-c5a16607f86c
+  DependsOn:
+    - TypeName: HmiMotor
+      VersionNumber: 0.0.1
+    - TypeName: HmiMotorizedABPosnUnit
+      VersionNumber: 0.0.2
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1

@@ -1,0 +1,85 @@
+﻿{
+    S7_BlockNumber := "10602";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "ResetAlarmTestLamp"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        BtnReset : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Reset : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        TestLamp : Bool;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        Notice : _.PA_Notice;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachineWithOutHistory;
+    END_VAR
+    VAR CONSTANT
+        ST_INITIAL : Int := 0;
+        ST_PRESSED : Int := 1;
+        ST_RESETING : Int := 2;
+        ST_TESTLAMP : Int := 3;
+        { S7_MLC := "MLC_3J4" }
+        TEST_LAMP_PRESS_TIME : Time := T#3s;
+        RESET_PULSE : Time := T#1s;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        // Кнопка - нажали - сброс аварий, удержали - тест ламп
+        CASE #_sm.State OF
+            #ST_INITIAL:
+                IF #BtnReset THEN
+                    #_sm.ChangeStateTo := #ST_PRESSED;
+                END_IF;
+            #ST_PRESSED:
+                IF NOT #BtnReset THEN
+                    #_sm.ChangeStateTo := #ST_RESETING;
+                ELSIF #_sm.StateTime >= #TEST_LAMP_PRESS_TIME THEN
+                    #Notice(Name := #Name, Text := wstring#'Тест ламп');
+                    #_sm.ChangeStateTo := #ST_TESTLAMP;
+                END_IF;
+            #ST_RESETING:
+                IF #_sm.StateTime > #RESET_PULSE THEN
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                END_IF;
+            #ST_TESTLAMP:
+                IF NOT #BtnReset THEN
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                END_IF;
+        END_CASE;
+        #_sm();
+        
+        #Reset :=
+        #TestLamp :=
+        false;
+        CASE #_sm.State OF
+            #ST_RESETING:
+                #Reset := true;
+            #ST_TESTLAMP:
+                #TestLamp := true;
+        END_CASE;
+        
+    END_NETWORK
+END_FUNCTION_BLOCK

@@ -1,0 +1,17 @@
+﻿DocumentHash:
+  - FileName: _ex_SiemensG120.s7dcl
+    Hash: O1YFayeoJ8KYi/il7nyWETqs1DQeUh89lVQHyxFIE8M=
+  - FileName: _ex_SiemensG120.s7res
+    Hash: X1sSYwfptGIpsxjRWgoNMsHlr3mKjJPjr/XH6tsLhAI=
+LibraryMetaFileHash: AXimHSNPeWFGmtFc6DYCW/3xjlFVEudlMTZKOyTUiT0=
+LibraryVersion:
+  Guid: feab4917-59a2-41b8-a811-c0ec335d9b49
+  DependsOn:
+    - TypeName: MotorState
+      VersionNumber: 0.0.1
+    - TypeName: MotorCmd
+      VersionNumber: 0.0.1
+    - TypeName: PZD_PM_G120
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1

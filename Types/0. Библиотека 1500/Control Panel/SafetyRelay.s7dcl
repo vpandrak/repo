@@ -1,0 +1,183 @@
+﻿{
+    S7_BlockNumber := "10604";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "SafetyRelay"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "Name" : WString := WSTRING#'Аварийное реле';
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Tripped : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        EStop : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.BasicState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Reset : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Ok : Bool;
+    END_VAR
+    VAR_IN_OUT
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+    END_VAR
+    VAR
+        Hmi : _.HmiSafetyRelay;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3WS";
+            S7_Visibility := "Hidden := External"
+        }
+        _initialReset : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_sr_tripped : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _w_sr_resetReq : _.PA_Warning;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _name : _.UnitFullName;
+    END_VAR
+    VAR CONSTANT
+        { S7_MLC := "MLC_4HX" }
+        ST_INITIAL : Int := 0;
+        ST_RESETTING : Int := 1;
+        ST_RESET_FAULTY : Int := 2;
+        ST_TRIPPED : Int := 3;
+        ST_OK : Int := 4;
+        PULSE_TIME : Time := T#300ms;
+        RESETING_TIME : Time := T#2s;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        #_name(Group := #Group,
+               Name := #Name,
+               HmiName := #Name);
+        
+        REGION Аварийное реле
+            CASE #_sm.State OF
+                #ST_INITIAL:
+                    IF NOT #Tripped THEN
+                        #_sm.ChangeStateTo := #ST_OK;
+                    ELSIF #Group.ResetFault THEN
+                        IF NOT #EStop THEN
+                            #_sm.ChangeStateTo := #ST_RESETTING;
+                        ELSE
+                            #_sm.ChangeStateTo := #ST_RESET_FAULTY;
+                            #Notice(Name := #_name.Full,
+                                    Text := WString#'Необходимо отжать кнопки аварийного останова');
+                        END_IF;
+                    END_IF;
+                    
+                #ST_RESETTING:
+                    IF #_sm.StateTime > #RESETING_TIME THEN
+                        IF NOT #Tripped THEN
+                            #_sm.ChangeStateTo := #ST_OK;
+                        ELSE
+                            #Notice(Name := #_name.Full,
+                                    Text := WString#'Сброс не удался. Проверьте состояние аварийных кнопок');
+                            #_event(Name := #_name.Full,
+                                    Text := WString#'Сброс не удался. Проверьте состояние аварийных кнопок');
+                            #_sm.ChangeStateTo := #ST_RESET_FAULTY;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_OK:
+                    IF #Tripped THEN
+                        #_sm.ChangeStateTo := #ST_TRIPPED;
+                    END_IF;
+                    
+                #ST_RESET_FAULTY:
+                    IF NOT #Group.ResetFault THEN
+                        #_sm.ChangeStateTo := #ST_TRIPPED;
+                    END_IF;
+                    
+                #ST_TRIPPED:
+                    IF #Group.ResetFault THEN
+                        IF NOT #EStop THEN
+                            #_sm.ChangeStateTo := #ST_RESETTING;
+                        ELSE
+                            #_sm.ChangeStateTo := #ST_RESET_FAULTY;
+                            #Notice(Name := #_name.Full,
+                                    Text := WString#'Необходимо отжать кнопки аварийного останова');
+                        END_IF;
+                    END_IF;
+            END_CASE;
+            #_sm();
+            #Reset := false;
+            #Ok := false;
+            #Hmi.Active := false;
+            #Hmi.ResetRequired := false;
+            
+            CASE #_sm.State OF
+                #ST_INITIAL:
+                    #Hmi.ResetRequired := true;
+                    
+                #ST_RESETTING:
+                    IF (#_sm.StateTime <= #PULSE_TIME) THEN
+                        #Reset := true;
+                    END_IF;
+                #ST_OK:
+                    #Ok := true;
+                    #Hmi.Active := true;
+            END_CASE;
+        END_REGION
+        
+        REGION Аварийное реле сработало
+            #_f_sr_tripped(Name := #_name.Full,
+                           Text := WString#'Сработало',
+                           SET := #_sm.State = #ST_TRIPPED OR #_sm.State = #ST_RESET_FAULTY,
+                           RESET := #_sm.State = #ST_OK
+            );
+            #Hmi.Tripped := #_f_sr_tripped.State.Active;
+            #_w_sr_resetReq(Name := #_name.Full,
+                            Text := wstring#'Требуется сброс аварийного реле',
+                            SET := #_sm.State = #ST_INITIAL);
+        END_REGION
+        
+        REGION Состояние
+            #State.Fault := #_f_sr_tripped.State.Active;
+            #State.Warning := #_w_sr_resetReq.State.Active;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

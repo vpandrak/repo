@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: ValveCmd.s7dcl
+    Hash: PLk0Z7HmN60fngAglyRtIboP8LVvw33c+7LSbL35G00=
+  - FileName: ValveCmd.s7res
+    Hash: lvlV3skbXiAuu9KOyBrxz1bNnYs/AZfcM5PozvtA3JI=
+LibraryMetaFileHash: czCAoqLjOmsilduh4ZKeeg5/TEPXg0P7rBF5KnvlhTs=
+LibraryVersion:
+  Guid: fda50871-8a8d-435e-9acf-890985e25859
+  DependsOn:
+    - TypeName: BasicCmd
+      VersionNumber: 0.0.2

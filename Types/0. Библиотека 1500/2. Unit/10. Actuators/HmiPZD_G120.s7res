@@ -1,0 +1,17 @@
+﻿MultiLingualTexts:
+  - id: MLC_WH
+    ru-RU: слово состояния
+  - id: MLC_3rL
+    ru-RU: слово управления
+  - id: MLC_47i
+    ru-RU: уставка скорости
+  - id: MLC_4Fj
+    ru-RU: актуальная скорость
+  - id: MLC_3Aa
+    ru-RU: ток
+  - id: MLC_3p5
+    ru-RU: код предупреждения
+  - id: MLC_4UU
+    ru-RU: код ошибки
+  - id: MLC_SM
+    ru-RU: состояние входов

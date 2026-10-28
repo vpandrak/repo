@@ -1,0 +1,21 @@
+﻿DocumentHash:
+  - FileName: AnalogInput.s7dcl
+    Hash: o7eH+iaHe33HnEPCrB24uS2MysbCmxYlC0l1Av7VS4Q=
+  - FileName: AnalogInput.s7res
+    Hash: RdwixY/32nFsOTOuk+2BShPg0I/1RPeR4PIAuxGs/9s=
+LibraryMetaFileHash: v+OXTjwmGQLBuv+Yblnh18SvbMKmG5srfLe22mJe4is=
+LibraryVersion:
+  Guid: 6aa80ecf-9aed-435f-b34a-5b85cb5816fd
+  DependsOn:
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: HmiAnalogSensor
+      VersionNumber: 0.0.2
+    - TypeName: HmiAnalogSensorSettings
+      VersionNumber: 0.0.2
+    - TypeName: AI_Settings
+      VersionNumber: 0.0.1
+    - TypeName: AI_Status
+      VersionNumber: 0.0.1
+    - TypeName: AI_Limits
+      VersionNumber: 0.0.1

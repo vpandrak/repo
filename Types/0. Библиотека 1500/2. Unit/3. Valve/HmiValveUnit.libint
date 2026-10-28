@@ -1,0 +1,17 @@
+﻿DocumentHash:
+  - FileName: HmiValveUnit.s7dcl
+    Hash: gxfxov3kYUkuLk7E2ngpWaPnctk1NnbDjuu/nO7QRUw=
+LibraryMetaFileHash: 0W/HWCFxEbbLxtoCj8FAGiPELyMaOz4BVh1W6S3ZyNc=
+LibraryVersion:
+  Guid: 379abdd0-b203-4702-bf8a-9e53f3ea4f0e
+  DependsOn:
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: HmiCommandValve
+      VersionNumber: 0.0.1
+    - TypeName: HmiValve
+      VersionNumber: 0.0.1
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1

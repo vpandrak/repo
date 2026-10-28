@@ -1,0 +1,9 @@
+﻿TYPE
+    HmiMotorizedABPosn : STRUCT
+        "Name" : WString;
+        Mode : _.HmiMode;
+        Command : _.HmiCommand;
+        Unit : _.HmiMotorizedABPosnUnit;
+        Actuator : _.HmiMotor;
+    END_STRUCT;
+END_TYPE

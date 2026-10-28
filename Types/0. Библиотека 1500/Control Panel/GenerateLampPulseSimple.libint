@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: GenerateLampPulseSimple.s7dcl
+    Hash: 0uV49jEllAiLiJrl7GZ/JQFUfsWNuKC+omaFrj3lPLY=
+LibraryMetaFileHash: d9WwK3UnLpwYjcJuYrejIa7xU4neq0xdAUekBqmtD1Y=
+LibraryVersion:
+  Guid: 8a5ad095-a53e-4b56-a862-955f84925313
+  DependsOn:
+    - TypeName: LampPulse
+      VersionNumber: 0.0.1

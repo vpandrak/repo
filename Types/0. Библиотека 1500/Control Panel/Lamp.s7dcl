@@ -1,0 +1,47 @@
+﻿{
+    S7_BlockNumber := "10611";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "Lamp"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Control : _.LampCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        TestLamp : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        TurnLamp : Bool;
+    END_VAR
+    VAR_IN_OUT
+        Pulse : _.LampPulse;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        IF #Control.Cont OR #TestLamp THEN
+            #TurnLamp := true;
+        ELSIF #Control.Blink THEN
+            #TurnLamp := #Pulse.Blink;
+        ELSIF #Control.Fast THEN
+            #TurnLamp := #Pulse.Fast;
+        ELSIF #Control.Medium THEN
+            #TurnLamp := #Pulse.Medium;
+        ELSIF #Control.Slow THEN
+            #TurnLamp := #Pulse.Slow;
+        ELSE
+            #TurnLamp := false;
+        END_IF;
+    END_NETWORK
+END_FUNCTION_BLOCK

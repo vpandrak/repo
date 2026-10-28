@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: Drive2DInterface.s7dcl
+    Hash: awjjxIJmT5nso3Ud8xX4nsGUTGOt/PFrjau5pHrZ9Xs=
+LibraryMetaFileHash: ZAYlYqm0EXFOdd8pPCSNBL/kpWxdQIoN/qNn8RVafP0=
+LibraryVersion:
+  Guid: a32572b2-1da7-4d45-9425-957a44855437
+  DependsOn:
+    - TypeName: MotorState
+      VersionNumber: 0.0.1
+    - TypeName: MotorCmd
+      VersionNumber: 0.0.1

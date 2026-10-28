@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: ABPosnSim.s7dcl
+    Hash: dsQacnd6HQn0VkXqbr63oObOybtWK6IFmX/AapUZRZo=
+LibraryMetaFileHash: /d4Ziq9+jrt0PqOE1wr3nzNmR133I/Q0WpEDAG7IOVs=
+LibraryVersion:
+  Guid: 4b968c5e-b2e8-421d-b48e-7d19b2232dd0
+  DependsOn:
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1

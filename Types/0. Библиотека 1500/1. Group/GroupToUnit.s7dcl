@@ -1,0 +1,69 @@
+﻿TYPE
+    GroupToUnit : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_wa";
+            S7_Visibility := "Hidden := External"
+        }
+        "Name" : WString[30];
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3KU";
+            S7_Visibility := "Hidden := External"
+        }
+        Mode : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3Q5";
+            S7_Visibility := "Hidden := External"
+        }
+        Place : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_56F";
+            S7_Visibility := "Hidden := External"
+        }
+        QuickStop : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Zn";
+            S7_Visibility := "Hidden := External"
+        }
+        ResetFault : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4zN";
+            S7_Visibility := "Hidden := External"
+        }
+        TestLamp : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4mZ";
+            S7_Visibility := "Hidden := External"
+        }
+        SafetyOk : Bool := true;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Yx";
+            S7_Visibility := "Hidden := External"
+        }
+        SafetyRequestPause : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3W8";
+            S7_Visibility := "Hidden := External"
+        }
+        ControlKey : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_54p";
+            S7_Visibility := "Hidden := External"
+        }
+        Horn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        HLPulses : _.LampPulse;
+    END_STRUCT;
+END_TYPE

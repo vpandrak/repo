@@ -1,0 +1,8 @@
+﻿TYPE
+    HmiCommand : STRUCT
+        { S7_MLC := "MLC_4rB" }
+        FromHMI : Word;
+        { S7_MLC := "MLC_4p7" }
+        FromDispatcher : Word;
+    END_STRUCT;
+END_TYPE

@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: OnOffInterface.s7dcl
+    Hash: pk0bbJLTeXuikoJ6axZAtdLmNv4JBVBtD3HARAHwW0o=
+LibraryMetaFileHash: B7EVCLwIrY7yNplsNz0VzEHqneymbKQfCCpu2tCAPyI=
+LibraryVersion:
+  Guid: 6d13305b-2516-487b-932c-46d6452f098d
+  DependsOn:
+    - TypeName: OnOffState
+      VersionNumber: 0.0.1
+    - TypeName: OnOffCmd
+      VersionNumber: 0.0.1

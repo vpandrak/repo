@@ -1,0 +1,61 @@
+﻿TYPE
+    MotorState : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Basic : _.BasicState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3y7";
+            S7_Visibility := "Hidden := External"
+        }
+        ReadyToRun1D : _.BitDescription := (
+            Active := true
+        );
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4nu";
+            S7_Visibility := "Hidden := External"
+        }
+        ReadyToRun2D : _.BitDescription := (
+            Active := true
+        );
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_57V";
+            S7_Visibility := "Hidden := External"
+        }
+        Fault : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3AC";
+            S7_Visibility := "Hidden := External"
+        }
+        ActualSpeed : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_XV";
+            S7_Visibility := "Hidden := External"
+        }
+        Running1D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_43c";
+            S7_Visibility := "Hidden := External"
+        }
+        Running2D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4e7";
+            S7_Visibility := "Hidden := External"
+        }
+        Startup1D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4zj";
+            S7_Visibility := "Hidden := External"
+        }
+        Startup2D : Bool;
+    END_STRUCT;
+END_TYPE

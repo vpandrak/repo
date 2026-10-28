@@ -1,0 +1,9 @@
+﻿TYPE
+    OnOffJog : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Start : Bool;
+    END_STRUCT;
+END_TYPE

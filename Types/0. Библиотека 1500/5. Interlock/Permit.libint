@@ -1,0 +1,15 @@
+﻿DocumentHash:
+  - FileName: Permit.s7dcl
+    Hash: srLfTRd+I0bNRJnOtaOMnUT9LxYyD0oSwdQK5ka3j/A=
+  - FileName: Permit.s7res
+    Hash: 1OrA7y9qMUq+4rFstfmlfCpY4sixgND+frsKcndRAxE=
+LibraryMetaFileHash: cBRPWWwc6HAK+rXHM+nGPc0QQjrbXxE7ggUys4g19bk=
+LibraryVersion:
+  Guid: 021348e0-4884-45c2-b7ef-6391d27cad04
+  DependsOn:
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1

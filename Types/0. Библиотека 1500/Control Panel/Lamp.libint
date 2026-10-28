@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: Lamp.s7dcl
+    Hash: Q6KUHWu+VM6MkEFwHqBA5cgXy7C1BUD2DnBez9cBCek=
+LibraryMetaFileHash: PvRLvTiNWoBjKAFtauSw2x+8wUnR3fQys6+U1ZB//sw=
+LibraryVersion:
+  Guid: 9810f095-a3b3-48c1-a6bf-4930fc375ceb
+  DependsOn:
+    - TypeName: LampCommand
+      VersionNumber: 0.0.1
+    - TypeName: LampPulse
+      VersionNumber: 0.0.1

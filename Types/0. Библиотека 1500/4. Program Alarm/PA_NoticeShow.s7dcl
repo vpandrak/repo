@@ -1,0 +1,158 @@
+﻿{
+    S7_BlockNumber := "10405";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PA_NoticeShow"
+    VAR_IN_OUT
+        Notice : _.PA_Notice;
+    END_VAR
+    VAR
+        Hmi : STRUCT
+            Acknowledge : Bool;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        PA_Notices : Array[0..#NOTICE_STRING_AMOUNT] of Program_Alarm;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        NoticeSig : Array[0..#NOTICE_STRING_AMOUNT] of Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        NoticeText : Array[0..#NOTICE_STRING_AMOUNT] of WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _nextFreeString : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        AckNotices : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Command : UInt;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Error : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Status : Word;
+        END_STRUCT;
+    END_VAR
+    VAR_TEMP
+        "i" : Int;
+        tmp : WString;
+    END_VAR
+    VAR CONSTANT
+        { S7_MLC := "MLC_4Ag" }
+        NOTICE_STRING_AMOUNT : Int := 2;
+        CALL_INTERVAL_TO_CLEAR : Time := T#5s;
+        SHOW_MIN_TIME : Time := T#2s;
+        ST_IDDLE : Int := 0;
+        ST_SHOWING_MSG : Int := 1;
+        ST_ADD_NEW_MSG : Int := 2;
+        ST_CLEAR_MESSAGES : Int := 3;
+        EXECUTE_ACK : UInt := 1;
+        NO_EXECUTE_ACK : UInt := 0;
+        ACK_DONE : UInt := 16#7001;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        CASE #_sm.State OF
+            #ST_IDDLE:
+                //Перед показам сообщения, квитируем предыдущие. (отчистим экран)
+                IF NOT #Notice.Empty OR #Hmi.Acknowledge
+                THEN
+                    #_sm.ChangeStateTo := #ST_CLEAR_MESSAGES;
+                END_IF;
+                
+                
+            #ST_SHOWING_MSG:
+                //Когда приходит новое сообщение, добавляем его к существующим. 
+                //Если новых сообщей не было некоторое время, то возвращаемся в ожидание
+                //Для того, чтобы потом отчистить экран
+                IF #_sm.StateTime > #CALL_INTERVAL_TO_CLEAR THEN
+                    #_sm.ChangeStateTo := #ST_CLEAR_MESSAGES;
+                ELSIF #Hmi.Acknowledge THEN
+                    #_sm.ChangeStateTo := #ST_CLEAR_MESSAGES;
+                ELSE
+                    //Показываем сообщения. 
+                    IF NOT #Notice.Empty THEN
+                        IF #_nextFreeString <= #NOTICE_STRING_AMOUNT THEN
+                            #_sm.ChangeStateTo := #ST_ADD_NEW_MSG;
+                        ELSE
+                            //Если экран переполнился, то сначала очистим. Но дадим сообщению 
+                            //Повисеть хотя бы некоторое время
+                            IF #_sm.StateTime > #SHOW_MIN_TIME THEN
+                                #_sm.ChangeStateTo := #ST_CLEAR_MESSAGES;
+                            END_IF;
+                        END_IF;
+                    END_IF;
+                END_IF;
+                
+            #ST_ADD_NEW_MSG:
+                #NoticeText[#_nextFreeString] := #Notice.Notice[0];
+                #NoticeSig[#_nextFreeString] := true;
+                #Notice(Name := #tmp,
+                        Read := true);
+                #_nextFreeString := #_nextFreeString + 1;
+                #_sm.ChangeStateTo := #ST_SHOWING_MSG;
+                
+            #ST_CLEAR_MESSAGES:
+                IF #_sm.StateTime > T#300ms
+                    //Ack_Alarm - асинхронная функция но почему-то после выполнения не возвращает статус
+                    //поэтому просто подождем некоторое время. Дадим ей выполнится.
+                THEN
+                    #_nextFreeString := 0;
+                    IF NOT #Notice.Empty THEN
+                        #_sm.ChangeStateTo := #ST_ADD_NEW_MSG;
+                    ELSE
+                        #_sm.ChangeStateTo := #ST_IDDLE;
+                    END_IF;
+                END_IF;
+        END_CASE;
+        #_sm();
+        #AckNotices.Command := #NO_EXECUTE_ACK;
+        CASE #_sm.State OF
+            #ST_CLEAR_MESSAGES:
+                #Hmi.Acknowledge := false;
+                IF #_sm.StateChanged THEN
+                    FOR #i := 0 TO #NOTICE_STRING_AMOUNT DO
+                        #NoticeSig[#i] := false;
+                    END_FOR;
+                END_IF;
+                #AckNotices.Command := #EXECUTE_ACK;
+        END_CASE;
+        
+        //Показать аварии
+        FOR #i := 0 TO #NOTICE_STRING_AMOUNT DO
+            #PA_Notices[#i](SIG := #NoticeSig[#i],
+                            SD_1 := #NoticeText[#i]);
+        END_FOR;
+        
+        Ack_Alarms(MODE := #AckNotices.Command,
+                   ERROR => #AckNotices.Error,
+                   STATUS => #AckNotices.Status);
+    END_NETWORK
+END_FUNCTION_BLOCK

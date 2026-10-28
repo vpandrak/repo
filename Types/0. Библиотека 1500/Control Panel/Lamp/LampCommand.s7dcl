@@ -1,0 +1,9 @@
+﻿TYPE
+    LampCommand : STRUCT
+        Cont : Bool;
+        Fast : Bool;
+        Slow : Bool;
+        Medium : Bool;
+        Blink : Bool;
+    END_STRUCT;
+END_TYPE

@@ -1,0 +1,178 @@
+﻿{
+    S7_BlockComment := "MLC_RT";
+    S7_BlockNumber := "10607";
+    S7_Optimized := "TRUE";
+    S7_PreferredLanguage := "LAD";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "ToAuto_and_StartAutomatic"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        BtnToStartAuto : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        BtnToStopAuto : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ToManual : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ToAuto : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        StartAutomatic : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        StopAutomatic : Bool;
+    END_VAR
+    VAR_IN_OUT
+        Notice : _.PA_Notice;
+        Group : _.GroupToUnit;
+        GroupState : _.BasicState;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachine;
+    END_VAR
+    VAR CONSTANT
+        ST_INITIAL : Int := 0;
+        ST_PRESSED_START : Int := 1;
+        ST_PRESSED_STOP : Int := 2;
+        ST_TO_AUTO : Int := 3;
+        ST_TO_MANUAL : Int := 4;
+        ST_STARTAUTOMATIC : Int := 5;
+        ST_STOPAUTOMATIC : Int := 6;
+        STARTSTOPAUTOMATIC_TIME : Time := T#3S;
+        TO_MODE_PULSE : Time := T#1s;
+    END_VAR
+
+    {
+        S7_Language := "SCL";
+        S7_NetworkTitle := "MLC_53B"
+    }
+    NETWORK
+        CASE #_sm.State OF
+            #ST_INITIAL:
+                IF #BtnToStopAuto THEN
+                    #_sm.ChangeStateTo := #ST_PRESSED_STOP;
+                ELSIF #BtnToStartAuto AND #GroupState.ReadyOperation THEN
+                    #_sm.ChangeStateTo := #ST_PRESSED_START;
+                END_IF;
+                
+            #ST_PRESSED_START:
+                IF NOT #BtnToStartAuto OR NOT #GroupState.ReadyOperation OR #BtnToStopAuto THEN
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                    
+                ELSIF #Group.Mode <> "MODE_AUTO"
+                      AND #_sm.StateTime >= #STARTSTOPAUTOMATIC_TIME
+                THEN
+                    #_sm.ChangeStateTo := #ST_TO_AUTO;
+                    
+                ELSIF #Group.Mode = "MODE_AUTO" AND NOT #GroupState.Running
+                      AND #_sm.StateTime >= #STARTSTOPAUTOMATIC_TIME
+                THEN
+                    #Notice(Name := #Group.Name,
+                            Text := wstring#'Нажата кнопка "Старт автоматики"');
+                    #_sm.ChangeStateTo := #ST_STARTAUTOMATIC;
+        
+                END_IF;
+                
+            #ST_PRESSED_STOP:
+                IF NOT #BtnToStopAuto THEN
+                #_sm.ChangeStateTo := #ST_INITIAL;
+                    
+                ELSIF #Group.Mode = "MODE_AUTO" AND NOT #GroupState.Stopped THEN
+                    #Notice(Name := #Group.Name,
+                            Text := wstring#'Нажата кнопка "Стоп автоматики"');
+                    #_sm.ChangeStateTo := #ST_STOPAUTOMATIC;
+                    
+                ELSIF #Group.Mode = "MODE_AUTO" AND #GroupState.Stopped THEN
+                    #_sm.ChangeStateTo := #ST_TO_MANUAL;
+                    
+                ELSE
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                END_IF;
+                
+            #ST_TO_AUTO:
+                IF NOT #BtnToStartAuto OR NOT #GroupState.ReadyOperation OR #BtnToStopAuto
+                THEN
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                
+                ELSIF #Group.Mode <> "MODE_AUTO" AND #_sm.StateTime > #TO_MODE_PULSE
+                THEN
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                    
+                ELSIF #Group.Mode = "MODE_AUTO"
+                THEN
+                    #Notice(Name := #Group.Name,
+                            Text := wstring#'Нажата кнопка "Старт автоматики"');
+                    #_sm.ChangeStateTo := #ST_STARTAUTOMATIC;
+                END_IF;
+                
+            #ST_STARTAUTOMATIC:
+                IF (NOT #GroupState.ReadyOperation OR #BtnToStopAuto) AND #GroupState.Stopped THEN
+                    #_sm.ChangeStateTo := #ST_TO_MANUAL;
+                    
+                ELSIF (NOT #GroupState.ReadyOperation OR #BtnToStopAuto) AND NOT #GroupState.Stopped THEN
+                    #_sm.ChangeStateTo := #ST_STOPAUTOMATIC;
+                    
+                ELSIF #Group.Mode = "MODE_AUTO" AND #GroupState.Running
+                THEN
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                    
+                ELSIF #_sm.StateTime >= #STARTSTOPAUTOMATIC_TIME
+                THEN
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                END_IF;
+                
+            #ST_TO_MANUAL:
+                IF #Group.Mode = "MODE_MANUAL" OR #_sm.StateTime > #TO_MODE_PULSE THEN
+                    #_sm.ChangeStateTo := #ST_INITIAL;
+                END_IF;
+                
+            #ST_STOPAUTOMATIC:
+                IF #Group.Mode = "MODE_AUTO" AND #GroupState.Stopped
+                THEN
+                    #_sm.ChangeStateTo := #ST_TO_MANUAL;
+                ELSIF #_sm.StateTime >= #STARTSTOPAUTOMATIC_TIME
+                THEN
+                    #_sm.ChangeStateTo := #ST_TO_MANUAL;
+                END_IF;
+        END_CASE;
+        #_sm();
+        
+        #ToManual :=
+        #ToAuto :=
+        #StartAutomatic :=
+        #StopAutomatic :=
+        false;
+        CASE #_sm.State OF
+            #ST_TO_MANUAL:
+                #ToManual := true;
+            #ST_TO_AUTO:
+                #ToAuto := true;
+            #ST_STARTAUTOMATIC:
+                #StartAutomatic := true;
+            #ST_STOPAUTOMATIC:
+                #StopAutomatic := true;
+        END_CASE;
+    END_NETWORK
+END_FUNCTION_BLOCK

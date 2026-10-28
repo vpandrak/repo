@@ -1,0 +1,33 @@
+﻿DocumentHash:
+  - FileName: MotorControl.s7dcl
+    Hash: qMpDzpkBWg/GkTB85ddqvK3Tvxql4aqTIyMGgOaj29w=
+  - FileName: MotorControl.s7res
+    Hash: PM3ZpJBEpVkiQWETgQyfgYam4D4hG0kDCOHaTzatLf8=
+LibraryMetaFileHash: baRekMRPcOHeVEeYDn0pwSiakhy+BihTEvIY5sXfl30=
+LibraryVersion:
+  Guid: f58c0c89-510d-4724-872d-6d72ab19ce39
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
+    - TypeName: MotorJog
+      VersionNumber: 0.0.1
+    - TypeName: MotorSettings
+      VersionNumber: 0.0.1
+    - TypeName: LampCommand
+      VersionNumber: 0.0.1
+    - TypeName: MotorState
+      VersionNumber: 0.0.1
+    - TypeName: HmiMotor
+      VersionNumber: 0.0.1
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: MotorCmd
+      VersionNumber: 0.0.1

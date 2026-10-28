@@ -1,0 +1,13 @@
+﻿TYPE
+    ValveCmd : STRUCT
+        Basic : _.BasicCmd;
+        { S7_MLC := "MLC_3FS" }
+        Open : Bool;
+        { S7_MLC := "MLC_3Bw" }
+        Close : Bool;
+        { S7_MLC := "MLC_3Gy" }
+        SetPosition : Bool;
+        { S7_MLC := "MLC_42R" }
+        Position : Real;
+    END_STRUCT;
+END_TYPE

@@ -1,0 +1,14 @@
+﻿TYPE
+    AI_Delays : STRUCT
+        { S7_MLC := "MLC_nH" }
+        HH_Del : Time;
+        { S7_MLC := "MLC_3Bu" }
+        H_Del : Time;
+        { S7_MLC := "MLC_4E5" }
+        L_Del : Time;
+        { S7_MLC := "MLC_3Nq" }
+        LL_Del : Time;
+        { S7_MLC := "MLC_4ME" }
+        LZ_Del : Time;
+    END_STRUCT;
+END_TYPE

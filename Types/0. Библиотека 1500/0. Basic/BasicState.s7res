@@ -1,0 +1,25 @@
+﻿MultiLingualTexts:
+  - id: MLC_Pw
+    ru-RU: Общая готовность
+  - id: MLC_3jD
+    ru-RU: Авария
+  - id: MLC_4a7
+    ru-RU: Предупреждение
+  - id: MLC_3RA
+    ru-RU: Запускается
+  - id: MLC_3RE
+    ru-RU: В работе
+  - id: MLC_3Vk
+    ru-RU: Остановлен
+  - id: MLC_3gh
+    ru-RU: Останавливается
+  - id: MLC_4Uz
+    ru-RU: Быстрый останов
+  - id: MLC_4Wx
+    ru-RU: В безопасном состоянии по запросу калиток
+  - id: MLC_ku
+    ru-RU: 1-выведен из контроля
+  - id: MLC_4pF
+    ru-RU: 1-локальное управление
+  - id: MLC_dr
+    ru-RU: 1-индивидуальное управление (manual or local)

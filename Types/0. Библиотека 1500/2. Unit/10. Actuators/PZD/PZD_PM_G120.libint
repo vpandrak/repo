@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: PZD_PM_G120.s7dcl
+    Hash: oiXPiS7pxmp4UPbzHweS0f73+zbwovI3KmJumxO5WFM=
+  - FileName: PZD_PM_G120.s7res
+    Hash: U8RSWBNMh94lH0yf4mzr/bqfdiXPaq810ahoWmQkD1c=
+LibraryMetaFileHash: uBjaB1kG3AG7VSloTdtI35tUAb2yzm2kE7M+5VeVYAg=
+LibraryVersion:
+  Guid: 90fe1d37-179d-4513-8781-b0417dc681b7
+  DependsOn:
+    - TypeName: HmiPZD_G120
+      VersionNumber: 0.0.1

@@ -1,0 +1,15 @@
+﻿MultiLingualTexts:
+  - id: MLC_4wb
+    en-US: ACP value from AI module
+  - id: MLC_4Fw
+    en-US: Technological value
+  - id: MLC_Mw
+    en-US: 0 - as an ACP val, as a Normal val
+  - id: MLC_p2
+    en-US: Acknowledge alarms
+  - id: MLC_4JJ
+    en-US: result
+  - id: MLC_32K
+    en-US: out of measuring range
+  - id: MLC_4Lf
+    en-US: St = (Xt - St-1)/(1+2*Smoothing)

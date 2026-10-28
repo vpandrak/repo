@@ -1,0 +1,96 @@
+﻿{
+    S7_BlockNumber := "10402";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PA_Fault"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4XU";
+            S7_Visibility := "Hidden := External"
+        }
+        Text : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_59M";
+            S7_Visibility := "Hidden := External"
+        }
+        SET : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_42e";
+            S7_Visibility := "Hidden := External"
+        }
+        RESET : Bool := true;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3EM";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.BitDescription;
+    END_VAR
+    VAR_IN_OUT
+        { S7_MLC := "MLC_3Ea" }
+        "Name" : WString;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _message : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _faultSet : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _fault : Program_Alarm;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_set : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_reset : R_TRIG;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        #_r_set(CLK:= #SET);
+        #_r_reset(CLK:= NOT #SET AND #RESET);
+        
+        IF #SET THEN
+            IF NOT #_faultSet THEN
+                IF #Name <> wstring#'' THEN
+                    #_message := CONCAT_WSTRING(IN1 := CONCAT_WSTRING(IN1 := #Name, IN2 := WSTRING#'. '), IN2 := #Text);
+                ELSE
+                    #_message := #Text;
+                END_IF;
+                #State.Reason := #Text;
+            END_IF;
+            #_faultSet := true;
+        ELSIF #RESET THEN
+            IF #_faultSet THEN
+                #State.Reason := WSTRING#'';
+            END_IF;
+            #_faultSet := false;
+        END_IF;
+        IF #_r_set.Q OR #_r_reset.Q THEN
+            #_fault(SIG := #_faultSet,
+                    SD_1 := #_message);
+        END_IF;
+        #State.Active := #_faultSet;
+        #SET := false;
+    END_NETWORK
+END_FUNCTION_BLOCK

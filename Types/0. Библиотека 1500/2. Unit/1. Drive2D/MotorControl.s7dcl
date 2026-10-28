@@ -1,0 +1,749 @@
+﻿{
+    S7_BlockNumber := "10214";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "MotorControl"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Qf : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Permit1D : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Interlock1D : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Permit2D : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Interlock2D : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ProtectStart : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ProtectGeneral : _.BitDescription;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.MotorState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ActuatorCmd : _.MotorCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Horn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Lamp1D : _.LampCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Lamp2D : _.LampCommand;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        Hmi : _.HmiMotor;
+        Settings : _.MotorSettings;
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+        Cmd : _.MotorCmd;
+        Jog : _.MotorJog;
+        ActuatorState : _.MotorState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        EventOn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Program_Alarm_Off : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_fault : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_NoQf : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _readyJog : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _ready1D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _ready2D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _restartDelayActive : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _tryToStart : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _restartRemainingTime : Time;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _CmdStart1D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _CmdStart2D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _JogStart1D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _JogStart2D_P : R_TRIG;
+    END_VAR
+    VAR_TEMP
+        _resetFault : Bool;
+    END_VAR
+    VAR CONSTANT
+        { S7_MLC := "MLC_3wy" }
+        ST_STOPPED : Int := 0;
+        { S7_MLC := "MLC_33Q" }
+        ST_PRESTARTUP_HORN_1D : Int := 1;
+        { S7_MLC := "MLC_3nv" }
+        ST_STARTUP_DELAY_1D : Int := 2;
+        { S7_MLC := "MLC_3AL" }
+        ST_STARTUP_1D : Int := 3;
+        { S7_MLC := "MLC_p5" }
+        ST_RUNNING_1D : Int := 4;
+        { S7_MLC := "MLC_WE" }
+        ST_SHUTDOWN_DELAY_1D : Int := 5;
+        { S7_MLC := "MLC_Wd" }
+        ST_PRESTARTUP_HORN_2D : Int := 6;
+        { S7_MLC := "MLC_3uM" }
+        ST_STARTUP_DELAY_2D : Int := 7;
+        { S7_MLC := "MLC_4H6" }
+        ST_STARTUP_2D : Int := 8;
+        { S7_MLC := "MLC_3K6" }
+        ST_RUNNING_2D : Int := 9;
+        { S7_MLC := "MLC_4kc" }
+        ST_SHUTDOWN_DELAY_2D : Int := 10;
+        { S7_MLC := "MLC_3bN" }
+        ST_SHUTDOWN : Int := 11;
+        ST_JOGGING_1D : Int := 21;
+        ST_JOGGING_2D : Int := 22;
+        ST_QUICKSTOP : Int := 900;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        REGION Аварии
+            #_resetFault := #Cmd.Basic.ResetFault;
+            
+            // Аварийный останов    
+            IF (#_sm.State = #ST_RUNNING_1D OR #_sm.State = #ST_STARTUP_1D
+                OR #_sm.State = #ST_RUNNING_2D OR #_sm.State = #ST_STARTUP_2D)
+                AND #Cmd.Basic.QuickStop
+            THEN
+                #Hmi.State.Alarm.%X0 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := wstring#'Аварийный останов';
+                
+            // Сработала основная защита
+            ELSIF #ProtectGeneral.Active THEN
+                #Hmi.State.Alarm.%X1 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сработала основная защита:', IN2 := #ProtectGeneral.Reason);
+                    
+            // Сработала защита от запуска    
+            ELSIF #ProtectStart.Active AND #State.Basic.Stopped THEN
+                #Hmi.State.Alarm.%X2 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сработала защита от старта:', IN2 := #ProtectStart.Reason);
+                    
+            // Во время работы сработал автоматический выключатель
+            ELSIF (#_sm.State = #ST_STARTUP_1D OR #_sm.State = #ST_RUNNING_1D
+                OR #_sm.State = #ST_STARTUP_2D OR #_sm.State = #ST_RUNNING_2D)
+                AND NOT #Qf.Active
+            THEN
+                #Hmi.State.Alarm.%X3 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сработал авт. выключатель', IN2 := #Qf.Reason);
+                    
+            // Аварии запуска/остановки    
+            ELSIF #_sm.State = #ST_STARTUP_1D AND #_sm.StateTime > #Settings.StartFBTime THEN
+                #Hmi.State.Alarm.%X4 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Проверьте схему управления. Не удалось запустить ', IN2 := #Settings."1DName");
+                
+            ELSIF #_sm.State = #ST_STARTUP_2D AND #_sm.StateTime > #Settings.StartFBTime THEN
+                #Hmi.State.Alarm.%X5 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Проверьте схему управления. Не удалось запустить ', IN2 := #Settings."2DName");
+                
+            ELSIF (#_sm.State = #ST_SHUTDOWN AND #_sm.StateTime > #Settings.StopFBTime) THEN
+                #Hmi.State.Alarm.%X6 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := wstring#'Не удалось остановить. Проверьте схему управления';
+                
+            ELSIF (#_sm.State = #ST_RUNNING_1D AND NOT #ActuatorState.Running1D AND #_sm.StateTime > #Settings.StartFBTime)
+                OR (#_sm.State = #ST_RUNNING_2D AND NOT #ActuatorState.Running2D AND #_sm.StateTime > #Settings.StartFBTime)
+            THEN
+                #Hmi.State.Alarm.%X7 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := wstring#'Остановлен без команды. Проверьте схему управления';
+                
+            ELSIF #_sm.State = #ST_STOPPED AND (#ActuatorState.Running1D OR #ActuatorState.Running2D) AND #_sm.StateTime > #Settings.StopFBTime THEN
+                #Hmi.State.Alarm.%X8 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := wstring#'Запущен без команды. Проверьте схему управления';
+                
+            // Запущен в оба направления    
+            ELSIF #ActuatorState.Running1D AND #ActuatorState.Running2D THEN
+                #Hmi.State.Alarm.%X9 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := wstring#'Запущен в оба направления. Проверьте схему управления';
+                
+            // Авария ЧРП/блока управления
+            ELSIF #ActuatorState.Fault.Active THEN
+                #Hmi.State.Alarm.%X10 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := #ActuatorState.Fault.Reason;
+                
+            ELSE
+                #_f_fault.SET := false;
+            END_IF;
+            
+            // Формирование программных аварий
+            IF NOT #Program_Alarm_Off THEN
+                #_f_fault(Name := #Name,
+                          RESET := #_resetFault);
+            END_IF;
+            
+            // Не включен автоматический выключатель 
+            IF (NOT #Hmi.State.Alarm.%X3 AND NOT #Qf.Active) THEN
+                #Hmi.State.Alarm.%X11 := true;
+                #_f_NoQf.Text := CONCAT_WSTRING(IN1 := wstring#'Не включен авт. выключатель ', IN2 := #Qf.Reason);
+            ELSE 
+                #Hmi.State.Alarm.%X11 := false;
+            END_IF;
+            // Формирование программных аварий
+            IF NOT #Program_Alarm_Off THEN
+                #_f_NoQf(Name := #Name,
+                         SET := #Hmi.State.Alarm.%X11,
+                         RESET := #Qf.Active);
+            END_IF;
+            
+            // Сброс слова аварий
+            IF #_resetFault THEN
+                #Hmi.State.Alarm := 0;
+            END_IF;
+            
+            // Формирование статуса общей аварии механизма с описанием причины
+            IF #Hmi.State.Alarm.%X11 THEN
+                #State.Fault.Active := true;
+                #State.Fault.Reason := #_f_NoQf.Text;
+            ELSIF #Hmi.State.Alarm > 0 THEN
+                #State.Fault.Active := true;
+                #State.Fault.Reason := #_f_fault.Text;
+            ELSE
+                IF #State.Fault.Active THEN
+                    #State.Fault.Reason := wstring#'';
+                END_IF;
+                #State.Fault.Active := false;
+            END_IF;
+        END_REGION
+        
+        REGION Готовность
+            IF #Group.Mode = "MODE_DISABLE" THEN
+                #_readyJog := #_ready1D := #_ready2D := false;
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := wstring#'Выведен из работы';
+            ELSIF #Cmd.Basic.QuickStop THEN
+                #_readyJog := #_ready1D := #_ready2D := false;
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := WSTRING#'Активен быстрый останов';
+            ELSIF NOT #Group.SafetyOk THEN
+                #_readyJog := #_ready1D := #_ready2D := false;
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := wstring#'Открыты калитки безопасности';
+            ELSIF #ProtectGeneral.Active THEN
+                #_readyJog := #_ready1D := #_ready2D := false;
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := #ProtectGeneral.Reason;
+            ELSIF #ProtectStart.Active AND #State.Basic.Stopped THEN
+                #_readyJog := #_ready1D := #_ready2D := false;
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := #ProtectStart.Reason;
+            ELSIF NOT #ActuatorState.Basic.ReadyOperation THEN
+                #_readyJog := #_ready1D := #_ready2D := false;
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := #ActuatorState.ReadyToRun1D.Reason;
+            ELSE
+                // "Нулевая блокировка"
+                IF (#Jog.Start1D OR #Jog.Start2D) AND NOT #_readyJog THEN
+                    #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := WSTRING#'Нулевая блокировка (JOG)';
+                ELSE
+                    #_readyJog := TRUE;
+                    IF #State.Fault.Active THEN
+                        #_ready1D := #_ready2D := false;
+                        #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := #State.Fault.Reason;
+                    // Задержка повторного запуска    
+                    ELSIF #_restartDelayActive THEN
+                        #_ready1D := #_ready2D := false;
+                        #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := WSTRING#'Задержка повторного запуска';
+                    ELSE
+                        
+                        IF #Interlock1D.Active THEN
+                            #_ready1D := false;
+                            #State.ReadyToRun1D.Reason := #Interlock1D.Reason;
+                        ELSIF #Permit1D.Active AND #State.Basic.Stopped THEN
+                            #_ready1D := false;
+                            #State.ReadyToRun1D.Reason := #Permit1D.Reason;
+                        ELSE
+                            //"Нулевая блокировка"
+                            IF (#Cmd.Start1D AND NOT #_ready1D) THEN
+                                #State.ReadyToRun1D.Reason := CONCAT_WSTRING(IN1 := wstring#'Нулевая блокировка ', IN2 := #Settings."1DName");
+                            ELSE
+                                IF NOT #_ready1D THEN
+                                    #State.ReadyToRun1D.Reason := wstring#'';
+                                END_IF;
+                                #_ready1D := true;
+                            END_IF;
+                        END_IF;
+                        
+                        IF #Interlock2D.Active THEN
+                            #_ready2D := false;
+                            #State.ReadyToRun2D.Reason := #Interlock2D.Reason;
+                        ELSIF #Permit2D.Active AND #State.Basic.Stopped THEN
+                            #_ready2D := false;
+                            #State.ReadyToRun2D.Reason := #Permit2D.Reason;
+                        ELSE
+                            //"Нулевая блокировка"
+                            IF (#Cmd.Start2D AND NOT #_ready2D) THEN
+                                #State.ReadyToRun2D.Reason := CONCAT_WSTRING(IN1 := wstring#'Нулевая блокировка ', IN2 := #Settings."2DName");
+                            ELSE
+                                IF NOT #_ready2D THEN
+                                    #State.ReadyToRun2D.Reason := wstring#'';
+                                END_IF;
+                                #_ready2D := true;
+                            END_IF;
+                        END_IF;
+                    END_IF;
+                END_IF;
+            END_IF;
+            
+            IF NOT #Settings.Reversable THEN
+                #_ready2D := false;
+                #State.ReadyToRun2D.Active := false;
+                #State.ReadyToRun2D.Reason := wstring#'Механизм нереверсивный';
+            END_IF;
+            
+            REGION Фронты команд
+                #_CmdStart1D_P(CLK := #Cmd.Start1D);
+                #_CmdStart2D_P(CLK := #Cmd.Start2D);
+                
+                #_JogStart1D_P(CLK := #Jog.Start1D);
+                #_JogStart2D_P(CLK := #Jog.Start2D);
+            END_REGION
+            
+            REGION Если есть команды и нет готовности, формируем сообщение
+                IF #_CmdStart1D_P.Q AND NOT #_ready1D THEN
+                    #Notice(Name := #Name,
+                            Text := CONCAT_WSTRING(IN1 := wstring#'Команда отклонена. ', IN2 := #State.ReadyToRun1D.Reason));
+                END_IF;
+                IF #_CmdStart2D_P.Q AND NOT #_ready2D THEN
+                    #Notice(Name := #Name,
+                            Text := CONCAT_WSTRING(IN1 := wstring#'Команда отклонена. ', IN2 := #State.ReadyToRun2D.Reason));
+                END_IF;
+            END_REGION
+        END_REGION
+        
+        REGION Управление
+            CASE #_sm.State OF
+                #ST_STOPPED:  // Механизм остановлен
+                   REGION Задержка повторного запуска
+                        IF #_tryToStart THEN
+                            #_restartDelayActive := true;
+                            #_tryToStart := false;
+                        END_IF;
+                        IF #_sm.StateTime >= #Settings.#RestartEnableTime THEN
+                            #_restartDelayActive := false;
+                        END_IF;
+                        #_restartRemainingTime := #Settings.#RestartEnableTime - #_sm.StateTime;
+                    END_REGION
+                    
+                    IF #Jog.Start1D AND #_readyJog THEN
+                        #_sm.ChangeStateTo := #ST_JOGGING_1D;
+                    ELSIF #Jog.Start2D AND #_readyJog THEN
+                        #_sm.ChangeStateTo := #ST_JOGGING_2D;
+                    ELSIF #Cmd.Start1D AND #_ready1D THEN
+                        IF #Settings.HornEnable AND #State.Basic.Single THEN
+                            #_sm.ChangeStateTo := #ST_PRESTARTUP_HORN_1D;
+                        ELSE
+                            IF #Settings.StartUpDelayTime > T#0ms THEN
+                                #_sm.ChangeStateTo := #ST_STARTUP_DELAY_1D;
+                            ELSE
+                                #_sm.ChangeStateTo := #ST_STARTUP_1D;
+                            END_IF;
+                        END_IF;
+                    ELSIF #Cmd.Start2D AND #_ready2D THEN
+                        IF #Settings.HornEnable AND #State.Basic.Single THEN
+                            #_sm.ChangeStateTo := #ST_PRESTARTUP_HORN_2D;
+                        ELSE
+                            IF #Settings.StartUpDelayTime > T#0ms THEN
+                                #_sm.ChangeStateTo := #ST_STARTUP_DELAY_2D;
+                            ELSE
+                                #_sm.ChangeStateTo := #ST_STARTUP_2D;
+                            END_IF;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_PRESTARTUP_HORN_1D: // Предпусковая сигнализация 1D
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start1D AND #Settings."TypeCmd_2/3_Point") THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    ELSIF #_sm.StateTime > #Settings.#HornTime THEN
+                        IF #Settings.StartUpDelayTime > T#0ms THEN
+                            #_sm.ChangeStateTo := #ST_STARTUP_DELAY_1D;
+                        ELSE
+                            #_sm.ChangeStateTo := #ST_STARTUP_1D;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_STARTUP_DELAY_1D: // Задержка перед запуском 1D
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start1D AND #Settings."TypeCmd_2/3_Point") THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    ELSIF  #_sm.StateTime > #Settings.#StartUpDelayTime THEN
+                        #_sm.ChangeStateTo := #ST_STARTUP_1D;
+                    END_IF;
+                    
+                #ST_STARTUP_1D: // Механизм запускается 1D
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start1D AND #Settings."TypeCmd_2/3_Point") THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    ELSIF #ActuatorState.Running1D THEN
+                        #_sm.ChangeStateTo := #ST_RUNNING_1D;
+                    END_IF;
+                    
+                #ST_RUNNING_1D: // Механизм запущен 1D
+                    IF #_sm.StateChanged AND #EventOn THEN
+                        #_event(Name := #Name,
+                                Text := CONCAT_WSTRING(IN1 := wstring#'Запущен ', IN2 := #Settings."1DName"));
+                    END_IF;
+                    
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start1D AND #Settings."TypeCmd_2/3_Point") THEN
+                        IF #Settings.#ShutDownDelayTime > T#0ms THEN
+                            #_sm.ChangeStateTo := #ST_SHUTDOWN_DELAY_1D;
+                        ELSE
+                            #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_SHUTDOWN_DELAY_1D: // Задержка перед остановкой
+                    IF #_sm.StateTime > #Settings.#ShutDownDelayTime THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+                    
+                #ST_PRESTARTUP_HORN_2D: // Предпусковая сигнализация 2D
+                    IF #Cmd.Basic.Stop OR NOT #Cmd.Start2D THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    ELSIF #_sm.StateTime > #Settings.#HornTime THEN
+                        IF #Settings.StartUpDelayTime > T#0ms THEN
+                            #_sm.ChangeStateTo := #ST_STARTUP_DELAY_2D;
+                        ELSE
+                            #_sm.ChangeStateTo := #ST_STARTUP_2D;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_STARTUP_DELAY_2D: // Задержка перед запуском 2D
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start2D AND #Settings."TypeCmd_2/3_Point") THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    ELSIF #_sm.StateTime > #Settings.#StartUpDelayTime THEN
+                        #_sm.ChangeStateTo := #ST_STARTUP_2D;
+                    END_IF;
+                    
+                #ST_STARTUP_2D: // Механизм запускается 2D
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start2D AND #Settings."TypeCmd_2/3_Point") THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    ELSIF #ActuatorState.Running2D THEN
+                        #_sm.ChangeStateTo := #ST_RUNNING_2D;
+                    END_IF;
+                    
+                #ST_RUNNING_2D: // Механизм запущен 2D
+                    IF #_sm.StateChanged AND #EventOn THEN
+                        #_event(Name := #Name,
+                                Text := CONCAT_WSTRING(IN1 := wstring#'Запущен ', IN2 := #Settings."2DName"));
+                    END_IF;
+                    
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start2D AND #Settings."TypeCmd_2/3_Point") THEN
+                        IF #Settings.#ShutDownDelayTime > T#0ms THEN
+                            #_sm.ChangeStateTo := #ST_SHUTDOWN_DELAY_2D;
+                        ELSE
+                            #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_SHUTDOWN_DELAY_2D: // Задержка перед остановкой
+                    IF #_sm.StateTime > #Settings.#ShutDownDelayTime THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+                    
+                #ST_SHUTDOWN: // Механизм останавливается
+                    IF NOT #ActuatorState.Running1D AND NOT #ActuatorState.Running2D THEN
+                        IF #EventOn THEN
+                            #_event(Name := #Name,
+                                    Text := wstring#'Остановлен');
+                        END_IF;
+                        #_sm.ChangeStateTo := #ST_STOPPED;
+                    END_IF;
+                    
+                #ST_JOGGING_1D: // Принудительное включение 1D
+                    IF #_sm.StateChanged AND #EventOn THEN
+                        #_event(Name := #Name,
+                                Text := CONCAT_WSTRING(IN1 := wstring#'Принудительное включение ', IN2 := #Settings."1DName"));
+                    END_IF;
+                    IF #Cmd.Basic.Stop OR NOT #Jog.Start1D THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+                    
+                #ST_JOGGING_2D: // Принудительное включение 2D
+                    IF #_sm.StateChanged  AND #EventOn THEN
+                        #_event(Name := #Name,
+                                Text := CONCAT_WSTRING(IN1 := wstring#'Принудительное включение ', IN2 := #Settings."2DName"));
+                    END_IF;
+                    IF #Cmd.Basic.Stop OR NOT #Jog.Start2D THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+            END_CASE;
+            
+            // Автомат внештатных ситуаций
+            CASE #_sm.State OF
+                #ST_QUICKSTOP:
+                    IF #ActuatorState.Basic.Stopped
+                        AND NOT #Cmd.Basic.QuickStop
+                    THEN
+                        IF #EventOn THEN
+                            #_event(Name := #Name,
+                                    Text := wstring#'Остановлен аварийно');
+                        END_IF;
+                        #_sm.ChangeStateTo := #ST_STOPPED;
+                    END_IF;
+                    
+                #ST_PRESTARTUP_HORN_1D,  // Предпусковая сигнализация 1D
+                #ST_STARTUP_DELAY_1D:    // Задержка перед запуском 1D
+                    IF NOT #_ready1D THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+                    
+                #ST_STARTUP_1D,          // Механизм запускается 1D
+                #ST_RUNNING_1D,          // Механизм запущен 1D
+                #ST_SHUTDOWN_DELAY_1D:   // Задержка перед остановкой
+                    IF NOT #_ready1D THEN
+                        #_sm.ChangeStateTo := #ST_QUICKSTOP;
+                    END_IF;
+                    #_tryToStart := TRUE;
+                    
+                #ST_PRESTARTUP_HORN_2D,  // Предпусковая сигнализация 2D
+                #ST_STARTUP_DELAY_2D:    // Задержка перед запуском 2D
+                    IF NOT #_ready2D THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+                    
+                #ST_STARTUP_2D,          // Механизм запускается 2D
+                #ST_RUNNING_2D,          // Механизм запущен 2D    
+                #ST_SHUTDOWN_DELAY_2D:   // Задержка перед остановкой
+                    IF NOT #_ready2D THEN
+                        #_sm.ChangeStateTo := #ST_QUICKSTOP;
+                    END_IF;
+                    #_tryToStart := TRUE;
+                    
+                #ST_JOGGING_1D,      // Принудительное включение 1D
+                #ST_JOGGING_2D:      // Принудительное включение 2D
+                    IF NOT #_readyJog THEN
+                        #_sm.ChangeStateTo := #ST_QUICKSTOP;
+                    END_IF;
+            END_CASE;
+            #_sm();
+            
+            // Формирование команд
+            #Horn := FALSE;
+            #ActuatorCmd.Start1D := FALSE;
+            #ActuatorCmd.Start2D := FALSE;
+            #ActuatorCmd.Basic.Stop := FALSE;
+            #ActuatorCmd.Basic.QuickStop := FALSE;
+            #ActuatorCmd.Basic.ResetFault := #_resetFault;
+            CASE #_sm.State OF
+                #ST_PRESTARTUP_HORN_1D, #ST_PRESTARTUP_HORN_2D:
+                    #Horn := TRUE;
+                    
+                #ST_STARTUP_1D, #ST_RUNNING_1D, #ST_SHUTDOWN_DELAY_1D, #ST_JOGGING_1D:
+                    #ActuatorCmd.Start1D := TRUE;
+                    
+                #ST_STARTUP_2D, #ST_RUNNING_2D, #ST_SHUTDOWN_DELAY_2D, #ST_JOGGING_2D:
+                    #ActuatorCmd.Start2D := TRUE;
+                    
+                #ST_SHUTDOWN:
+                    #ActuatorCmd.Basic.Stop := TRUE;
+                    
+                #ST_QUICKSTOP:
+                    #ActuatorCmd.Basic.QuickStop := TRUE;
+            END_CASE;
+            
+            // Формирование задания скорости
+            CASE #_sm.State OF
+                #ST_STARTUP_1D, #ST_RUNNING_1D, #ST_SHUTDOWN_DELAY_1D, #ST_JOGGING_1D,
+                #ST_STARTUP_2D, #ST_RUNNING_2D, #ST_SHUTDOWN_DELAY_2D, #ST_JOGGING_2D:
+                    IF #Cmd.Fast THEN
+                        #ActuatorCmd.SetSpeed := true;
+                        IF #Cmd.Start2D AND #Settings.BipolarOutputRanges THEN
+                            #ActuatorCmd.Speed := -1 * #Settings.FastSpeed;
+                        ELSE
+                            #ActuatorCmd.Speed := #Settings.FastSpeed;
+                        END_IF;
+                    ELSIF #Cmd.SetSpeed THEN
+                        #ActuatorCmd.SetSpeed := true;
+                        #ActuatorCmd.Speed := #Cmd.Speed;
+                    ELSE
+                        #ActuatorCmd.SetSpeed := true;
+                        IF #Cmd.Start2D AND #Settings.BipolarOutputRanges THEN
+                            #ActuatorCmd.Speed := -1 * #Settings.SlowSpeed;
+                        ELSE
+                            #ActuatorCmd.Speed := #Settings.SlowSpeed;
+                        END_IF;
+                    END_IF;
+                ELSE
+                    #ActuatorCmd.SetSpeed := false;
+                    #ActuatorCmd.Speed := 0.0;
+            END_CASE;
+            
+            // Получение значения скорости от привода
+            #State.ActualSpeed := #ActuatorState.ActualSpeed;
+        END_REGION
+        
+        REGION Состояния для автоматики
+            #State.Basic.ReadyOperation := #_readyJog AND NOT #State.Fault.Active;
+            #State.ReadyToRun1D.Active := #_ready1D;
+            #State.ReadyToRun2D.Active := #_ready2D;
+            #State.Basic.Fault := #State.Fault.Active;
+            #State.Basic.Startup := #State.Startup1D OR #State.Startup2D;
+            #State.Basic.Running := #State.Running1D OR #State.Running2D;
+            #State.Basic.Shutdown := (#_sm.State = #ST_SHUTDOWN_DELAY_1D OR #_sm.State = #ST_SHUTDOWN_DELAY_2D OR #_sm.State = #ST_SHUTDOWN);
+            #State.Basic.Stopped := (#_sm.State = #ST_STOPPED);
+            #State.Basic.QuickStopping := (#_sm.State = #ST_QUICKSTOP);
+            
+            #State.#Running1D := (#_sm.State = #ST_RUNNING_1D);
+            #State.#Running2D := (#_sm.State = #ST_RUNNING_2D);
+            #State.Startup1D := (#_sm.State = #ST_PRESTARTUP_HORN_1D OR #_sm.State = #ST_STARTUP_DELAY_1D OR #_sm.State = #ST_STARTUP_1D);
+            #State.Startup2D := (#_sm.State = #ST_PRESTARTUP_HORN_2D OR #_sm.State = #ST_STARTUP_DELAY_2D OR #_sm.State = #ST_STARTUP_2D);
+        END_REGION
+        
+        REGION Hmi
+            #Hmi.State.Status.%X0 := #State.Basic.ReadyOperation;
+            #Hmi.State.Status.%X1 := #State.ReadyToRun1D.Active;
+            #Hmi.State.Status.%X2 := #State.ReadyToRun2D.Active;
+            #Hmi.State.Status.%X3 := #State.Basic.Fault;
+            #Hmi.State.Status.%X4 := #State.Basic.Stopped;
+            #Hmi.State.Status.%X5 := (#_sm.State = #ST_PRESTARTUP_HORN_1D);
+            #Hmi.State.Status.%X6 := (#_sm.State = #ST_STARTUP_DELAY_1D);
+            #Hmi.State.Status.%X7 := (#_sm.State = #ST_STARTUP_1D);
+            #Hmi.State.Status.%X8 := (#_sm.State = #ST_RUNNING_1D OR #_sm.State = #ST_JOGGING_1D);
+            #Hmi.State.Status.%X9 := (#_sm.State = #ST_SHUTDOWN_DELAY_1D);
+            #Hmi.State.Status.%X10 := (#_sm.State = #ST_PRESTARTUP_HORN_2D);
+            #Hmi.State.Status.%X11 := (#_sm.State = #ST_STARTUP_DELAY_2D);
+            #Hmi.State.Status.%X12 := (#_sm.State = #ST_STARTUP_2D);
+            #Hmi.State.Status.%X13 := (#_sm.State = #ST_RUNNING_2D OR #_sm.State = #ST_JOGGING_2D);
+            #Hmi.State.Status.%X14 := (#_sm.State = #ST_SHUTDOWN_DELAY_2D);
+            #Hmi.State.Status.%X15 := (#_sm.State = #ST_SHUTDOWN); 
+            
+            #Hmi.State.Feature1.%X0 := NOT (NOT #Permit1D.Active AND #State.Basic.Stopped);
+            #Hmi.State.Feature1.%X1 := #Interlock1D.Active;
+            #Hmi.State.Feature1.%X2 := NOT (NOT #Permit2D.Active AND #State.Basic.Stopped);
+            #Hmi.State.Feature1.%X3 := #Interlock2D.Active;
+            #Hmi.State.Feature1.%X4 := #ProtectStart.Active;
+            #Hmi.State.Feature1.%X5 := #ProtectGeneral.Active;
+            // #Hmi.State.Feature1.%X6 := FALSE; // "InterlockFC".MaskOn - 1D
+            // #Hmi.State.Feature1.%X7 := FALSE; // "InterlockFC".MaskOn - 2D
+            // #Hmi.State.Feature1.%X8 := FALSE; // "ProtectFC".MaskOn
+            #Hmi.State.Feature1.%X9 := FALSE;
+            #Hmi.State.Feature1.%X10 := FALSE;
+            #Hmi.State.Feature1.%X11 := FALSE;
+            #Hmi.State.Feature1.%X12 := FALSE;
+            #Hmi.State.Feature1.%X13 := FALSE;
+            #Hmi.State.Feature1.%X14 := FALSE;
+            #Hmi.State.Feature1.%X15 := FALSE;
+            
+            #Hmi.State.Feature2.%X0 := #_resetFault;
+            #Hmi.State.Feature2.%X1 := #Cmd.Basic.QuickStop;
+            #Hmi.State.Feature2.%X2 := #ActuatorCmd.Start1D;
+            #Hmi.State.Feature2.%X3 := #ActuatorCmd.Start2D;
+            #Hmi.State.Feature2.%X4 := #ActuatorState.Running1D;
+            #Hmi.State.Feature2.%X5 := #ActuatorState.Running2D;
+            #Hmi.State.Feature2.%X6 := #Qf.Active;
+            #Hmi.State.Feature2.%X7 := #Horn;
+            
+            #Hmi.State.Feature3 := #_sm.State;
+            
+            #Hmi.Speed.Actual := #State.ActualSpeed;
+        END_REGION
+        
+        REGION Лампы
+            #Lamp1D.Fast := #State.Startup1D;
+            #Lamp1D.Cont := #State.#Running1D OR (#_sm.State = #ST_JOGGING_1D);
+            
+            #Lamp2D.Fast := #State.Startup2D;
+            #Lamp2D.Cont := #State.#Running2D OR (#_sm.State = #ST_JOGGING_2D);
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

@@ -1,0 +1,6 @@
+﻿TYPE
+    ABPosnSensor : STRUCT
+        APosn : Bool;
+        BPosn : Bool;
+    END_STRUCT;
+END_TYPE

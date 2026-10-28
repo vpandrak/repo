@@ -1,0 +1,14 @@
+﻿TYPE
+    MotorJog : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Start1D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Start2D : Bool;
+    END_STRUCT;
+END_TYPE

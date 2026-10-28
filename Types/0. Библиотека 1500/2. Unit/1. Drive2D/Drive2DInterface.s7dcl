@@ -1,0 +1,19 @@
+﻿TYPE
+    Drive2DInterface : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.MotorState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Cmd : _.MotorCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OperatorCommand : _.MotorCmd;
+    END_STRUCT;
+END_TYPE

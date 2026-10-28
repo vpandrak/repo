@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: MotorizedABPosnSettings.s7dcl
+    Hash: QmTKf0+5BrFWM7nAK/96OMTL0QfYnxiJEpKtyxuP0BI=
+  - FileName: MotorizedABPosnSettings.s7res
+    Hash: fxqzF4pVe5/x8p2HzHVhASivCLYxn/joWrCnm3u1g3I=
+LibraryMetaFileHash: kvBr/ITq+cCxRnGpNRmeFLrAp7+2Ik8TvT9K7pJvG80=
+LibraryVersion:
+  Guid: 36f79da1-7b01-4eda-9323-0d3db9162134
+  DependsOn:
+    - TypeName: MotorSettings
+      VersionNumber: 0.0.1

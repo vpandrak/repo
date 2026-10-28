@@ -1,0 +1,41 @@
+﻿DocumentHash:
+  - FileName: MotorizedABPosnUnit.s7dcl
+    Hash: cCxO1W+RIbG0KvEDBl8yHL8KKC/NYLK3m6Wt8BVL3SI=
+  - FileName: MotorizedABPosnUnit.s7res
+    Hash: xrSKZodShvZ4SL9nehJ4W4tOmrHWuQ+MD/o06yTk+XY=
+LibraryMetaFileHash: J7LFIDFE1aMK14Qp+oRlhbgi5ZjmJW3WYbDrAgP7m1A=
+LibraryVersion:
+  Guid: 650aaf65-2a4c-4e89-b6d4-553a6ea451e8
+  DependsOn:
+    - TypeName: ABPosnInterface
+      VersionNumber: 0.0.1
+    - TypeName: MotorizedABPosnControl
+      VersionNumber: 0.0.1
+    - TypeName: HmiMotorizedABPosnUnit
+      VersionNumber: 0.0.2
+    - TypeName: ABPosnCommand
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: Lamp
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnSensor
+      VersionNumber: 0.0.1
+    - TypeName: UnitFullName
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnCmd
+      VersionNumber: 0.0.1
+    - TypeName: MotorizedABPosnSettings
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: _ex_DirectControl
+      VersionNumber: 0.0.1
+    - TypeName: MotorControl
+      VersionNumber: 0.0.1
+    - TypeName: InterlockFC
+      VersionNumber: 0.0.1
+    - TypeName: ProtectFC
+      VersionNumber: 0.0.1

@@ -1,0 +1,21 @@
+﻿TYPE
+    HmiPZD_G120 : STRUCT
+        { S7_MLC := "MLC_WH" }
+        StatusWord : Word;
+        { S7_MLC := "MLC_3rL" }
+        ControlWord : Word;
+        { S7_MLC := "MLC_47i" }
+        Setpoint : Real;
+        { S7_MLC := "MLC_4Fj" }
+        ActualSpeed : Real;
+        { S7_MLC := "MLC_3Aa" }
+        Current : Real;
+        ActivePower : Real;
+        { S7_MLC := "MLC_3p5" }
+        WarningCode : UInt;
+        { S7_MLC := "MLC_4UU" }
+        FaultCode : UInt;
+        { S7_MLC := "MLC_SM" }
+        DIState : Word;
+    END_STRUCT;
+END_TYPE

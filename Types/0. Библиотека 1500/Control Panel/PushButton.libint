@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: PushButton.s7dcl
+    Hash: pM494wDmvhHEcap38Lj0KREUJCGPf+bSdC2R0khxlLE=
+LibraryMetaFileHash: Usuuk4y1vt3RvKpUGjE7UHrbbwO0hzr7hWaFdrLaPf8=
+LibraryVersion:
+  Guid: 148ec865-331a-4de2-b17d-d280769f6edd
+  DependsOn:
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1

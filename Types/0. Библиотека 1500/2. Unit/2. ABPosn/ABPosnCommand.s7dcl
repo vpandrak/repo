@@ -1,0 +1,399 @@
+﻿{
+    S7_BlockNumber := "10320";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "ABPosnCommand"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OperatorCommand : _.ABPosnCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ControlCmd : _.ABPosnCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ControlJog : _.ABPosnJog;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        HmiMode : _.HmiMode;
+        HmiCommand : _.HmiCommand;
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+        Pu1 : _.ABPosnCmd;
+        Pu2 : _.ABPosnCmd;
+        AutoCmd : _.ABPosnCmd;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smMode : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1MoveToA_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1MoveToB_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1MoveToA_N : F_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1MoveToB_N : F_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu2MoveToA_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu2MoveToB_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _resetFault_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _cmd : Int;
+    END_VAR
+    VAR CONSTANT
+        MODE_DISABLE : Int := 0;
+        MODE_SERVICE : Int := 1;
+        MODE_MANUAL : Int := 2;
+        MODE_SEMIAUTO : Int := 4;
+        MODE_AUTO : Int := 8;
+        PLACE_PU1 : Int := 0;
+        PLACE_PU2 : Int := 1;
+        PLACE_DISPATCHER : Int := 2;
+        STOP : Int := 0;
+        MOVETOA : Int := 1;
+        MOVETOB : Int := 2;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        #_smMode(ChangeStateTo := #Group.Mode);
+        
+        REGION Фронты
+            #_pu1MoveToA_P(CLK := #Pu1.MoveToA);
+            #_pu1MoveToB_P(CLK := #Pu1.MoveToB);
+            #_pu1MoveToA_N(CLK := #Pu1.MoveToA);
+            #_pu1MoveToB_N(CLK := #Pu1.MoveToB);
+            
+            #_pu2MoveToA_P(CLK := #Pu2.MoveToA);
+            #_pu2MoveToB_P(CLK := #Pu2.MoveToB);
+        END_REGION
+        
+        REGION Если есть команды запуска одновременно в оба направления, формируем сообщение
+            IF (#Pu1.MoveToA AND #Pu1.MoveToB)
+                OR (#Pu2.MoveToA AND #Pu2.MoveToB)
+            THEN
+                #Notice(Text := WSTRING#'Предупреждение. Команды запуска в оба направления',
+                        Name := #Name);
+                #_event(Text := WSTRING#'Предупреждение. Команды запуска в оба направления',
+                        Name := #Name);
+            END_IF;
+        END_REGION
+        
+        // Инициализация выходных команд
+        #ControlCmd.Basic.QuickStop := false;
+        
+        IF #Group.QuickStop THEN
+            #ControlCmd.Basic.QuickStop := true;
+            #ControlJog.MoveToA := false;
+            #ControlJog.MoveToB := false;
+            #OperatorCommand.MoveToA := false;
+            #OperatorCommand.MoveToB := false;
+            #OperatorCommand.Basic.Stop := false;
+            #ControlCmd.MoveToA := false;
+            #ControlCmd.MoveToB := false;
+            #ControlCmd.Basic.Stop := false;
+            
+            REGION События на визуализацию
+                IF #_pu1MoveToA_P.Q OR #_pu1MoveToB_P.Q
+                    OR #_pu2MoveToA_P.Q OR #_pu2MoveToB_P.Q
+                THEN
+                    #Notice(Name := #Name,
+                            Text := wstring#'Команда отклонена. Активен аварийный останов');
+                END_IF;
+            END_REGION
+        ELSE
+            IF #_smMode.StateChanged THEN
+                // При смене режима на любой, кроме на автоматический, сбрасываем команды
+                IF #_smMode.State <> #MODE_AUTO THEN
+                    #ControlJog.MoveToA := false;
+                    #ControlJog.MoveToB := false;
+                    #OperatorCommand.MoveToA := false;
+                    #OperatorCommand.MoveToB := false;
+                    #ControlCmd.MoveToA := false;
+                    #ControlCmd.MoveToB := false;
+                    #_cmd := #STOP;
+                END_IF;
+                
+                // При смене режима на автоматический, первоначально сохраняем команды 
+                IF #_smMode.State = #MODE_AUTO THEN
+                    #AutoCmd := #ControlCmd;
+                END_IF;
+            END_IF;
+            
+            CASE #_smMode.State OF
+                #MODE_DISABLE:
+                    #ControlJog.MoveToA := false;
+                    #ControlJog.MoveToB := false;
+                    #OperatorCommand.MoveToA := false;
+                    #OperatorCommand.MoveToB := false;
+                    #OperatorCommand.Basic.Stop := false;
+                    #ControlCmd.MoveToA := false;
+                    #ControlCmd.MoveToB := false;
+                    #ControlCmd.Basic.Stop := true;
+                    #_cmd := #STOP;
+                    
+                    REGION События на визуализацию
+                        IF #_pu1MoveToA_P.Q OR #_pu1MoveToB_P.Q
+                            OR #_pu2MoveToA_P.Q OR #_pu2MoveToB_P.Q
+                        THEN
+                            #Notice(Text := wstring#'Команда отклонена т.к. механизм выведен из работы',
+                                    Name := #Name);
+                            #_event(Text := WSTRING#'Команда отклонена т.к. механизм выведен из работы',
+                                    Name := #Name);
+                        END_IF;
+                    END_REGION
+                    
+                #MODE_SERVICE:
+                    REGION Операции с пульта Jog'aми
+                        #OperatorCommand.MoveToA := false;
+                        #OperatorCommand.MoveToB := false;
+                        #OperatorCommand.Basic.Stop := false;
+                        #ControlCmd.MoveToA := false;
+                        #ControlCmd.MoveToB := false;
+                        #ControlCmd.Basic.Stop := false;
+                        
+                        CASE #Group.Place OF
+                            #PLACE_PU1:
+                                CASE #_cmd OF
+                                    #STOP:
+                                        #ControlJog.MoveToA := false;
+                                        #ControlJog.MoveToB := false;
+                                        
+                                        IF #Pu1.MoveToA THEN
+                                            #_cmd := #MOVETOA;
+                                        ELSIF #Pu1.MoveToB THEN
+                                            #_cmd := #MOVETOB;
+                                        END_IF;
+                                        
+                                    #MOVETOA:
+                                        #ControlJog.MoveToA := true;
+                                        #ControlJog.MoveToB := false;
+                                        
+                                        IF #Pu1.Basic.Stop OR NOT #Pu1.MoveToA THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #MOVETOB:
+                                        #ControlJog.MoveToA := false;
+                                        #ControlJog.MoveToB := true;
+                                        
+                                        IF #Pu1.Basic.Stop OR NOT #Pu1.MoveToB THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            #PLACE_PU2:
+                                CASE #_cmd OF
+                                    #STOP:
+                                        #ControlJog.MoveToA := false;
+                                        #ControlJog.MoveToB := false;
+                                        
+                                        IF #Pu2.MoveToA THEN
+                                            #_cmd := #MOVETOA;
+                                        ELSIF #Pu2.MoveToB THEN
+                                            #_cmd := #MOVETOB;
+                                        END_IF;
+                                        
+                                    #MOVETOA:
+                                        #ControlJog.MoveToA := true;
+                                        #ControlJog.MoveToB := false;
+                                        
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.MoveToA THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #MOVETOB:
+                                        #ControlJog.MoveToA := false;
+                                        #ControlJog.MoveToB := true;
+                                        
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.MoveToB THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            #PLACE_DISPATCHER:
+                                ;
+                        END_CASE;
+                    END_REGION
+                    
+                #MODE_MANUAL:
+                    REGION Операции с пульта или Hmi
+                        #ControlJog.MoveToA := false;
+                        #ControlJog.MoveToB := false;
+                        #OperatorCommand.MoveToA := false;
+                        #OperatorCommand.MoveToB := false;
+                        #OperatorCommand.Basic.Stop := false;
+                        
+                        CASE #Group.Place OF
+                            #PLACE_PU1:
+                                CASE #_cmd OF
+                                    #STOP:
+                                        #ControlCmd.Basic.Stop := true;
+                                        #ControlCmd.MoveToA := false;
+                                        #ControlCmd.MoveToB := false;
+                                        
+                                        IF #_pu1MoveToA_P.Q OR #HmiCommand.FromHMI.%X0 THEN
+                                            #_cmd := #MOVETOA;
+                                        ELSIF #_pu1MoveToB_P.Q OR #HmiCommand.FromHMI.%X2 THEN
+                                            #_cmd := #MOVETOB;
+                                        END_IF;
+                                        
+                                    #MOVETOA:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.MoveToA := true;
+                                        #ControlCmd.MoveToB := false;
+                                        
+                                        IF #Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1 OR #_pu1MoveToA_N.Q OR #_pu1MoveToB_P.Q OR #HmiCommand.FromHMI.%X2 THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #MOVETOB:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.MoveToA := false;
+                                        #ControlCmd.MoveToB := true;
+                                        
+                                        IF #Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1 OR #_pu1MoveToB_N.Q OR #_pu1MoveToA_P.Q OR #HmiCommand.FromHMI.%X0 THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            #PLACE_PU2:
+                                CASE #_cmd OF
+                                    #STOP:
+                                        #ControlCmd.Basic.Stop := true;
+                                        #ControlCmd.MoveToA := false;
+                                        #ControlCmd.MoveToB := false;
+                                        
+                                        IF #Pu2.MoveToA THEN
+                                            #_cmd := #MOVETOA;
+                                        ELSIF #Pu2.MoveToB THEN
+                                            #_cmd := #MOVETOB;
+                                        END_IF;
+                                        
+                                    #MOVETOA:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.MoveToA := true;
+                                        #ControlCmd.MoveToB := false;
+                                        
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.MoveToA THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #MOVETOB:
+                                        #ControlCmd.Basic.Stop := false;
+                                        #ControlCmd.MoveToA := false;
+                                        #ControlCmd.MoveToB := true;
+                                        
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.MoveToB THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            #PLACE_DISPATCHER:
+                                ;
+                        END_CASE;
+                    END_REGION
+                    
+                #MODE_AUTO, #MODE_SEMIAUTO:
+                    #ControlJog.MoveToA := false;
+                    #ControlJog.MoveToB := false;
+                    
+                    #ControlCmd := #AutoCmd;
+                    
+                    CASE #Group.Place OF
+                        #PLACE_PU1:
+                            IF #_pu1MoveToA_P.Q THEN
+                                #OperatorCommand.MoveToA := true;
+                            ELSIF NOT #Pu1.MoveToA THEN
+                                #OperatorCommand.MoveToA := false;
+                            END_IF;
+                            IF #_pu1MoveToB_P.Q THEN
+                                #OperatorCommand.MoveToB := true;
+                            ELSIF NOT #Pu1.MoveToB THEN
+                                #OperatorCommand.MoveToB := false;
+                            END_IF;
+                            IF #Pu1.Basic.Stop THEN
+                                #OperatorCommand.Basic.Stop := true;
+                                #OperatorCommand.MoveToA := false;
+                                #OperatorCommand.MoveToB := false;
+                            ELSE
+                                #ControlCmd.Basic.Stop := false;
+                            END_IF;
+                        #PLACE_PU2:
+                            ;
+                        #PLACE_DISPATCHER:
+                            ;
+                    END_CASE;
+            END_CASE;
+        END_IF;
+        
+        REGION #Hmi
+            #HmiMode.Mode := #Group.Mode;
+            #HmiMode.Place := #Group.Place;
+            
+            // Содержание слова управления с Hmi (аналогично с Dispatcher)
+            // #Hmi.Control.FromHMI.%X0 - команда "Двигаться в позицию А"
+            // #Hmi.Control.FromHMI.%X1 - команда "СТОП" 
+            // #Hmi.Control.FromHMI.%X2 - команда "Двигаться в позицию Б"
+            // #Hmi.Control.FromHMI.%X15 - сброс аварий с HMI
+            
+            #_resetFault_P(CLK := #HmiCommand.FromHMI.%X15 OR #HmiCommand.FromDispatcher.%X15);
+            IF (#_resetFault_P.Q AND NOT #Group.ControlKey) THEN
+                #Notice(Name := #Name,
+                        Text := wstring#'Команда сброса аварий отклонена. Включите ключ-бирку');
+            ELSIF #_resetFault_P.Q THEN
+                #Notice(Name := #Name,
+                        Text := WSTRING#'Сброс аварий');
+            END_IF;
+            #ControlCmd.Basic.ResetFault := #Group.ResetFault OR ((#HmiCommand.FromHMI.%X15 OR #HmiCommand.FromDispatcher.%X15) AND #Group.ControlKey);
+            
+            #HmiCommand.FromHMI :=
+            #HmiCommand.FromDispatcher :=
+            0;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

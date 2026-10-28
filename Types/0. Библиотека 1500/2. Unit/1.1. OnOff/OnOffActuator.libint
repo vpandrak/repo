@@ -1,0 +1,33 @@
+﻿DocumentHash:
+  - FileName: OnOffActuator.s7dcl
+    Hash: usqiHfZCuaMAI8qKiNF+I6l+rVSr53Cu9zDfFt6nimY=
+  - FileName: OnOffActuator.s7res
+    Hash: EHD67F9xauBHb79E+2V8aeP1EUlYpThlcUpvqO7lvtw=
+LibraryMetaFileHash: U3jBDffoZNeoMdK31lzQi2l+FQd1qAS3209tGxolq1w=
+LibraryVersion:
+  Guid: 186a011b-5af5-4b52-a90a-49140873e2e2
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
+    - TypeName: OnOffJog
+      VersionNumber: 0.0.1
+    - TypeName: OnOffSettings
+      VersionNumber: 0.0.1
+    - TypeName: LampCommand
+      VersionNumber: 0.0.1
+    - TypeName: HmiState
+      VersionNumber: 0.0.1
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: OnOffState
+      VersionNumber: 0.0.1
+    - TypeName: OnOffCmd
+      VersionNumber: 0.0.1

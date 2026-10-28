@@ -1,0 +1,45 @@
+﻿TYPE
+    MotorCmd : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Basic : _.BasicCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Start1D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Start2D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Fast : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        SetSpeed : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3XC";
+            S7_Visibility := "Hidden := External"
+        }
+        Speed : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        SetTorque : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Torque : Real;
+    END_STRUCT;
+END_TYPE

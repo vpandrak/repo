@@ -1,0 +1,10 @@
+﻿TYPE
+    HmiCommandValve : STRUCT
+        { S7_MLC := "MLC_3j7" }
+        FromHMI : Word;
+        { S7_MLC := "MLC_3Rg" }
+        FromDispatcher : Word;
+        PositionHmi : Real;
+        PositionDispatcher : Real;
+    END_STRUCT;
+END_TYPE

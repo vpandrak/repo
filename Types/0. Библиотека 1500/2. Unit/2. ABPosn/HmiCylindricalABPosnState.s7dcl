@@ -1,0 +1,34 @@
+﻿TYPE
+    HmiCylindricalABPosnState : STRUCT
+        State : STRUCT
+            ReadyOperation : Bool;
+            ReadyMoveToA : Bool;
+            ReadyMoveToB : Bool;
+            Fault : Bool;
+            Warning : Bool;
+            Stopped : Bool;
+            MovingToA : Bool;
+            APosn : Bool;
+            MovingToB : Bool;
+            BPosn : Bool;
+            MiddlePos : Bool;
+        END_STRUCT;
+        Feature1 : STRUCT
+            PermitMovingToA : Bool;
+            PermitMovingToB : Bool;
+            InterlockMovingToA : Bool;
+            InterlockMovingToB : Bool;
+            ProtectStart : Bool;
+            ProtectGeneral : Bool;
+            ResetFault : Bool;
+            QuickStop : Bool;
+            SensorAPosn : Bool;
+            SensorBPosn : Bool;
+            SolToA : Bool;
+            SolToB : Bool;
+            Manual : Bool;
+        END_STRUCT;
+        Feature2 : Word;
+        Alarm : Word;
+    END_STRUCT;
+END_TYPE

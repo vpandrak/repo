@@ -1,0 +1,95 @@
+﻿{
+    S7_BlockNumber := "10342";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "ValveSim"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        MoveToA : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        MoveToB : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        APosn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        BPosn : Bool;
+    END_VAR
+    VAR
+        _sm : _.StateMachine;
+    END_VAR
+    VAR CONSTANT
+        ST_UNDEF : Int := 0;
+        ST_A : Int := 1;
+        ST_MOVE_TO_B : Int := 2;
+        ST_B : Int := 3;
+        ST_MOVE_TO_A : Int := 4;
+        STROKE_TIME : Time := T#3s;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        //Симуляция перемещения между двумя позициями
+        
+        CASE #_sm.State OF
+            #ST_UNDEF:
+                IF #MoveToA THEN
+                    #_sm.ChangeStateTo := #ST_MOVE_TO_A;
+                ELSIF #MoveToB THEN
+                    #_sm.ChangeStateTo := #ST_MOVE_TO_B;
+                END_IF;
+                
+            #ST_A:
+                IF #MoveToB THEN
+                    #_sm.ChangeStateTo := #ST_MOVE_TO_A;
+                END_IF;
+                
+            #ST_MOVE_TO_B:
+                IF NOT #MoveToB THEN
+                    #_sm.ChangeStateTo := #ST_UNDEF;
+                ELSIF #_sm.StateTime > #STROKE_TIME THEN
+                    #_sm.ChangeStateTo := #ST_B;
+                END_IF;
+                
+            #ST_B:
+                IF #MoveToA THEN
+                    #_sm.ChangeStateTo := #ST_MOVE_TO_A;
+                END_IF;
+                
+            #ST_MOVE_TO_A:
+                IF NOT #MoveToA THEN
+                    #_sm.ChangeStateTo := #ST_UNDEF;
+                ELSIF #_sm.StateTime > #STROKE_TIME THEN
+                    #_sm.ChangeStateTo := #ST_A;
+                END_IF;
+        END_CASE;
+        
+        #_sm();
+        
+        #APosn := false;
+        #BPosn := false;
+        CASE #_sm.State OF
+            #ST_A:
+                #APosn := true;
+                
+            #ST_B:
+                #BPosn := true;
+        END_CASE;
+        
+        
+    END_NETWORK
+END_FUNCTION_BLOCK

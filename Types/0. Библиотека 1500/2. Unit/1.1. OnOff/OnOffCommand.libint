@@ -1,0 +1,29 @@
+﻿DocumentHash:
+  - FileName: OnOffCommand.s7dcl
+    Hash: vm5dbsMCiawq+Kw44I+t3bal0TUgkoj8pqmmL2fdfqg=
+LibraryMetaFileHash: vJvWa3X1nejYw3rOAgYd7674ZqxknZyns66oTUy/x7s=
+LibraryVersion:
+  Guid: 5b19124b-cc4d-4799-90ec-035752802d6d
+  DependsOn:
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: StateMachineWithOutHistory
+      VersionNumber: 0.0.1
+    - TypeName: OnOffJog
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
+    - TypeName: OnOffCmd
+      VersionNumber: 0.0.1
+    - TypeName: LampCommand
+      VersionNumber: 0.0.1
+    - TypeName: OnOffSettings
+      VersionNumber: 0.0.1
+    - TypeName: OnOffState
+      VersionNumber: 0.0.1

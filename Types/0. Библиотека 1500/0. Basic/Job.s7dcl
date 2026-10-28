@@ -1,0 +1,7 @@
+﻿TYPE
+    Job : STRUCT
+        Busy : Bool;
+        Done : Bool;
+        Error : Bool;
+    END_STRUCT;
+END_TYPE

@@ -1,0 +1,13 @@
+﻿TYPE
+    ABPosnState : STRUCT
+        Basic : _.BasicState;
+        ReadyMoveToA : _.BitDescription;
+        ReadyMoveToB : _.BitDescription;
+        Fault : _.BitDescription;
+        SafePosn : Bool;
+        MovingToA : Bool;
+        MovingToB : Bool;
+        APosn : Bool;
+        BPosn : Bool;
+    END_STRUCT;
+END_TYPE

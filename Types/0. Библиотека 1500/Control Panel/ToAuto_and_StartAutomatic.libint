@@ -1,0 +1,17 @@
+﻿DocumentHash:
+  - FileName: ToAuto_and_StartAutomatic.s7dcl
+    Hash: nVD2usAUOntFdfnsr+1/NDl6wbsAVH/HxlF9ehtAIKk=
+  - FileName: ToAuto_and_StartAutomatic.s7res
+    Hash: woyAuABwQtc4CGf887k3SGyg1d/UQvmAwIA1E6J54CQ=
+LibraryMetaFileHash: mlZ6xh0E2pGYH06yMlGxSI6SVpQMad0obaTSLtzomaI=
+LibraryVersion:
+  Guid: 1c0f5b81-7dc2-4407-8aa6-47c47e72f6c5
+  DependsOn:
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14

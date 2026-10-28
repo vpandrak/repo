@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: GroupToUnit.s7dcl
+    Hash: wv3155k99WUdocj3ouqM/46CNLYl3p/nHbKIGoq/oCc=
+  - FileName: GroupToUnit.s7res
+    Hash: rW2aCHOkQ/jd3pGmMLbNcbMyOGAI9kITmy9c+4Ozqk8=
+LibraryMetaFileHash: pmDrsILOv7d0lPzLQyIGuPQQSRdMRvOuLu26MKrWChw=
+LibraryVersion:
+  Guid: 0ccf9a31-7587-4591-b9cb-671b27508690
+  DependsOn:
+    - TypeName: LampPulse
+      VersionNumber: 0.0.1

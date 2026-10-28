@@ -1,0 +1,538 @@
+﻿{
+    S7_BlockNumber := "10222";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "OnOffActuator"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Qf : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Permit : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "Interlock" : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ProtectStart : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ProtectGeneral : _.BitDescription;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ExecutorCmd : _.OnOffCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Lamp : _.LampCommand;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        Hmi : _.HmiState;
+        Settings : _.OnOffSettings;
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+        State : _.OnOffState;
+        Cmd : _.OnOffCmd;
+        Jog : _.OnOffJog;
+        ExecutorState : _.OnOffState;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_fault : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_NoQf : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _readyJog : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _ready : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _restartDelayActive : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _tryToStart : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _restartRemainingTime : Time;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_QfTrippedActive : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _CmdStart_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _JogStart_P : R_TRIG;
+    END_VAR
+    VAR_TEMP
+        _resetFault : Bool;
+    END_VAR
+    VAR CONSTANT
+        { S7_MLC := "MLC_3Uk" }
+        ST_STOPPED : Int := 0;
+        { S7_MLC := "MLC_4rj" }
+        ST_PRESTARTUP_HORN : Int := 1;
+        { S7_MLC := "MLC_it" }
+        ST_STARTUP_DELAY : Int := 2;
+        { S7_MLC := "MLC_4Gd" }
+        ST_STARTUP : Int := 3;
+        { S7_MLC := "MLC_L5" }
+        ST_RUNNING : Int := 4;
+        { S7_MLC := "MLC_Nf" }
+        ST_SHUTDOWN_DELAY : Int := 5;
+        { S7_MLC := "MLC_4BU" }
+        ST_SHUTDOWN : Int := 11;
+        ST_JOGGING : Int := 21;
+        ST_QUICKSTOP : Int := 900;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        REGION Аварии
+            #_resetFault := #Cmd.Basic.ResetFault;
+            
+            // Аварийный останов
+            IF (#_sm.State = #ST_RUNNING OR #_sm.State = #ST_STARTUP)
+               AND #Cmd.Basic.QuickStop
+            THEN
+                #Hmi.Alarm.%X0 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := wstring#'Аварийный останов';
+                
+            // Сработала основная защита    
+            ELSIF #ProtectGeneral.Active THEN
+                #Hmi.Alarm.%X1 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сработала основная защита:', IN2 := #ProtectGeneral.Reason);
+                
+            // Сработала защита от запуска
+            ELSIF #ProtectStart.Active AND #State.Basic.Stopped THEN
+                #Hmi.Alarm.%X2 := true;
+                #_f_fault.SET := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сработала защита от старта:', IN2 := #ProtectStart.Reason);
+                
+            // Во время работы сработал автоматический выключатель
+            ELSIF (#_sm.State = #ST_STARTUP OR #_sm.State = #ST_RUNNING)
+                AND NOT #Qf.Active
+            THEN
+                #Hmi.Alarm.%X3 := true;
+                #_f_fault.SET := true;
+                #_f_QfTrippedActive := true;
+                #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Сработал авт. выключатель', IN2 := #Qf.Reason);
+                
+            // Аварии запуска/остановки (при управлении от ПЛК)
+            ELSIF (NOT #Settings.LocalControlWithOutPLC OR (#Settings.LocalControlWithOutPLC AND NOT #State.Basic.Local)) THEN
+                IF #_sm.State = #ST_STARTUP AND #_sm.StateTime > #Settings.StartFBTime THEN
+                    #Hmi.Alarm.%X4 := true;
+                    #_f_fault.SET := true;
+                    #_f_fault.Text := CONCAT_WSTRING(IN1 := wstring#'Проверьте схему управления. Не удалось запустить ', IN2 := #Settings.DirectName);
+                    
+                ELSIF #_sm.State = #ST_SHUTDOWN AND #_sm.StateTime > #Settings.StopFBTime THEN
+                    #Hmi.Alarm.%X6 := true;
+                    #_f_fault.SET := true;
+                    #_f_fault.Text := wstring#'Не удалось остановить. Проверьте схему управления';
+                    
+                ELSIF #_sm.State = #ST_RUNNING AND NOT #ExecutorState.Basic.Running AND #_sm.StateTime > #Settings.StartFBTime THEN
+                    #Hmi.Alarm.%X7 := true;
+                    #_f_fault.SET := true;
+                    #_f_fault.Text := wstring#'Остановлен без команды. Проверьте схему управления';
+                    
+                ELSIF #_sm.State = #ST_STOPPED AND #ExecutorState.Basic.Running AND #_sm.StateTime > #Settings.StopFBTime THEN
+                    #Hmi.Alarm.%X8 := true;
+                    #_f_fault.SET := true;
+                    #_f_fault.Text := wstring#'Запущен без команды. Проверьте схему управления';
+                END_IF;
+                
+            ELSE
+                #_f_fault.SET := false;
+            END_IF;
+            
+            // Формирование программных аварий
+            IF NOT #Settings.Program_Alarm_Off THEN
+                #_f_fault(Name := #Name,
+                          RESET := #_resetFault);
+            END_IF;
+            
+            // Не включен автоматический выключатель 
+            IF NOT #Hmi.Alarm.%X3 AND NOT #Qf.Active THEN
+                #Hmi.Alarm.%X11 := true;
+                #_f_NoQf.Text := CONCAT_WSTRING(IN1 := wstring#'Не включен авт. выключатель ', IN2 := #Qf.Reason);
+            ELSE
+                #Hmi.Alarm.%X11 := false;
+            END_IF;
+            // Формирование программных аварий
+            IF NOT #Settings.Program_Alarm_Off THEN
+                #_f_NoQf(Name := #Name,
+                         SET := #Hmi.Alarm.%X11,
+                         RESET := #Qf.Active);
+            END_IF;
+            
+            // Сброс слова аварий
+            IF #_resetFault THEN
+                #Hmi.Alarm := 0;
+            END_IF;
+            
+            // Формирование статуса общей аварии механизма с описанием причины
+            IF #Hmi.Alarm.%X11 THEN
+                #State.Fault.Active := true;
+                #State.Fault.Reason := #_f_NoQf.Text;
+            ELSIF #Hmi.Alarm > 0 THEN
+                #State.Fault.Active := true;
+                #State.Fault.Reason := #_f_fault.Text;
+            ELSE
+                IF #State.Fault.Active THEN
+                    #State.Fault.Reason := wstring#'';
+                END_IF;
+                #State.Fault.Active := false;
+            END_IF;
+        END_REGION
+        
+        REGION Готовность
+            IF #Group.Mode = "MODE_DISABLE" THEN
+                #_readyJog := #_ready := false;
+                #State.ReadyToRun.Reason := wstring#'Выведен из работы';
+            ELSIF #Cmd.Basic.QuickStop THEN
+                #_readyJog := #_ready := false;
+                #State.ReadyToRun.Reason := WSTRING#'Активен быстрый останов';
+            ELSIF NOT #Group.SafetyOk THEN
+                #_readyJog := #_ready := false;
+                #State.ReadyToRun.Reason := wstring#'Открыты калитки безопасности';
+            ELSIF #ProtectGeneral.Active THEN
+                #_readyJog := #_ready := false;
+                #State.ReadyToRun.Reason := #ProtectGeneral.Reason;
+            ELSIF #ProtectStart.Active AND #State.Basic.Stopped THEN
+                #_readyJog := #_ready := false;
+                #State.ReadyToRun.Reason := #ProtectStart.Reason;
+            ELSIF NOT #ExecutorState.Basic.ReadyOperation THEN
+                #_readyJog := #_ready := false;
+                #State.ReadyToRun.Reason := #ExecutorState.ReadyToRun.Reason;
+            ELSE
+                //"Нулевая блокировка"
+                IF #Jog.Start AND NOT #_readyJog THEN
+                    #State.ReadyToRun.Reason := WSTRING#'Нулевая блокировка (JOG)';
+                ELSE
+                    #_readyJog := TRUE;
+                    IF #State.Fault.Active THEN
+                        #_ready := false;
+                        #State.ReadyToRun.Reason := #State.Fault.Reason;
+                    // Задержка повторного запуска    
+                    ELSIF #_restartDelayActive THEN
+                        #_ready := false;
+                        #State.ReadyToRun.Reason := WSTRING#'Задержка повторного запуска';
+                    ELSE
+                        IF #Interlock.Active THEN
+                            #_ready := false;
+                            #State.ReadyToRun.Reason := #Interlock.Reason;
+                        ELSIF #Permit.Active AND #State.Basic.Stopped THEN
+                            #_ready := false;
+                            #State.ReadyToRun.Reason := #Permit.Reason;
+                        ELSE
+                            //"Нулевая блокировка"
+                            IF (#Cmd.Start AND NOT #_ready) THEN
+                                #State.ReadyToRun.Reason := CONCAT_WSTRING(IN1 := wstring#'Нулевая блокировка ', IN2 := #Settings.DirectName);
+                            ELSE
+                                IF NOT #_ready THEN
+                                    #State.ReadyToRun.Reason := wstring#'';
+                                END_IF;
+                                #_ready := true;
+                            END_IF;
+                        END_IF;
+                    END_IF;
+                END_IF;
+            END_IF;
+            
+            REGION Фронты команд
+                #_CmdStart_P(CLK := #Cmd.Start);
+                #_JogStart_P(CLK := #Jog.Start);
+            END_REGION
+            
+            REGION Если есть команды и нет готовности, формируем сообщение
+                IF #_CmdStart_P.Q AND NOT #_ready THEN
+                    #Notice(Name := #Name,
+                            Text := CONCAT_WSTRING(IN1 := wstring#'Команда отклонена. ', IN2 := #State.ReadyToRun.Reason));
+                END_IF;
+            END_REGION
+        END_REGION
+        
+        REGION Управление
+            CASE #_sm.State OF
+                #ST_STOPPED: // Механизм остановлен
+                   REGION Задержка повторного запуска
+                        IF #_tryToStart THEN
+                            #_restartDelayActive := true;
+                            #_tryToStart := false;
+                        END_IF;
+                        IF #_sm.StateTime >= #Settings.#RestartEnableTime THEN
+                            #_restartDelayActive := false;
+                        END_IF;
+                        #_restartRemainingTime := #Settings.#RestartEnableTime - #_sm.StateTime;
+                    END_REGION
+                    
+                    IF #Jog.Start AND #_readyJog THEN
+                        #_sm.ChangeStateTo := #ST_JOGGING;
+                    ELSIF #Cmd.Start AND #_ready THEN
+                            IF #Settings.StartUpDelayTime > T#0ms THEN
+                                #_sm.ChangeStateTo := #ST_STARTUP_DELAY;
+                            ELSE
+                                #_sm.ChangeStateTo := #ST_STARTUP;
+                            END_IF;
+                    END_IF;
+                    
+                #ST_STARTUP_DELAY: // Задержка перед запуском
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start AND #Settings."TypeCmd_2/3_Point") THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    ELSIF  #_sm.StateTime > #Settings.#StartUpDelayTime THEN
+                        #_sm.ChangeStateTo := #ST_STARTUP;
+                    END_IF;
+                    
+                #ST_STARTUP: // Механизм запускается
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start AND #Settings."TypeCmd_2/3_Point") THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    ELSIF #ExecutorState.Basic.Running THEN
+                        #_sm.ChangeStateTo := #ST_RUNNING;
+                    END_IF;
+                    
+                #ST_RUNNING: // Механизм запущен 1D
+                    IF #_sm.StateChanged AND #Settings.EventOn THEN
+                        #_event(Name := #Name,
+                                Text := CONCAT_WSTRING(IN1 := wstring#'Запущен ', IN2 := #Settings.DirectName));
+                    END_IF;
+                    
+                    IF #Cmd.Basic.Stop OR (NOT #Cmd.Start AND #Settings."TypeCmd_2/3_Point") THEN
+                        IF #Settings.#ShutDownDelayTime > T#0ms THEN
+                            #_sm.ChangeStateTo := #ST_SHUTDOWN_DELAY;
+                        ELSE
+                            #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_SHUTDOWN_DELAY: // Задержка перед остановкой
+                    IF #_sm.StateTime > #Settings.#ShutDownDelayTime THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+                    
+                #ST_SHUTDOWN: // Механизм останавливается
+                    IF NOT #ExecutorState.Basic.Running THEN
+                        IF #Settings.EventOn THEN
+                            #_event(Name := #Name,
+                                    Text := wstring#'Остановлен');
+                        END_IF;
+                        #_sm.ChangeStateTo := #ST_STOPPED;
+                    END_IF;
+                    
+                #ST_JOGGING: // Принудительное включение
+                    IF #_sm.StateChanged AND #Settings.EventOn THEN
+                        #_event(Name := #Name,
+                                Text := CONCAT_WSTRING(IN1 := wstring#'Принудительное включение ', IN2 := #Settings.DirectName));
+                    END_IF;
+                    IF #Cmd.Basic.Stop OR NOT #Jog.Start THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+            END_CASE;
+            
+            // Автомат внештатных ситуаций
+            CASE #_sm.State OF
+                #ST_QUICKSTOP:
+                    IF #ExecutorState.Basic.Stopped
+                       AND NOT #Cmd.Basic.QuickStop
+                    THEN
+                        IF #Settings.EventOn THEN
+                            #_event(Name := #Name,
+                                    Text := wstring#'Остановлен аварийно');
+                        END_IF;
+                        #_sm.ChangeStateTo := #ST_STOPPED;
+                    END_IF;
+                    
+                #ST_STOPPED:
+                    // Локальное управление без ПЛК
+                    IF #Settings.LocalControlWithOutPLC AND #State.Basic.Local
+                        AND #ExecutorState.Basic.Running
+                    THEN
+                        #_sm.ChangeStateTo := #ST_RUNNING;
+                    END_IF;
+                    
+                #ST_STARTUP_DELAY: // Задержка перед запуском
+                    IF NOT #_ready THEN
+                        #_sm.ChangeStateTo := #ST_SHUTDOWN;
+                    END_IF;
+                    
+                #ST_STARTUP,          // Механизм запускается
+                #ST_SHUTDOWN_DELAY,   // Задержка перед остановкой
+                #ST_SHUTDOWN:         // Механизм останавливается
+                    IF NOT #_ready THEN
+                        #_sm.ChangeStateTo := #ST_QUICKSTOP;
+                    END_IF;
+                    
+                    // Локальное управление без ПЛК
+                    IF #Settings.LocalControlWithOutPLC AND #State.Basic.Local THEN
+                        IF #ExecutorState.Basic.Running
+                        THEN
+                            #_sm.ChangeStateTo := #ST_RUNNING;
+                        ELSE
+                            #_sm.ChangeStateTo := #ST_STOPPED;
+                        END_IF;
+                    END_IF;
+                    
+                    #_tryToStart := TRUE;
+               
+                #ST_RUNNING:          // Механизм запущен
+                    IF NOT #_ready THEN
+                        #_sm.ChangeStateTo := #ST_QUICKSTOP;
+                    END_IF;
+                    
+                    // Локальное управление без ПЛК
+                    IF #Settings.LocalControlWithOutPLC AND #State.Basic.Local
+                        AND NOT #ExecutorState.Basic.Running
+                    THEN
+                        #_sm.ChangeStateTo := #ST_STOPPED;
+                    END_IF;
+                    
+                    #_tryToStart := TRUE;
+                    
+                #ST_JOGGING:          // Принудительное включение
+                    IF NOT #_readyJog THEN
+                        #_sm.ChangeStateTo := #ST_QUICKSTOP;
+                    END_IF;
+            END_CASE;
+            #_sm();
+            
+            // Формирование команд
+            #ExecutorCmd.Start := FALSE;
+            #ExecutorCmd.Basic.Stop := FALSE;
+            #ExecutorCmd.Basic.QuickStop := FALSE;
+            #ExecutorCmd.Basic.ResetFault := #Cmd.Basic.ResetFault;
+            CASE #_sm.State OF
+                #ST_STARTUP, #ST_RUNNING, #ST_SHUTDOWN_DELAY, #ST_JOGGING:
+                    // Управление от ПЛК
+                    IF (NOT #Settings.LocalControlWithOutPLC OR (#Settings.LocalControlWithOutPLC AND NOT #State.Basic.Local)) THEN
+                        #ExecutorCmd.Start := TRUE;
+                    END_IF;
+                    
+                #ST_SHUTDOWN:
+                    #ExecutorCmd.Basic.Stop := TRUE;
+                    
+                #ST_QUICKSTOP:
+                    #ExecutorCmd.Basic.QuickStop := TRUE;
+            END_CASE;
+        END_REGION
+        
+        REGION Состояние
+            #State.Basic.ReadyOperation := #_readyJog AND NOT #State.Fault.Active;
+            #State.ReadyToRun.Active := #_ready;
+            #State.Basic.Fault := #State.Fault.Active;
+            #State.Basic.Startup := #State.Basic.Startup;
+            #State.Basic.Running := #State.Basic.Running;
+            #State.Basic.Shutdown := (#_sm.State = #ST_SHUTDOWN_DELAY OR #_sm.State = #ST_SHUTDOWN);
+            #State.Basic.Stopped := (#_sm.State = #ST_STOPPED);
+            #State.Basic.QuickStopping := (#_sm.State = #ST_QUICKSTOP);
+            
+            #State.Basic.Running := (#_sm.State = #ST_RUNNING);
+            #State.Basic.Startup := (#_sm.State = #ST_STARTUP_DELAY OR #_sm.State = #ST_STARTUP);
+        END_REGION
+        
+        REGION Hmi
+            #Hmi.Status.%X0 := #State.Basic.ReadyOperation;
+            #Hmi.Status.%X1 := #State.ReadyToRun.Active;
+            #Hmi.Status.%X2 := FALSE;
+            #Hmi.Status.%X3 := #State.Basic.Fault;
+            #Hmi.Status.%X4 := #State.Basic.Stopped;
+            #Hmi.Status.%X5 := FALSE;
+            #Hmi.Status.%X6 := (#_sm.State = #ST_STARTUP_DELAY);
+            #Hmi.Status.%X7 := (#_sm.State = #ST_STARTUP);
+            #Hmi.Status.%X8 := (#_sm.State = #ST_RUNNING OR #_sm.State = #ST_JOGGING);
+            #Hmi.Status.%X9 := (#_sm.State = #ST_SHUTDOWN_DELAY);
+            #Hmi.Status.%X10 := FALSE;
+            #Hmi.Status.%X11 := FALSE;
+            #Hmi.Status.%X12 := FALSE;
+            #Hmi.Status.%X13 := FALSE;
+            #Hmi.Status.%X14 := FALSE;
+            #Hmi.Status.%X15 := (#_sm.State = #ST_SHUTDOWN);
+            
+            #Hmi.Feature1.%X0 := NOT (NOT #Permit.Active AND #State.Basic.Stopped);
+            #Hmi.Feature1.%X1 := #Interlock.Active;
+            #Hmi.Feature1.%X2 := FALSE;
+            #Hmi.Feature1.%X3 := FALSE;
+            #Hmi.Feature1.%X4 := #ProtectStart.Active;
+            #Hmi.Feature1.%X5 := #ProtectGeneral.Active;
+            // #Hmi.State.Feature1.%X6 := FALSE; // "InterlockFC".MaskOn
+            #Hmi.Feature1.%X7 := FALSE; 
+            // #Hmi.State.Feature1.%X8 := FALSE; // "ProtectFC".MaskOn
+            #Hmi.Feature1.%X9 := FALSE;
+            #Hmi.Feature1.%X10 := FALSE;
+            #Hmi.Feature1.%X11 := FALSE;
+            #Hmi.Feature1.%X12 := FALSE;
+            #Hmi.Feature1.%X13 := FALSE;
+            #Hmi.Feature1.%X14 := FALSE;
+            #Hmi.Feature1.%X15 := FALSE;
+            
+            #Hmi.Feature2.%X0 := #_resetFault;
+            #Hmi.Feature2.%X1 := #Cmd.Basic.QuickStop;
+            #Hmi.Feature2.%X2 := #ExecutorCmd.Start;
+            #Hmi.Feature2.%X3 := FALSE;
+            #Hmi.Feature2.%X4 := #ExecutorState.Basic.Running;
+            #Hmi.Feature2.%X5 := FALSE;
+            #Hmi.Feature2.%X6 := #Qf.Active;
+            #Hmi.Feature2.%X7 := FALSE;
+            
+            #Hmi.Feature3 := #_sm.State;
+        END_REGION
+        
+        REGION Лампы
+            #Lamp.Fast := #State.Basic.Startup;
+            #Lamp.Cont := #State.Basic.Running OR (#_sm.State = #ST_JOGGING);
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

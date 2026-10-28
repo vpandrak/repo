@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: MotorCmd.s7dcl
+    Hash: cjVDmIA4OWf/ItlLrez27L8sWTI9NuqYa8/7+1ubd/s=
+  - FileName: MotorCmd.s7res
+    Hash: xBeBUQnRw3mjnFJrwh5ZmFhyxUukGsN6rQinN+xZPa4=
+LibraryMetaFileHash: dlXClEoqpFhEDzIXgJeAbaP85r4sEDT55pbIg2YPqhY=
+LibraryVersion:
+  Guid: 41db7c43-e2f2-4790-8ff8-be38a2d4d48b
+  DependsOn:
+    - TypeName: BasicCmd
+      VersionNumber: 0.0.2

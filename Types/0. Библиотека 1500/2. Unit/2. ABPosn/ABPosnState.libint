@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: ABPosnState.s7dcl
+    Hash: /lM6pfHR7IwE9RCNwnHILzcDjNuseUO4VjdeAK6OkZI=
+LibraryMetaFileHash: kReNvbDewZ3KXBV4W0rUKlIf3oB3dG2+3Cx3txUNtoo=
+LibraryVersion:
+  Guid: 58831b6d-9ddd-49d0-9b86-fe38cbec1cc3
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14

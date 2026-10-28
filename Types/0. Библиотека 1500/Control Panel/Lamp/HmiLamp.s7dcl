@@ -1,0 +1,6 @@
+﻿TYPE
+    HmiLamp : STRUCT
+        Active : Bool;
+        Pulse : Bool;
+    END_STRUCT;
+END_TYPE

@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: GroupState.s7dcl
+    Hash: yUhcxnuSZM/Xm4B1/MV4iyJpcDzdsy/AIdVNyjuUwPM=
+  - FileName: GroupState.s7res
+    Hash: 5gKUHGZOrXb0Un6BmUudUZjh9aObj3gNuuQ++AjqKaw=
+LibraryMetaFileHash: hOmYVm57aJs1M7b1SvdiH8Un+TvW2Rc2I+2pkMKb+Bg=
+LibraryVersion:
+  Guid: f7f0a8bf-17bc-4329-9229-758ed826972e
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14

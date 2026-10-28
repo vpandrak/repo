@@ -1,0 +1,89 @@
+﻿{
+    S7_BlockNumber := "10503";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "Protect"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3Dt";
+            S7_Visibility := "Hidden := External"
+        }
+        NotCheck : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3rM";
+            S7_Visibility := "Hidden := External"
+        }
+        DeLockAll : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        First : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        MaskOn : Bool;
+    END_VAR
+    VAR_IN_OUT
+        Conditions : Array[*] of _.BitDescription;
+        Hmi : _.HmiProtect;
+    END_VAR
+    VAR_TEMP
+        "i" : DInt;
+        ActiveProtect : DInt;
+        _LOWER_BOUND : DInt;
+        _UPPER_BOUND : DInt;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        #_LOWER_BOUND := LOWER_BOUND(ARR := #Conditions, DIM := 1);
+        #_UPPER_BOUND := UPPER_BOUND(ARR := #Conditions, DIM := 1);
+        #ActiveProtect := -1;
+        FOR #i := #_LOWER_BOUND TO #_UPPER_BOUND DO
+            // Сбрасываем память сработки защит    
+            IF #DeLockAll THEN
+                //#Hmi.Lock := #Hmi.Lock AND NOT DINT_TO_WORD(2 ** #i);
+                #Hmi.Lock := #Hmi.Lock AND (NOT SHL(IN := WORD#1, N := #i));
+            END_IF;
+            
+            // Проверка маски для текущего условия защиты
+            IF #Conditions[#i].Active THEN
+                //#Hmi.Input := #Hmi.Input OR DINT_TO_WORD(2 ** #i);
+                #Hmi.Input := #Hmi.Input OR SHL(IN := WORD#1, N := #i);
+                
+                //IF ((#Hmi.Mask AND DINT_TO_WORD(2 ** #i)) = 16#0) AND NOT #NotCheck
+                IF ((SHR(IN:=#Hmi.Mask, N:=#i) AND WORD#1) = 16#0) AND NOT #NotCheck
+                THEN
+                    //#Hmi.Lock := #Hmi.Lock OR DINT_TO_WORD(2 ** #i);
+                    #Hmi.Lock := #Hmi.Lock OR SHL(IN := WORD#1, N := #i);
+                END_IF;
+                
+            ELSE
+                //#Hmi.Input := #Hmi.Input AND NOT DINT_TO_WORD(2 ** #i);
+                #Hmi.Input := #Hmi.Input AND (NOT SHL(IN := WORD#1, N := #i));
+            END_IF;
+            
+        //    IF ((#Hmi.Lock AND DINT_TO_WORD(2 ** #i)) > 16#0) THEN
+            IF ((#Hmi.Lock AND SHL(IN := WORD#1, N := #i)) > 16#0) THEN
+                #ActiveProtect := #i;
+            END_IF;
+        END_FOR;
+        
+        IF #ActiveProtect >= 0 THEN
+            #First := #Conditions[#ActiveProtect];
+        ELSE
+            #First.Active := FALSE;
+            #First.Reason := WSTRING#'';
+        END_IF;
+        
+        #MaskOn := #Hmi.Mask <> 0; // маскировка включена
+    END_NETWORK
+END_FUNCTION_BLOCK

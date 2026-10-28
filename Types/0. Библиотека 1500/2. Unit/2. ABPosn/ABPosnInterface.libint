@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: ABPosnInterface.s7dcl
+    Hash: 8FXkfBsppP2KEQCLbH4iKk0WY+7EvcEPARVlHinBpnA=
+LibraryMetaFileHash: aY8oZKjRI/HpuApBmvx0/kWCL66IrSIpWkfaDwnIL5k=
+LibraryVersion:
+  Guid: 5c917ef6-1e22-47c0-830c-d8911a17ad93
+  DependsOn:
+    - TypeName: ABPosnCmd
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnState
+      VersionNumber: 0.0.1

@@ -1,0 +1,11 @@
+﻿MultiLingualTexts:
+  - id: MLC_3ra
+    ru-RU: Текст аварии
+  - id: MLC_4au
+    ru-RU: Сигнал для установки аварии
+  - id: MLC_3r2
+    ru-RU: Сигнал для сброса (если не установлен, то сброс при отсутствии SET)
+  - id: MLC_mC
+    ru-RU: Авария активна
+  - id: MLC_3VR
+    ru-RU: Имя агрегата

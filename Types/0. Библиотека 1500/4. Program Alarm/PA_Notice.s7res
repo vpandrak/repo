@@ -1,0 +1,9 @@
+﻿MultiLingualTexts:
+  - id: MLC_4Nw
+    ru-RU: Текст уведомления
+  - id: MLC_rR
+    ru-RU: Флаг для считывания из пула сообщений
+  - id: MLC_4Yd
+    ru-RU: Пул сообщений пуст
+  - id: MLC_XL
+    ru-RU: Имя агрегата

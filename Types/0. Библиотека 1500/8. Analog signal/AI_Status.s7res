@@ -1,0 +1,14 @@
+﻿MultiLingualTexts:
+  - id: MLC_4Vp
+    en-US: Авария Incoming (входящая)
+  - id: MLC_xS
+    en-US: Предупреждение Incoming (входящее)
+  - id: MLC_Yu
+    en-US: Параметр ОК
+  - id: MLC_4dV
+    en-US: out of measuring range
+    ru-RU: out of measuring range
+  - id: MLC_4MR
+    en-US: Симуляция активна
+  - id: MLC_zE
+    en-US: Сглаживание активно

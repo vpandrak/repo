@@ -1,0 +1,1665 @@
+﻿{
+    S7_BlockNumber := "10101";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "Group"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_39q";
+            S7_Visibility := "Hidden := External"
+        }
+        Pu : _.ModeSwitches;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Buttons : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            ResetFault : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Horn : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            StartAutomatic : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            StopAutomatic : Bool;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4ht";
+            S7_Visibility := "Hidden := External"
+        }
+        QuickStop : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_qv";
+            S7_Visibility := "Hidden := External"
+        }
+        ExtAutoModeOFF : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4P8";
+            S7_Visibility := "Hidden := External"
+        }
+        PermitStart : Array[0..3] of _.BitDescription := [
+            4((
+                Active := true
+            ))
+        ];
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_34M";
+            S7_Visibility := "Hidden := External"
+        }
+        Gate : Array[0..31] of _.IGate := [
+            (
+                SafetyOk := true
+            )
+        ];
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4Gg";
+            S7_Visibility := "Hidden := External"
+        }
+        Units : Array[0..31] of _.BasicState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3ZY";
+            S7_Visibility := "Hidden := External"
+        }
+        AUnits : Array[0..31] of _.BasicState;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Mode : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Place : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.GroupState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ToUnit : _.GroupToUnit;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ACommand : _.AutomaticCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Horn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampWarning : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampFault : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampReady : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampAutomatic : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampManual : Bool;
+    END_VAR
+    VAR_IN_OUT
+        LampPulse : _.LampPulse;
+        Notice : _.PA_Notice;
+    END_VAR
+    VAR
+        Hmi : _.HmiGroup;
+    END_VAR
+    VAR RETAIN
+        Settings : _.GroupSettings := (
+            GATE_UB := 0
+        );
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smAutomatic : _.StateMachineDefaultStates;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smResetting : _.StateMachineWithOutHistory;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _resetTestLamp : _.ResetAlarmTestLamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _permitStart : _.Permit;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _e_mode : _.PA_Event_Mode;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _e_state : _.PA_Event_State;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_ControlKey : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_BtnStartAutomatic : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_commandStart : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_resetFault : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _Gate : _.IGate;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _UnitsState : _.BasicState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _AUnitsState : _.BasicState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _UnitsNotReady : UInt;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _UnitsFault : UInt;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _AUnitsNotReady : UInt;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _AUnitsFault : UInt;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampWarning : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampFault : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampReady : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampAutomatic : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampManual : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _cmdStartAutomatic : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _cmdStopAutomatic : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _cmdStopAutomatic_by_mode : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4et";
+            S7_Visibility := "Hidden := External"
+        }
+        _auto_mode_off_Ext : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _stop_automatic_before_disable : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _stop_automatic_before_manual : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _stop_automatic_before_semiauto : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _resetFault : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _initialized : Bool;
+    END_VAR
+    VAR_TEMP
+        "i" : Int;
+    END_VAR
+    VAR CONSTANT
+        "----------------------------0" : Int;
+        NO_COMMAND : Int := 0;
+        RESETTING : Int := 1;
+        RESET_DONE : Int := 2;
+        RESET_ERROR : Int := 3;
+        RESET_TIME : Time := T#2S;
+        "----------------------------1" : Int;
+        ST_0_STOPPED : Int := 0;
+        ST_1_READYAUTO : Int := 1;
+        ST_2_PRESTARTUP_HORN : Int := 2;
+        ST_3_STARTUP_DELAY : Int := 3;
+        ST_4_STARTING : Int := 4;
+        ST_5_RUNNING : Int := 5;
+        ST_6_STOPPING_DELAY : Int := 6;
+        ST_7_STOPPING : Int := 7;
+        ST_10_AUTOMODE_OFF : Int := 10;
+        ST_900_QUICKSTOPPING : Int := 900;
+        ST_901_QUICKSTOPPED : Int := 901;
+        ST_999_FAULT : Int := 999;
+        "----------------------------2" : Int;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        REGION Инициализация группы
+            IF NOT #_initialized THEN
+                
+                // Имя группы
+                #Hmi.Name := #Settings.Name;
+                #ToUnit.Name := #Settings.Name;
+                #_smAutomatic.Name := #Settings.Name;
+                
+                #_initialized := true;
+            END_IF;
+        END_REGION
+        
+        REGION Калитки
+            // Если хотя бы одна из калиток не закрыта, то сбрасываем бит безопасности
+            #_Gate.SafetyOk := true;
+            FOR #i := 0 TO #Settings.GATE_UB DO
+                IF NOT #Gate[#i].SafetyOk THEN
+                    #_Gate.SafetyOk := false;
+                    EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Калитка запрашивает доступ
+            #_Gate.RequestPause := false;
+            FOR #i := 0 TO #Settings.GATE_UB DO
+                IF #Gate[#i].RequestPause THEN
+                    #_Gate.RequestPause := true;
+                    EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Аварии калиток
+            #_Gate.Fault := false;
+            FOR #i := 0 TO #Settings.GATE_UB DO
+                IF #Gate[#i].Fault THEN
+                    #_Gate.Fault := true;
+                    EXIT;
+                END_IF;
+            END_FOR;
+        END_REGION
+        
+        REGION Состояние механизмов
+            // Готовность механизмов
+            #_UnitsState.ReadyOperation := true;
+            #_UnitsNotReady := 0;
+            FOR #i := 0 TO #Settings.UNIT_UB DO
+                IF NOT #Units[#i].ReadyOperation AND NOT #Units[#i].Disable THEN
+                    #_UnitsState.ReadyOperation := false;
+                    #_UnitsNotReady := #_UnitsNotReady + 1; // Количество механизмов, неготовых к работе
+                    // EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Авария механизмов
+            #_UnitsState.Fault := false;
+            #_UnitsFault := 0;
+            FOR #i := 0 TO #Settings.UNIT_UB DO
+                IF #Units[#i].Fault AND NOT #Units[#i].Disable THEN
+                    #_UnitsState.Fault := true;
+                    #_UnitsFault := #_UnitsFault + 1; // Количество механизмов в аварии
+                    // EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Предупреждение механизмов
+            #_UnitsState.Warning := false;
+            FOR #i := 0 TO #Settings.UNIT_UB DO
+                IF #Units[#i].Warning AND NOT #Units[#i].Disable THEN
+                    #_UnitsState.Warning := true;
+                    EXIT;
+                END_IF;
+            END_FOR;
+            
+            // В группе есть механизмы, переведенные в локальный режим управления
+            #_UnitsState.Local := false;
+            FOR #i := 0 TO #Settings.UNIT_UB DO
+                IF #Units[#i].Local THEN
+                    #_UnitsState.Local := true;
+                    EXIT;
+                END_IF;
+            END_FOR;
+            
+            // В группе есть механизмы, выведенные из работы
+            #_UnitsState.Disable := false;
+            FOR #i := 0 TO #Settings.UNIT_UB DO
+                IF #Units[#i].Disable THEN
+                    #_UnitsState.Disable := true;
+                    EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Механизмы подтвердили безопасное состояние по запросу доступа от калиток
+            #_UnitsState.SafeToEnter := true;
+            FOR #i := 0 TO #Settings.UNIT_UB DO
+                IF NOT #Units[#i].SafeToEnter AND NOT #Units[#i].Disable THEN
+                    #_UnitsState.SafeToEnter := false;
+                    EXIT;
+                END_IF;
+            END_FOR;
+        END_REGION
+        
+        REGION Состояние автоматов управления механизмами
+            // Готовность автоматов механизмов
+            #_AUnitsState.ReadyOperation := true;
+            #_AUnitsNotReady := 0;
+            FOR #i := 0 TO #Settings.AUTOMATIC_UB DO
+                IF NOT #AUnits[#i].ReadyOperation AND NOT #AUnits[#i].Disable THEN
+                    #_AUnitsState.ReadyOperation := false;
+                    #_AUnitsNotReady := #_AUnitsNotReady + 1; // Количество автоматик механизмов, не готовых к работе в автоматическом режиме
+                    // EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Авария автоматов механизмов
+            #_AUnitsState.Fault := false;
+            #_AUnitsFault := 0;
+            FOR #i := 0 TO #Settings.AUTOMATIC_UB DO
+                IF #AUnits[#i].Fault AND NOT #AUnits[#i].Disable THEN
+                    #_AUnitsState.Fault := true;
+                    #_AUnitsFault := #_AUnitsFault + 1; // Количество автоматик механизмов в аварии
+                    // EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Предупреждение автоматов механизмов
+            #_AUnitsState.Warning := false;
+            FOR #i := 0 TO #Settings.AUTOMATIC_UB DO
+                IF #AUnits[#i].Warning AND NOT #AUnits[#i].Disable THEN
+                    #_AUnitsState.Warning := true;
+                    EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Автоматы механизмов остановлены
+            #_AUnitsState.Stopped := true;
+            FOR #i := 0 TO #Settings.AUTOMATIC_UB DO
+                IF NOT #AUnits[#i].Stopped AND NOT #AUnits[#i].Disable THEN
+                    #_AUnitsState.Stopped := false;
+                    EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Автоматы механизмов запущены
+            #_AUnitsState.Running := true;
+            FOR #i := 0 TO #Settings.AUTOMATIC_UB DO
+                IF NOT #AUnits[#i].Running AND NOT #AUnits[#i].Disable THEN
+                    #_AUnitsState.Running := false;
+                    EXIT;
+                END_IF;
+            END_FOR;
+        
+            // Автоматы механизмов запуcкаются
+            #_AUnitsState.Startup := false;
+            FOR #i := 0 TO #Settings.AUTOMATIC_UB DO
+                IF #AUnits[#i].Startup AND NOT #AUnits[#i].Disable THEN
+                    #_AUnitsState.Startup := true;
+                    EXIT;
+                END_IF;
+            END_FOR;
+            
+            // Автоматы механизмов подтвердили безопасное состояние по запросу доступа от калиток
+            #_AUnitsState.SafeToEnter := true;
+            FOR #i := 0 TO #Settings.AUTOMATIC_UB DO
+                IF NOT #AUnits[#i].SafeToEnter AND NOT #AUnits[#i].Disable THEN
+                    #_AUnitsState.SafeToEnter := false;
+                    EXIT;
+                END_IF;
+            END_FOR;
+        END_REGION
+        
+        REGION Выбор места / режима управления
+        (*   
+           Режимы управления:
+            0 - выведена из работы (Disable)
+            1 - наладочный (Service)
+            2 - ручной (Manual)
+            4 - полуавтоматический (SemiAuto)
+            8 - автоматический (Auto)
+            
+           Место управления:
+            0 - с ПУ1 (ЧМИ)
+            1 - с ПУ2 (на будущие развитие, в данной версии не используется)
+            2 - с диспетчерской
+            
+            ПУ - кнопочный пульт управления
+            ЧМИ - панель оператора, система визуализации на объекте
+            Диспетчерская - удаленная система визуализации 
+        *)
+            
+            #_r_ControlKey(CLK := #Pu.ControlKey);
+            #_cmdStopAutomatic_by_mode := false;
+            
+            REGION Переключение места управления: ПУ1(ЧМИ)/Диспетчер
+                CASE #Place OF
+                    "PLACE_PU1":
+                        IF #Hmi.Command.FromHMI.%X9
+                           OR #Hmi.Command.FromDispatcher.%X9
+                        THEN
+                            #Place := "PLACE_DISPATCHER";
+                        END_IF;
+                        
+                    "PLACE_PU2":
+                        #Place := "PLACE_PU1";
+                        
+                    "PLACE_DISPATCHER":
+                        IF #Hmi.Command.FromHMI.%X8
+                           OR #Hmi.Command.FromDispatcher.%X8
+                        THEN
+                            #Place := "PLACE_PU1";
+                        END_IF;
+                END_CASE;
+            END_REGION
+            
+            REGION Выбор режима по командам с ЧМИ или ПУ
+                // ПУ1 и ЧМИ - одно и тоже место управления
+                // Если выбрано место управления - ПУ1, то режим работы задает кнопки/переключатель или ЧМИ
+                // Если выбрано место управления - ДИСПЕТЧЕР, то режим работы задается от диспетчера
+                CASE #Mode OF
+                    "MODE_DISABLE":
+                        CASE #Place OF
+                            "PLACE_PU1":
+                                IF #Pu.ControlKey THEN
+                                    IF #Pu.ToManual OR #Hmi.Command.FromHMI.%X5 OR #_r_ControlKey.Q THEN
+                                        #Mode := "MODE_MANUAL";
+                                    ELSIF #Pu.ToSemiAuto OR #Hmi.Command.FromHMI.%X6 THEN
+                                        #Mode := "MODE_SEMIAUTO";
+                                    ELSIF #Pu.ToAuto OR #Hmi.Command.FromHMI.%X7 THEN
+                                        #Mode := "MODE_AUTO";
+                                    END_IF;
+                                END_IF;
+                                
+                            "PLACE_DISPATCHER":
+                                IF #Hmi.Command.FromDispatcher.%X5 THEN
+                                    #Mode := "MODE_MANUAL";
+                                ELSIF #Hmi.Command.FromDispatcher.%X6 THEN
+                                    #Mode := "MODE_SEMIAUTO";
+                                ELSIF #Hmi.Command.FromDispatcher.%X7 THEN
+                                    #Mode := "MODE_AUTO";
+                                END_IF;
+                        END_CASE;
+                        
+                    "MODE_SERVICE":
+                        CASE #Place OF
+                            "PLACE_PU1":
+                                IF NOT #Pu.ControlKey THEN
+                                    #Mode := "MODE_DISABLE";
+                                ELSIF #Pu.ToManual OR #Hmi.Command.FromHMI.%X5 THEN
+                                    #Mode := "MODE_MANUAL";
+                                ELSIF #Pu.ToSemiAuto OR #Hmi.Command.FromHMI.%X6 THEN
+                                    #Mode := "MODE_SEMIAUTO";
+                                ELSIF #Pu.ToAuto OR #Hmi.Command.FromHMI.%X7 THEN
+                                    #Mode := "MODE_AUTO";
+                                END_IF;
+                                
+                            "PLACE_DISPATCHER":
+                                IF #Hmi.Command.FromDispatcher.%X5 THEN
+                                    #Mode := "MODE_MANUAL";
+                                ELSIF #Hmi.Command.FromDispatcher.%X6 THEN
+                                    #Mode := "MODE_SEMIAUTO";
+                                ELSIF #Hmi.Command.FromDispatcher.%X7 THEN
+                                    #Mode := "MODE_AUTO";
+                                END_IF;
+                        END_CASE;
+                        
+                    "MODE_MANUAL":
+                        CASE #Place OF
+                            "PLACE_PU1":
+                                IF NOT #Pu.ControlKey THEN
+                                    #Mode := "MODE_DISABLE";
+                                ELSIF #Hmi.Command.FromHMI.%X4 THEN
+                                    #Mode := "MODE_SERVICE";
+                                ELSIF #Pu.ToSemiAuto OR #Hmi.Command.FromHMI.%X6 THEN
+                                    #Mode := "MODE_SEMIAUTO";
+                                ELSIF #Pu.ToAuto OR #Hmi.Command.FromHMI.%X7 THEN
+                                    #Mode := "MODE_AUTO";
+                                END_IF;
+                                
+                            "PLACE_DISPATCHER":
+                                IF #Hmi.Command.FromDispatcher.%X4 THEN
+                                    #Mode := "MODE_SERVICE";
+                                ELSIF #Hmi.Command.FromDispatcher.%X6 THEN
+                                    #Mode := "MODE_SEMIAUTO";
+                                ELSIF #Hmi.Command.FromDispatcher.%X7 THEN
+                                    #Mode := "MODE_AUTO";
+                                END_IF;
+                        END_CASE;
+                        
+                    "MODE_SEMIAUTO":
+                        CASE #Place OF
+                            "PLACE_PU1":
+                                IF NOT #Pu.ControlKey THEN
+                                    #Mode := "MODE_DISABLE";
+                                ELSIF #Hmi.Command.FromHMI.%X4 THEN
+                                    #Mode := "MODE_SERVICE";
+                                ELSIF #Pu.ToManual OR #Hmi.Command.FromHMI.%X5 THEN
+                                    #Mode := "MODE_MANUAL";
+                                ELSIF #Pu.ToAuto OR #Hmi.Command.FromHMI.%X7 THEN
+                                    #Mode := "MODE_AUTO";
+                                END_IF;
+                                
+                            "PLACE_DISPATCHER":
+                                IF #Hmi.Command.FromDispatcher.%X4 THEN
+                                    #Mode := "MODE_SERVICE";
+                                ELSIF #Hmi.Command.FromDispatcher.%X5 THEN
+                                    #Mode := "MODE_MANUAL";
+                                ELSIF #Hmi.Command.FromDispatcher.%X7 THEN
+                                    #Mode := "MODE_AUTO";
+                                END_IF;
+                        END_CASE;
+                        
+                    "MODE_AUTO":
+                        IF #_auto_mode_off_Ext THEN
+                            IF #State.Basic.Stopped OR #_smAutomatic.State = #ST_999_FAULT
+                            THEN
+                               #Mode := "MODE_MANUAL";
+                           END_IF;
+                        ELSIF #_stop_automatic_before_disable THEN
+                            #_cmdStopAutomatic_by_mode := true;
+                            IF #State.Basic.Stopped OR #_smAutomatic.State = #ST_999_FAULT
+                            THEN
+                                #_stop_automatic_before_disable := FALSE;
+                                #Mode := "MODE_DISABLE";
+                            END_IF;
+                        ELSIF #_stop_automatic_before_manual THEN
+                            #_cmdStopAutomatic_by_mode := true;
+                            IF #State.Basic.Stopped OR #_smAutomatic.State = #ST_999_FAULT
+                            THEN
+                                #_stop_automatic_before_manual := FALSE;
+                                #Mode := "MODE_MANUAL";
+                            END_IF;
+                        ELSIF #_stop_automatic_before_semiauto THEN
+                            #_cmdStopAutomatic_by_mode := true;
+                            IF #State.Basic.Stopped OR #_smAutomatic.State = #ST_999_FAULT
+                            THEN
+                                #_stop_automatic_before_semiauto := FALSE;
+                                #Mode := "MODE_SEMIAUTO";
+                            END_IF;
+                        ELSE
+                            CASE #Place OF
+                                "PLACE_PU1":
+                                    IF NOT #Pu.ControlKey THEN
+                                        IF NOT #State.Basic.Stopped THEN
+                                            IF #Settings.EventOn AND NOT #_stop_automatic_before_disable THEN
+                                                #_event(Name := #Hmi.Name,
+                                                        Text := wstring#'Остановка группы перед выведением из работы');
+                                            END_IF;
+                                            #_stop_automatic_before_disable := TRUE;
+                                        ELSE
+                                            #Mode := "MODE_DISABLE";
+                                        END_IF;
+                                        
+                                    ELSIF #Pu.ToManual OR #Hmi.Command.FromHMI.%X5 THEN
+                                        IF NOT #State.Basic.Stopped THEN
+                                            IF #Settings.EventOn AND NOT #_stop_automatic_before_manual THEN
+                                                #_event(Name := #Hmi.Name,
+                                                        Text := wstring#'Остановка группы перед переводом в ручной режим');
+                                            END_IF;
+                                            #_stop_automatic_before_manual := TRUE;
+                                        ELSE
+                                            #Mode := "MODE_MANUAL";
+                                        END_IF;
+                                        
+                                    ELSIF #Pu.ToSemiAuto OR #Hmi.Command.FromHMI.%X6 THEN
+                                        IF NOT #State.Basic.Stopped THEN
+                                            IF #Settings.EventOn AND NOT #_stop_automatic_before_semiauto THEN
+                                                #_event(Name := #Hmi.Name,
+                                                        Text := wstring#'Остановка группы перед переводом в полуавтоматический режим');
+                                            END_IF;
+                                            #_stop_automatic_before_semiauto := TRUE;
+                                        ELSE
+                                            #Mode := "MODE_SEMIAUTO";
+                                        END_IF;
+                                    END_IF;
+                                    
+                                "PLACE_DISPATCHER":
+                                    IF #Hmi.Command.FromDispatcher.%X5 THEN
+                                        IF NOT #State.Basic.Stopped THEN
+                                            IF #Settings.EventOn AND NOT #_stop_automatic_before_manual THEN
+                                                #_event(Name := #Hmi.Name,
+                                                        Text := wstring#'Остановлена группы перед переводом в ручной режим');
+                                            END_IF;
+                                            #_stop_automatic_before_manual := TRUE;
+                                        ELSE
+                                            #Mode := "MODE_MANUAL";
+                                        END_IF;
+                                        
+                                    ELSIF #Hmi.Command.FromDispatcher.%X6 THEN
+                                        IF NOT #State.Basic.Stopped THEN
+                                            IF #Settings.EventOn AND NOT #_stop_automatic_before_semiauto THEN
+                                                #_event(Name := #Hmi.Name,
+                                                        Text := wstring#'Остановка группы перед переводом в полуавтоматический режим');
+                                            END_IF;
+                                            #_stop_automatic_before_semiauto := TRUE;
+                                        ELSE
+                                            #Mode := "MODE_SEMIAUTO";
+                                        END_IF;
+                                    END_IF;
+                            END_CASE;
+                        END_IF;
+                END_CASE;
+            END_REGION
+        END_REGION
+        
+        REGION Разрешение запуска
+            #_permitStart(Name := #Hmi.Name,
+                          Hmi := #Hmi.Permit,
+                          Conditions := #PermitStart,
+                          Stopped := #State.Basic.Stopped);
+        END_REGION
+        
+        REGION Готовность
+            IF #Mode = "MODE_DISABLE" THEN
+                #State.ReadyToAuto.Active := FALSE;
+                #State.ReadyToAuto.Reason := wstring#'Выведена из работы';
+            ELSIF #QuickStop THEN
+                #State.ReadyToAuto.Active := FALSE;
+                #State.ReadyToAuto.Reason := WSTRING#'Активен быстрый останов';
+            ELSIF NOT #_Gate.SafetyOk THEN
+                #State.ReadyToAuto.Active := FALSE;
+                #State.ReadyToAuto.Reason := wstring#'Открыты калитки безопасности';
+            ELSIF #State.Fault.Active THEN
+                #State.ReadyToAuto.Active := FALSE;
+                #State.ReadyToAuto.Reason := #State.Fault.Reason;
+            ELSIF NOT #_UnitsState.ReadyOperation THEN
+                #State.ReadyToAuto.Active := FALSE;
+                #State.ReadyToAuto.Reason := wstring#'Нет готовности механизмов';
+            ELSIF NOT #_AUnitsState.ReadyOperation THEN
+                #State.ReadyToAuto.Active := FALSE;
+                #State.ReadyToAuto.Reason := wstring#'Нет готовности автоматов механизмов';
+            ELSIF NOT #_permitStart.First.Active AND #State.Basic.Stopped THEN
+                #State.ReadyToAuto.Active := FALSE;
+                #State.ReadyToAuto.Reason := #_permitStart.First.Reason;
+            ELSE
+                #State.ReadyToAuto.Active := TRUE;
+                #State.ReadyToAuto.Reason := wstring#'';
+            END_IF;
+        END_REGION
+        
+        REGION Команды запуска / остановки автоматики
+            #_r_BtnStartAutomatic(CLK := #Buttons.StartAutomatic);
+            
+            #_cmdStopAutomatic := FALSE;
+            #_cmdStartAutomatic := FALSE;
+            
+            IF #Mode = "MODE_AUTO" THEN
+                #_cmdStopAutomatic :=
+                (
+                (#Place = "PLACE_PU1" AND (#Hmi.Command.FromHMI.%X1 OR #Buttons.StopAutomatic))
+                OR (#Place = "PLACE_DISPATCHER" AND #Hmi.Command.FromDispatcher.%X1)
+                OR #_cmdStopAutomatic_by_mode
+                );
+                
+                #_cmdStartAutomatic :=
+                (
+                (#Place = "PLACE_PU1" AND (#Hmi.Command.FromHMI.%X0 OR #_r_BtnStartAutomatic.Q))
+                OR (#Place = "PLACE_DISPATCHER" AND #Hmi.Command.FromDispatcher.%X0)
+                )
+                AND NOT #_cmdStopAutomatic
+                ;
+            END_IF;
+            
+            // Notice
+            IF (#_r_BtnStartAutomatic.Q OR #Hmi.Command.FromHMI.%X0 OR #Hmi.Command.FromDispatcher.%X0)
+                AND (#Mode = "MODE_DISABLE" OR #Mode = "MODE_SERVICE" OR #Mode = "MODE_MANUAL")
+            THEN
+                #Notice(Name := #Hmi.Name,
+                        Text := WSTRING#'Для запуска автоматики необходимо включить авт. режим');
+            END_IF;
+            
+            #_r_commandStart(CLK := #_cmdStartAutomatic);
+            
+            // Notice
+            IF #_r_commandStart.Q THEN
+                IF #QuickStop THEN
+                    #Notice(Name := #Hmi.Name,
+                            Text := WSTRING#'Запуск невозможен. Активен аварийный останов');
+                ELSIF NOT #ToUnit.SafetyOk THEN
+                    #Notice(Name := #Hmi.Name,
+                            Text := WSTRING#'Запуск невозможен. Открыты калитки безопасности');
+                ELSIF NOT #_UnitsState.ReadyOperation THEN
+                    #Notice(Name := #Hmi.Name,
+                            Text := WSTRING#'Запуск невозможен. Нет готовности механизмов');
+                ELSIF NOT #_AUnitsState.ReadyOperation THEN
+                    #Notice(Name := #Hmi.Name,
+                            Text := WSTRING#'Запуск невозможен. Нет готовности автоматики');
+                ELSIF NOT #_permitStart.First.Active THEN
+                    #Notice(Name := #Hmi.Name,
+                            Text := WSTRING#'Запуск невозможен. Не выполнены условия запуска');
+                END_IF;
+            END_IF;
+        END_REGION
+        
+        REGION Управление
+            CASE #_smAutomatic.State OF
+                #ST_0_STOPPED:
+                    REGION Остановлен
+                        // Группа готова к работе в автоматическом режиме
+                        IF #State.ReadyToAuto.Active THEN
+                            #_smAutomatic.ChangeStateTo := #ST_1_READYAUTO;
+                        END_IF;
+                        
+                        // Сброс флага внешней остановки автоматики и перевода в ручной режим
+                        #_auto_mode_off_Ext := FALSE;
+                    END_REGION
+                    
+                #ST_1_READYAUTO:
+                    REGION Готовность к работе в автоматическом режиме
+                        // Пришла команда "Старт автоматики"
+                        IF #_cmdStartAutomatic THEN
+                            IF #Settings.HornEnable THEN
+                                #_smAutomatic.ChangeStateTo := #ST_2_PRESTARTUP_HORN;
+                            ELSE
+                                #_smAutomatic.ChangeStateTo := #ST_3_STARTUP_DELAY;
+                            END_IF;
+                        END_IF;
+                        
+                        // Автоматы механизмов не готовы к работе в автоматическом режиме
+                        IF NOT #State.ReadyToAuto.Active THEN
+                            #_smAutomatic.ChangeStateTo := #ST_0_STOPPED;
+                        END_IF;
+                        
+                        // Сброс флага внешней остановки автоматики и перевода в ручной режим
+                        #_auto_mode_off_Ext := FALSE;
+                    END_REGION
+                    
+                #ST_2_PRESTARTUP_HORN:
+                    REGION Предпусковая сигнализация
+                        // Пришла внешняя команда "Стоп автоматики" и перевод группы в ручной режим 
+                        IF #ExtAutoModeOFF THEN
+                            #_smAutomatic.ChangeStateTo := #ST_10_AUTOMODE_OFF;
+                            #_auto_mode_off_Ext := true;
+                            
+                        // Пришла команда "Стоп автоматики" (штатный останов)     
+                        ELSIF #_cmdStopAutomatic THEN
+                            #_smAutomatic.ChangeStateTo := #ST_7_STOPPING;
+                            
+                        // Предпусковая сигнализация выполнена       
+                        ELSIF #_smAutomatic.StateTime > #Settings.HornTime THEN
+                            #_smAutomatic.ChangeStateTo := #ST_3_STARTUP_DELAY;
+                        END_IF;
+                        
+                        REGION Обработка ошибочных ситуаций
+                            // Нажата аварийная кнопка
+                            IF #QuickStop THEN
+                                #_smAutomatic.ChangeStateTo := #ST_900_QUICKSTOPPING;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 101. Нажата аварийная кнопка во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X2 := TRUE;
+                            END_IF;
+                            
+                            // Не автоматический режим 
+                            IF #Mode <> "MODE_AUTO" THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 102. Нештатно отключен  автомат. режим во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X3 := TRUE;
+                            END_IF;
+                            
+                            // Аварии автоматов механизмов
+                            IF #_AUnitsState.Fault
+                                AND #Settings.StopAutomatic_FaultAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 103. Авария автоматики механизма(ов) во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X4 := TRUE;
+                            END_IF;
+                            
+                            // Нет готовности автоматов механизмов к работе
+                            IF NOT #_AUnitsState.ReadyOperation
+                                AND #Settings.StopAutomatic_NotReadyOperationAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 104. Остутствует готовность автоматики механизма(ов) во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X5 := TRUE;
+                            END_IF;
+                        END_REGION
+                    END_REGION
+                    
+                #ST_3_STARTUP_DELAY:
+                    REGION Задержка перед запуском группы
+                        // Пришла внешняя команда "Стоп автоматики" и перевод группы в ручной режим 
+                        IF #ExtAutoModeOFF THEN
+                            #_smAutomatic.ChangeStateTo := #ST_10_AUTOMODE_OFF;
+                            #_auto_mode_off_Ext := true;
+                            
+                        // Пришла команда "Стоп автоматики" (штатный останов)     
+                        ELSIF #_cmdStopAutomatic THEN
+                            #_smAutomatic.ChangeStateTo := #ST_7_STOPPING;
+                            
+                        // Задержка перед запуском группы выполнена       
+                        ELSIF #_smAutomatic.StateTime > #Settings.StartUpDelayTime THEN
+                            #_smAutomatic.ChangeStateTo := #ST_4_STARTING;
+                        END_IF;
+        
+                        REGION Обработка ошибочных ситуаций
+                            // Нажата аварийная кнопка
+                            IF #QuickStop THEN
+                                #_smAutomatic.ChangeStateTo := #ST_900_QUICKSTOPPING;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 101. Нажата аварийная кнопка во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X2 := TRUE;
+                            END_IF;
+                            
+                            // Не автоматический режим 
+                            IF #Mode <> "MODE_AUTO" THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 102. Нештатно отключен  автомат. режим во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X3 := TRUE;
+                            END_IF;
+                            
+                            // Аварии автоматов механизмов
+                            IF #_AUnitsState.Fault
+                                AND #Settings.StopAutomatic_FaultAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 103. Авария автоматики механизма(ов) во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X4 := TRUE;
+                            END_IF;
+                            
+                            // Нет готовности автоматов механизмов к работе
+                            IF NOT #_AUnitsState.ReadyOperation
+                                AND #Settings.StopAutomatic_NotReadyOperationAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 104. Остутствует готовность автоматики механизма(ов) во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X5 := TRUE;
+                            END_IF;
+                        END_REGION
+                    END_REGION
+                    
+                #ST_4_STARTING:
+                    REGION Старт автоматики
+                        // Пришла внешняя команда "Стоп автоматики" и перевод группы в ручной режим 
+                        IF #ExtAutoModeOFF THEN
+                            #_smAutomatic.ChangeStateTo := #ST_10_AUTOMODE_OFF;
+                            #_auto_mode_off_Ext := true;
+                            
+                        // Пришла команда "Стоп автоматики" (штатный останов)     
+                        ELSIF #_cmdStopAutomatic THEN
+                            #_smAutomatic.ChangeStateTo := #ST_7_STOPPING;
+                            
+                        ELSIF #_AUnitsState.Running THEN
+                            #_smAutomatic.ChangeStateTo := #ST_5_RUNNING;
+                        END_IF;
+                        
+                        REGION Обработка ошибочных ситуаций
+                            // Нажата аварийная кнопка
+                            IF #QuickStop THEN
+                                #_smAutomatic.ChangeStateTo := #ST_900_QUICKSTOPPING;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 101. Нажата аварийная кнопка во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X2 := TRUE;
+                            END_IF;
+                            
+                            // Не автоматический режим 
+                            IF #Mode <> "MODE_AUTO" THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 102. Нештатно отключен  автомат. режим во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X3 := TRUE;
+                            END_IF;
+                            
+                            // Аварии автоматов механизмов
+                            IF #_AUnitsState.Fault
+                                AND #Settings.StopAutomatic_FaultAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 103. Авария автоматики механизма(ов) во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X4 := TRUE;
+                            END_IF;
+                            
+                            // Нет готовности автоматов механизмов к работе
+                            IF NOT #_AUnitsState.ReadyOperation
+                               AND #Settings.StopAutomatic_NotReadyOperationAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 104. Остутствует готовность автоматики механизма(ов) во время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X5 := TRUE;
+                            END_IF;
+                            
+                            // Превышено время запуска группы
+                            IF #_smAutomatic.StateTime > #Settings.StartFBTime THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 105. Превышено время запуска автоматики';
+                                
+                                #Hmi.State.Alarm.%X0 := TRUE;
+                            END_IF;
+                        END_REGION
+                    END_REGION
+                    
+                #ST_5_RUNNING:
+                    REGION Автоматика запущена
+                        // Пришла внешняя команда "Стоп автоматики" и перевод группы в ручной режим 
+                        IF #ExtAutoModeOFF THEN
+                            #_smAutomatic.ChangeStateTo := #ST_10_AUTOMODE_OFF;
+                            #_auto_mode_off_Ext := true;
+                            
+                        // Пришла команда "Стоп автоматики" (штатный останов)     
+                        ELSIF #_cmdStopAutomatic THEN
+                            #_smAutomatic.ChangeStateTo := #ST_6_STOPPING_DELAY;
+                        END_IF;
+                        
+                        REGION Обработка ошибочных ситуаций
+                            // Нажата аварийная кнопка
+                            IF #QuickStop THEN
+                                #_smAutomatic.ChangeStateTo := #ST_900_QUICKSTOPPING;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 111. Нажата аварийная кнопка во время работы автоматики';
+                                
+                                #Hmi.State.Alarm.%X6 := TRUE;
+                            END_IF;
+                            
+                            // Не автоматический режим 
+                            IF #Mode <> "MODE_AUTO" THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 112. Нештатно отключен автомат. режим во время работы автоматики';
+                                
+                                #Hmi.State.Alarm.%X7 := TRUE;
+                            END_IF;
+                            
+                            // Аварии автоматов механизмов
+                            IF #_AUnitsState.Fault
+                                AND #Settings.StopAutomatic_FaultAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 113. Авария автоматики механизма(ов) во время работы автоматики';
+                                
+                                #Hmi.State.Alarm.%X8 := TRUE;
+                            END_IF;
+                            
+                            // Нет готовности автоматов механизмов к работе
+                            IF NOT #_AUnitsState.ReadyOperation
+                                AND #Settings.StopAutomatic_NotReadyOperationAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 114. Остутствует готовность автоматики механизма(ов) во время работы автоматики';
+                                
+                                #Hmi.State.Alarm.%X9 := TRUE;
+                            END_IF;
+                        END_REGION
+                    END_REGION
+                    
+                #ST_6_STOPPING_DELAY:
+                    REGION Задержка перед остановкой группы
+                        // Пришла внешняя команда "Стоп автоматики" и перевод группы в ручной режим 
+                        IF #ExtAutoModeOFF THEN
+                            #_smAutomatic.ChangeStateTo := #ST_10_AUTOMODE_OFF;
+                            #_auto_mode_off_Ext := true;
+                            
+                        // Задержка перед остановкой группы выполнена       
+                        ELSIF #_smAutomatic.StateTime > #Settings.ShutDownDelayTime THEN
+                            #_smAutomatic.ChangeStateTo := #ST_7_STOPPING;
+                        END_IF;
+                        
+                        REGION Обработка ошибочных ситуаций
+                            // Нажата аварийная кнопка
+                            IF #QuickStop THEN
+                                #_smAutomatic.ChangeStateTo := #ST_900_QUICKSTOPPING;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 121. Нажата аварийная кнопка во время остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X10 := TRUE;
+                            END_IF;
+                            
+                            // Не автоматический режим 
+                            IF #Mode <> "MODE_AUTO" THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 122. Нештатно отключен автомат. режим во время остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X11 := TRUE;
+                            END_IF;
+                            
+                            // Аварии автоматов механизмов
+                            IF #_AUnitsState.Fault
+                                AND #Settings.StopAutomatic_FaultAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 123. Авария автоматики механизма(ов) во время остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X12 := TRUE;
+                            END_IF;
+                            
+                            // Превышено время штатной остановки
+                            IF #_smAutomatic.StateTime > #Settings.StopFBTime THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 124. Превышено время остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X1 := TRUE;
+                            END_IF;
+                        END_REGION
+                    END_REGION
+                    
+                #ST_7_STOPPING:
+                    REGION Штатный останов автоматики
+                        // Пришла внешняя команда "Стоп автоматики" и перевод группы в ручной режим 
+                        IF #ExtAutoModeOFF THEN
+                            #_smAutomatic.ChangeStateTo := #ST_10_AUTOMODE_OFF;
+                            #_auto_mode_off_Ext := true;
+                            
+                        // Все автомататы механизмов остановлены    
+                        ELSIF #_AUnitsState.Stopped THEN
+                            #_smAutomatic.ChangeStateTo := #ST_0_STOPPED;
+                        END_IF;
+                        
+                        REGION Обработка ошибочных ситуаций
+                            // Нажата аварийная кнопка
+                            IF #QuickStop THEN
+                                #_smAutomatic.ChangeStateTo := #ST_900_QUICKSTOPPING;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 121. Нажата аварийная кнопка во время остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X10 := TRUE;
+                            END_IF;
+                            
+                            // Не автоматический режим 
+                            IF #Mode <> "MODE_AUTO" THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 122. Нештатно отключен автомат. режим во время остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X11 := TRUE;
+                            END_IF;
+                            
+                            // Аварии автоматов механизмов
+                            IF #_AUnitsState.Fault
+                                AND #Settings.StopAutomatic_FaultAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 123. Авария автоматики механизма(ов) во время остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X12 := TRUE;
+                            END_IF;
+                            
+                            // Превышено время штатной остановки
+                            IF #_smAutomatic.StateTime > #Settings.StopFBTime THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 124. Превышено время остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X1 := TRUE;
+                            END_IF;
+                        END_REGION
+                    END_REGION
+                    
+                #ST_10_AUTOMODE_OFF:
+                    REGION Отключение автоматического режима
+                        // Не автоматический режим и все автоматы механизмов остановлены
+                        IF #Mode <> "MODE_AUTO"
+                           AND #_AUnitsState.Stopped
+                        THEN
+                            #_smAutomatic.ChangeStateTo := #ST_0_STOPPED;
+                        END_IF;
+                        
+                        REGION Обработка ошибочных ситуаций
+                            // Нажата аварийная кнопка
+                            IF #QuickStop THEN
+                                #_smAutomatic.ChangeStateTo := #ST_900_QUICKSTOPPING;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 131. Нажата аварийная кнопка во время остановки автоматики и перевода в ручн. режим';
+                                
+                                #Hmi.State.Alarm.%X10 := TRUE;
+                            END_IF;
+                            
+                            // Не автоматический режим 
+                            IF #Mode <> "MODE_AUTO" THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 132. Нештатно отключен автомат. режим во время остановки автоматики и перевода в ручн. режим';
+                                
+                                #Hmi.State.Alarm.%X11 := TRUE;
+                            END_IF;
+                            
+                            // Аварии автоматов механизмов
+                            IF #_AUnitsState.Fault
+                                AND #Settings.StopAutomatic_FaultAUnits
+                            THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 133. Авария автоматики механизма(ов) во время остановки автоматики и перевода в ручн. режим';
+                                
+                                #Hmi.State.Alarm.%X12 := TRUE;
+                            END_IF;
+                            
+                            // Превышено время штатной остановки
+                            IF #_smAutomatic.StateTime > #Settings.StopFBTime THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 134. Превышено время остановки автоматики и перевода в ручн. режим';
+                                
+                                #Hmi.State.Alarm.%X1 := TRUE;
+                            END_IF;
+                        END_REGION
+                    END_REGION
+                    
+                #ST_900_QUICKSTOPPING:
+                    REGION Контролируемый экстренный останов
+                        // Все автомата механизмов остановлены
+                        IF #_AUnitsState.Stopped THEN
+                            #_smAutomatic.ChangeStateTo := #ST_901_QUICKSTOPPED;
+                        END_IF;
+                        
+                        REGION Обработка ошибочных ситуаций
+                            // Превышено время быстрой остановки
+                            IF #_smAutomatic.StateTime > #Settings.QuickStopMaxTime THEN
+                                #_smAutomatic.ChangeStateTo := #ST_999_FAULT;
+                                #_smAutomatic.FaultText := wstring#'Группа. Ошибка 141. Превышено время экстренной остановки автоматики';
+                                
+                                #Hmi.State.Alarm.%X14 := TRUE;
+                            END_IF;
+                        END_REGION
+                    END_REGION
+                    
+                #ST_901_QUICKSTOPPED:
+                    REGION Контролируемый экстренный останов выполнен
+                        IF #_resetFault
+                           AND #_AUnitsState.Stopped
+                           AND NOT #QuickStop
+                        THEN
+                            #_smAutomatic.ChangeStateTo := #ST_0_STOPPED;
+                        END_IF;
+                    END_REGION
+                    
+                #ST_999_FAULT:
+                    REGION Ошибка
+                        // Сброс состояния ошибки автомата
+                        IF #_resetFault
+                            AND #_AUnitsState.Stopped
+                        THEN
+                            #_smAutomatic.ChangeStateTo := #ST_0_STOPPED;
+                        END_IF;
+                    END_REGION
+            END_CASE;
+            #_smAutomatic();
+        END_REGION
+        
+        REGION Формирование команд на автоматы механизмов
+            CASE #_smAutomatic.State OF
+                #ST_0_STOPPED, #ST_1_READYAUTO:
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := false;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                #ST_2_PRESTARTUP_HORN:
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := false;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                #ST_3_STARTUP_DELAY:
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := false;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                #ST_4_STARTING:
+                    #ACommand.StartAutomatic := true;
+                    #ACommand.StopAutomatic := false;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                #ST_5_RUNNING:
+                    #ACommand.StartAutomatic := #_cmdStartAutomatic;
+                    #ACommand.StopAutomatic := false;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                #ST_6_STOPPING_DELAY:
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := false;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                #ST_7_STOPPING:
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := true;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                #ST_10_AUTOMODE_OFF:
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := true;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                #ST_900_QUICKSTOPPING, #ST_901_QUICKSTOPPED:
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := true;
+                    #ACommand.QuickStopAutomatic := true;
+                    
+                #ST_999_FAULT:
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := true;
+                    #ACommand.QuickStopAutomatic := false;
+                    
+                ELSE
+                    #ACommand.StartAutomatic := false;
+                    #ACommand.StopAutomatic := true;
+                    #ACommand.QuickStopAutomatic := false;
+            END_CASE;
+            
+            // Формирование выхода запуска предпусковой сигнализации
+            #Horn := #_smAutomatic.State = #ST_2_PRESTARTUP_HORN;
+        END_REGION
+        
+        REGION Состояние
+            // Предупреждение группы
+            #State.Basic.Warning :=
+            #_UnitsState.Warning
+            OR #_AUnitsState.Warning
+            ;
+            
+            // Авария группы
+            IF #_UnitsState.Fault THEN
+                #State.Fault.Active := true;
+                #State.Fault.Reason := wstring#'Авария механизмов';
+            ELSIF #_AUnitsState.Fault THEN
+                #State.Fault.Active := true;
+                #State.Fault.Reason := wstring#'Авария автоматов механизмов';
+            ELSIF #_Gate.Fault THEN
+                #State.Fault.Active := true;
+                #State.ReadyToAuto.Reason := wstring#'Авария калиток безопасности';
+            ELSIF #_smAutomatic.Fault THEN
+                #State.Fault.Active := true;
+                #State.ReadyToAuto.Reason := #_smAutomatic.FaultText;
+            ELSE
+                #State.Fault.Active := false;
+                #State.Fault.Reason := wstring#'';
+            END_IF;
+            #State.Basic.Fault := #State.Fault.Active;
+            
+            // Группа подтвердила безопасное состояние по запросу доступа от калиток
+            #State.Basic.SafeToEnter :=
+            #_UnitsState.SafeToEnter
+            AND #_AUnitsState.SafeToEnter
+            ;
+            
+            #State.Basic.ReadyOperation := #State.ReadyToAuto.Active;
+            #State.Basic.Stopped :=
+            (#_smAutomatic.State = #ST_0_STOPPED
+            OR #_smAutomatic.State = #ST_1_READYAUTO
+            OR (#_smAutomatic.State = #ST_10_AUTOMODE_OFF AND #_AUnitsState.Stopped)
+            );
+            #State.Basic.Startup := (#_smAutomatic.State = #ST_2_PRESTARTUP_HORN OR #_smAutomatic.State = #ST_3_STARTUP_DELAY OR #_smAutomatic.State = #ST_4_STARTING);
+            #State.Basic.Running := #_smAutomatic.State = #ST_5_RUNNING;
+            #State.Basic.Shutdown := (#_smAutomatic.State = #ST_6_STOPPING_DELAY OR #_smAutomatic.State = #ST_7_STOPPING OR #_smAutomatic.State = #ST_10_AUTOMODE_OFF);
+            #State.Basic.QuickStopping := (#_smAutomatic.State = #ST_900_QUICKSTOPPING OR #_smAutomatic.State = #ST_901_QUICKSTOPPED);
+            
+            #State.Basic.Local := #_UnitsState.Local;
+            #State.Basic.Disable := #_UnitsState.Disable;
+        END_REGION
+        
+        REGION Сброс аварий / Тест ламп
+            #_resetTestLamp(Name := #Hmi.Name,
+                            Notice := #Notice,
+                            BtnReset := #Buttons.ResetFault);
+            
+            // Общий сброс аварий (с кнопки, с HMI, с диспетчерской)
+            #_r_resetFault(CLK := #_resetTestLamp.Reset OR #Hmi.Command.FromHMI.%X15 OR #Hmi.Command.FromDispatcher.%X15);
+            #_resetFault := (#_r_resetFault.Q AND #Pu.ControlKey);
+            
+            // Процедура сброса аварий
+            CASE #_smResetting.State OF
+                #NO_COMMAND:
+                    IF (#_r_resetFault.Q AND NOT #Pu.ControlKey) THEN
+                        #Notice(Name := #Hmi.Name,
+                                Text := wstring#'Команда сброса аварий отклонена. Переключите ключ-бирку');
+                    ELSIF #_resetFault THEN
+                        #Notice(Name := #Hmi.Name,
+                                Text := WSTRING#'Сброс аварий');
+                        #_smResetting.ChangeStateTo := #RESETTING;
+                    END_IF;
+                    
+                #RESETTING:
+                    IF #_smResetting.StateTime >= #RESET_TIME THEN
+                        IF NOT #State.Basic.Fault THEN
+                            #_smResetting.ChangeStateTo := #RESET_DONE;
+                        ELSE
+                            #_smResetting.ChangeStateTo := #RESET_ERROR;
+                            IF #Settings.EventOn THEN
+                                #_event(Name := #Hmi.Name,
+                                        Text := WSTRING#'После сброса остались активные аварии');
+                            END_IF;
+                            #Notice(Name := #Hmi.Name,
+                                    Text := WSTRING#'После сброса остались активные аварии');
+                        END_IF;
+                    END_IF;
+                    
+                    // Сброс слова аварий группы
+                    #Hmi.State.Alarm := 0;
+                    
+                #RESET_DONE, #RESET_ERROR:
+                    IF NOT #_resetFault THEN
+                        #_smResetting.ChangeStateTo := #NO_COMMAND;
+                    END_IF;
+            END_CASE;
+            #_smResetting();
+        END_REGION
+        
+        REGION Данные для механизмов группы ("ToUnit")
+            // Ключ-бирка   
+            #ToUnit.ControlKey := #Pu.ControlKey;
+            
+            // Экстренный останов
+            #ToUnit.QuickStop := #QuickStop;
+            
+            // Калиитки
+            #ToUnit.SafetyOk := #_Gate.SafetyOk;
+            #ToUnit.SafetyRequestPause := #_Gate.RequestPause;
+            
+            // Сброс аварий
+            #ToUnit.ResetFault := (#_smResetting.State = #RESETTING);
+            
+            // Тест ламп
+            #ToUnit.TestLamp := #_resetTestLamp.TestLamp;
+            
+            // Предпусковая групповая сигналзиация
+            #ToUnit.Horn := #Horn;
+            
+            // Режим и место управления 
+            #ToUnit.Mode := #Mode;
+            #ToUnit.Place := #Place;
+            
+            // Импульсы для ламп сигнализации работы механизмов
+            #ToUnit.HLPulses := #LampPulse;
+        END_REGION
+        
+        REGION Hmi
+            #Hmi.Mode.Mode := #Mode;
+            #Hmi.Mode.Place := #Place;
+            
+            // Event при смене места/режима управления группы
+            IF #Settings.EventOn THEN
+                #_e_mode(Name := #Hmi.Name,
+                         Mode := #Mode,
+                         Place := #Place);
+            END_IF;
+            
+            // Notice и Event при смене состояния группы
+            #_e_state(Name := #Hmi.Name,
+                      State := #State.Basic,
+                      Notice := #Notice,
+                      EventOn := #Settings.EventOn);
+            
+            #Hmi.State.Status.%X0 := #State.Basic.ReadyOperation;
+            #Hmi.State.Status.%X1 := #State.Basic.Fault;
+            #Hmi.State.Status.%X2 := #State.Basic.Warning;
+            #Hmi.State.Status.%X3 := #State.Basic.Stopped;
+            #Hmi.State.Status.%X4 := #State.Basic.Startup;
+            #Hmi.State.Status.%X5 := #State.Basic.Running;
+            #Hmi.State.Status.%X6 := #State.Basic.Shutdown;
+            #Hmi.State.Status.%X7 := #State.Basic.QuickStopping;
+            #Hmi.State.Status.%X8 := #State.Basic.SafeToEnter;
+            #Hmi.State.Status.%X9 := #State.Basic.Disable;
+            #Hmi.State.Status.%X10 := #State.Basic.Local;
+            
+            #Hmi.State.Feature1.%X0 := #Pu.ControlKey;
+            #Hmi.State.Feature1.%X1 := #QuickStop;
+            #Hmi.State.Feature1.%X2 := #ExtAutoModeOFF;
+            #Hmi.State.Feature1.%X3 := #_permitStart.First.Active;
+            #Hmi.State.Feature1.%X4 := NOT #_Gate.SafetyOk;
+            #Hmi.State.Feature1.%X5 := #_UnitsState.Fault;
+            #Hmi.State.Feature1.%X6 := #_AUnitsState.Fault;
+            #Hmi.State.Feature1.%X7 := #_UnitsState.Warning;
+            #Hmi.State.Feature1.%X8 := #_AUnitsState.Warning;
+            #Hmi.State.Feature1.%X9 := #_UnitsState.ReadyOperation;
+            #Hmi.State.Feature1.%X10 := #_AUnitsState.ReadyOperation;
+            
+            #Hmi.State.Feature2.%X0 := #_smResetting.State = #RESETTING;
+            #Hmi.State.Feature2.%X1 := #_smResetting.State = #RESET_DONE;
+            #Hmi.State.Feature2.%X2 := #_smAutomatic.State = #ST_2_PRESTARTUP_HORN;
+            
+            IF #State.ReadyToAuto.Active THEN
+                IF NOT #Hmi.ReadyToAuto.Active THEN
+                    #Hmi.ReadyToAuto.Reason := WSTRING#'';
+                END_IF;
+                #Hmi.ReadyToAuto.Active := TRUE;
+            ELSE
+                #Hmi.ReadyToAuto := #State.ReadyToAuto;
+            END_IF;
+            
+            IF NOT #State.Fault.Active THEN
+                IF #Hmi.Fault.Active THEN
+                    #Hmi.Fault.Reason := WSTRING#'';
+                END_IF;
+                #Hmi.Fault.Active := FALSE;
+            ELSE
+                #Hmi.Fault := #State.Fault;
+            END_IF;
+            
+            // Сброс команд ЧМИ/Диспетчер после обработки
+            #Hmi.Command.FromHMI.%X0 := false;
+            #Hmi.Command.FromHMI.%X1 := false;
+            #Hmi.Command.FromHMI.%X2 := false;
+            #Hmi.Command.FromHMI.%X3 := false;
+            #Hmi.Command.FromHMI.%X4 := false;
+            #Hmi.Command.FromHMI.%X5 := false;
+            #Hmi.Command.FromHMI.%X6 := false;
+            #Hmi.Command.FromHMI.%X7 := false;
+            #Hmi.Command.FromHMI.%X8 := false;
+            #Hmi.Command.FromHMI.%X9 := false;
+            #Hmi.Command.FromHMI.%X15 := false;
+            
+            #Hmi.Command.FromDispatcher.%X0 := false;
+            #Hmi.Command.FromDispatcher.%X1 := false;
+            #Hmi.Command.FromDispatcher.%X2 := false;
+            #Hmi.Command.FromDispatcher.%X3 := false;
+            #Hmi.Command.FromDispatcher.%X4 := false;
+            #Hmi.Command.FromDispatcher.%X5 := false;
+            #Hmi.Command.FromDispatcher.%X6 := false;
+            #Hmi.Command.FromDispatcher.%X7 := false;
+            #Hmi.Command.FromDispatcher.%X8 := false;
+            #Hmi.Command.FromDispatcher.%X9 := false;
+            #Hmi.Command.FromDispatcher.%X15 := false;
+            
+            (*
+           ---------------------------------------------------------------------------------------
+           Биты слова состояния группы для ЧМИ
+            #Hmi.State.Status.%X0 - Готовность группы
+            #Hmi.State.Status.%X1 - Авария группы
+            #Hmi.State.Status.%X2 - Предупреждения группы 
+            #Hmi.State.Status.%X3 - Группа остановлена (автоматика остановлена)
+            #Hmi.State.Status.%X4 - Группа запускается 
+            #Hmi.State.Status.%X5 - Группа в работе (автоматика запущена)
+            #Hmi.State.Status.%X6 - Группа останавливается
+            #Hmi.State.Status.%X7 - Группа останавливается экстренно
+            #Hmi.State.Status.%X8 - Группа в безопасном состоянии по запросу калиток
+            #Hmi.State.Status.%X9 - Есть механизмы группы, выведенные из работы 
+            #Hmi.State.Status.%X10 - Есть механизмы группы, переведенные в локальный режим управления     
+                
+            ---------------------------------------------------------------------------------------
+            Биты слова 1 дополнительных свойств группы для ЧМИ
+             #Hmi.State.Feature1.%X0 - Вход "Ключ-бирка"
+             #Hmi.State.Feature1.%X1 - Вход "Экстренный останов" 
+             #Hmi.State.Feature1.%X2 - Вход "Внешний останов автоматики и перевод группы в ручном режим" 
+             #Hmi.State.Feature1.%X3 - Условия запуска группы выполнены
+             #Hmi.State.Feature1.%X4 - Калитки безопасности НЕ закрыты     
+             #Hmi.State.Feature1.%X5 - Механизмы группы - авария
+             #Hmi.State.Feature1.%X6 - Автоматики механизмов группы - авария
+             #Hmi.State.Feature1.%X7 - Механизмы группы - предупреждение
+             #Hmi.State.Feature1.%X8 - Автоматики механизмов группы - предупреждение
+             #Hmi.State.Feature1.%X9 - Механизмы группы все готовы в работе
+             #Hmi.State.Feature1.%X10 - Автоматики механизмов группы все готовы к работе в автоматическом режиме
+            
+            ---------------------------------------------------------------------------------------
+            Биты слова 2 дополнительных свойств группы для ЧМИ
+             #Hmi.State.Feature2.%X0 - Процесс сброса аварий 
+             #Hmi.State.Feature2.%X1 - Сброс аварий завершен
+             #Hmi.State.Feature2.%X2 - Предпусковая сигнализация при запуске группы в автоматическом режиме
+             
+            ---------------------------------------------------------------------------------------
+            Биты слова аварий 
+             #Hmi.State.Alarm.%X0 - Группа не запустилась за заданное время
+             #Hmi.State.Alarm.%X1 - Группа не остановилась за заданное время
+             
+             #Hmi.State.Alarm.%X2 - Во время запуска группы нажата кнопка экстренного останова
+             #Hmi.State.Alarm.%X3 - Во время запуска группы нештатно отключен автоматический режим
+             #Hmi.State.Alarm.%X4 - Во время запуска группы произошла авария автоматов механизмов
+             #Hmi.State.Alarm.%X5 - Во время запуска группы пропала готовность автоматов механизмов     
+             
+             #Hmi.State.Alarm.%X6 - Во время работы группы нажата кнопка экстренного останова
+             #Hmi.State.Alarm.%X7 - Во время работы группы нештатно отключен автоматический режим
+             #Hmi.State.Alarm.%X8 - Во время работы группы произошла авария автоматов механизмов
+             #Hmi.State.Alarm.%X9 - Во время работы группы пропала готовность автоматов механизмов 
+             
+             #Hmi.State.Alarm.%X10 - Во время остановки группы нажата кнопка экстренного останова
+             #Hmi.State.Alarm.%X11 - Во время остановки группы нештатно отключен автоматический режим
+             #Hmi.State.Alarm.%X12 - Во время остановки группы произошла авария автоматов механизмов
+             #Hmi.State.Alarm.%X13 - Во время остановки группы пропала готовность автоматов механизмов  
+             
+             #Hmi.State.Alarm.%X14 - Превышено время экстренной остановки группы  
+             #Hmi.State.Alarm.%X15 -  
+        
+            ---------------------------------------------------------------------------------------
+            Биты слов управления
+             #Hmi.Command.FromHMI.%X0 - команда остановить автоматику
+             #Hmi.Command.FromHMI.%X1 - команда запустить автоматику
+             #Hmi.Command.FromHMI.%X2 - 
+             #Hmi.Command.FromHMI.%X3 - 
+             #Hmi.Command.FromHMI.%X4 - активировать сервисный режим 
+             #Hmi.Command.FromHMI.%X5 - активировать ручной режим 
+             #Hmi.Command.FromHMI.%X6 - активировать полуавтоматический режим 
+             #Hmi.Command.FromHMI.%X7 - активировать автоматический режим  
+             #Hmi.Command.FromHMI.%X8 - выбрать место управления с ЧМИ
+             #Hmi.Command.FromHMI.%X9 - выбрать место управления с Диспетчера 
+             #Hmi.Command.FromHMI.%X15 - сброс аварий с ЧМИ
+               
+             #Hmi.Command.FromDispatcher.%X0 - команда остановить автоматику
+             #Hmi.Command.FromDispatcher.%X1 - команда запустить автоматику
+             #Hmi.Command.FromDispatcher.%X2 - 
+             #Hmi.Command.FromDispatcher.%X3 -   
+             #Hmi.Command.FromDispatcher.%X4 - активировать сервисный режим 
+             #Hmi.Command.FromDispatcher.%X5 - активировать ручной режим 
+             #Hmi.Command.FromDispatcher.%X6 - активировать полуавтоматический режим 
+             #Hmi.Command.FromDispatcher.%X7 - активировать автоматический режим  
+             #Hmi.Command.FromDispatcher.%X8 - выбрать место управления с ЧМИ
+             #Hmi.Command.FromDispatcher.%X9 - выбрать место управления с Диспетчера
+             #Hmi.Command.FromDispatcher.%X15 - сброс аварий с диспетчерской
+        *)
+        END_REGION
+        
+        REGION Индикация работы
+            // Ручной режим
+            #_lampManual.Control.Cont := (#Mode = "MODE_MANUAL");
+        
+            // Пуск/Остановка/Работа автоматики
+            #_lampAutomatic.Control.Cont := (#Mode = "MODE_AUTO" AND #State.Basic.Stopped);
+            #_lampAutomatic.Control.Slow := #State.Basic.Running;
+            #_lampAutomatic.Control.Fast := (#Mode = "MODE_AUTO" AND NOT #State.Basic.Stopped AND NOT #State.Basic.Running);
+            
+            // Авария
+            #_lampFault.Control.Cont := FALSE;
+            #_lampFault.Control.Medium := #State.Basic.Fault AND NOT #ToUnit.ResetFault;
+            #_lampFault.Control.Fast := #ToUnit.ResetFault;
+            
+            // Предупреждение
+            #_lampWarning.Control.Cont := FALSE;
+            #_lampWarning.Control.Medium := #State.Basic.Warning;
+            
+            // Готовность
+            #_lampReady.Control.Cont := #State.Basic.ReadyOperation;
+            
+            #_lampManual(Pulse := #ToUnit.HLPulses, TurnLamp => #LampManual, TestLamp := #ToUnit.TestLamp);
+            #_lampAutomatic(Pulse := #ToUnit.HLPulses, TurnLamp => #LampAutomatic, TestLamp := #ToUnit.TestLamp);
+            #_lampFault(Pulse := #ToUnit.HLPulses, TurnLamp => #LampFault, TestLamp := #ToUnit.TestLamp);
+            #_lampReady(Pulse := #ToUnit.HLPulses, TurnLamp => #LampReady, TestLamp := #ToUnit.TestLamp);
+            #_lampWarning(Pulse := #ToUnit.HLPulses, TurnLamp => #LampWarning, TestLamp := #ToUnit.TestLamp);
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

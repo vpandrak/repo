@@ -1,0 +1,8 @@
+﻿TYPE
+    ValveJog : STRUCT
+        { S7_MLC := "MLC_4U2" }
+        Open : Bool;
+        { S7_MLC := "MLC_4N6" }
+        Close : Bool;
+    END_STRUCT;
+END_TYPE

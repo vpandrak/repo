@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: HmiControl.s7dcl
+    Hash: lF51zDLP1EFhhGkEoPlRuUQAnFSJFgfMu0tqolEPcCM=
+  - FileName: HmiControl.s7res
+    Hash: Ww+/rC7s+prG9GevKGEHylPaFM3xKOAfU/Hjw52OwMY=
+LibraryMetaFileHash: Xmetpf6La9W/2g4oUnYnAiMgvQOaNiyzM0ldg+cHIoA=
+LibraryVersion:
+  Guid: 4c442518-a7db-45ad-aadf-908588e3f3a8
+  DependsOn:
+    - TypeName: HmiState
+      VersionNumber: 0.0.1

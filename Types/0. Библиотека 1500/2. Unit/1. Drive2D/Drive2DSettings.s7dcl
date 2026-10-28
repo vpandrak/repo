@@ -1,0 +1,19 @@
+﻿TYPE
+    Drive2DSettings : STRUCT
+        "Name" : WString[30];
+        { S7_MLC := "MLC_Mc" }
+        SimulationOn : Bool;
+        { S7_MLC := "MLC_L7" }
+        EventOn : Bool;
+        { S7_MLC := "MLC_hb" }
+        Program_Alarm_Off : Bool;
+        Control : _.MotorSettings;
+        Drive : STRUCT
+            NSpeed : Real;
+            NCurrent : Real;
+            NVoltage : Real;
+            NPower : Real;
+            NTorgue : Real;
+        END_STRUCT;
+    END_STRUCT;
+END_TYPE

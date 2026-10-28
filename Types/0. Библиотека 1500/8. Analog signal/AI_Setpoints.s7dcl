@@ -1,0 +1,12 @@
+﻿TYPE
+    AI_Setpoints : STRUCT
+        Physh_HRange : Real;
+        Physh_LRange : Real;
+        { S7_MLC := "MLC_yy" }
+        Hysteresis : Real := 0.02;
+        { S7_MLC := "MLC_3gB" }
+        K_Smoothing : Real;
+        { S7_MLC := "MLC_4gx" }
+        Sim_Value : Real;
+    END_STRUCT;
+END_TYPE

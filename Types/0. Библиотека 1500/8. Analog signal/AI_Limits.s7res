@@ -1,0 +1,13 @@
+﻿MultiLingualTexts:
+  - id: MLC_LV
+    en-US: peripheral high limit. Default is 27648
+    ru-RU: peripheral high limit. Default is 27648
+  - id: MLC_3Fy
+    en-US: peripheral low limit. Default is 0
+    ru-RU: peripheral low limit. Default is 0
+  - id: MLC_h5
+    en-US: peripheral live zero high limit
+    ru-RU: peripheral live zero high limit
+  - id: MLC_mU
+    en-US: peripheral live zero low limit
+    ru-RU: peripheral live zero low limit

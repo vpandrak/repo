@@ -1,0 +1,38 @@
+﻿TYPE
+    ValveSettings : STRUCT
+        { S7_MLC := "MLC_Sd" }
+        OpenPosnName : WString[20] := WSTRING#'А';
+        { S7_MLC := "MLC_4F3" }
+        ClosePosnName : WString[20] := WSTRING#'В';
+        { S7_MLC := "MLC_3Mw" }
+        OpenPosnLimitSwitch : Bool := true;
+        { S7_MLC := "MLC_3Xd" }
+        MoveToOpenMaxTime : Time := T#10s;
+        { S7_MLC := "MLC_3Cz" }
+        MoveToOpenOnLSTime : Time;
+        { S7_MLC := "MLC_4pA" }
+        OpenPosnLSLostControl : Bool;
+        { S7_MLC := "MLC_4LH" }
+        ClosePosnLimitSwitch : Bool := true;
+        { S7_MLC := "MLC_5Ak" }
+        MoveToCloseMaxTime : Time := T#10s;
+        { S7_MLC := "MLC_3Sb" }
+        MoveToCloseOnLSTime : Time;
+        { S7_MLC := "MLC_4wX" }
+        ClosePosnLSLostControl : Bool;
+        { S7_MLC := "MLC_3BF" }
+        TypeInputCmd : Int;
+        { S7_MLC := "MLC_3Vu" }
+        TypeControl : Bool;
+        { S7_MLC := "MLC_4GW" }
+        FeedBackEn : Bool;
+        { S7_MLC := "MLC_3Jc" }
+        MinPosition : Real;
+        { S7_MLC := "MLC_3RS" }
+        MaxPosition : Real;
+        { S7_MLC := "MLC_56b" }
+        DeadBand : Real;
+        { S7_MLC := "MLC_4pL" }
+        ChangeRate : Real;
+    END_STRUCT;
+END_TYPE

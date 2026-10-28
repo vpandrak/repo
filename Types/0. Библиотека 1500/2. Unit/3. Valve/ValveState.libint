@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: ValveState.s7dcl
+    Hash: U1eU0qxVPN28okahiZ1lQaTkL7nt8GB7x2grxfn+TnY=
+LibraryMetaFileHash: 644lOMrEiJS5JUt++/2bvxbVjC06UMkMcTrTCU4qcus=
+LibraryVersion:
+  Guid: 1d4ed4ac-1797-4fa8-a797-4cbd052857cd
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14

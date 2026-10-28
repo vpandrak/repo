@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: ResetAlarmTestLamp.s7dcl
+    Hash: pcr1xSWExyoBzmKqYNzch27CGn+6mWBsBdVwQVMV2hE=
+  - FileName: ResetAlarmTestLamp.s7res
+    Hash: xa8UJcidjf9vT83DScseGOQSHYucpSbq501+yT0XlIw=
+LibraryMetaFileHash: o0lXvxF5jrdMr9pGkeR6rRSCrXFJuuRlmGEZvvDwQSk=
+LibraryVersion:
+  Guid: 7bae51e9-0060-46c5-8ba4-4966d97e4767
+  DependsOn:
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: StateMachineWithOutHistory
+      VersionNumber: 0.0.1

@@ -1,0 +1,6 @@
+﻿TYPE
+    HmiMotorAxisCommand : STRUCT
+        Basic : _.HmiCommand;
+        TargetPosition : Real;
+    END_STRUCT;
+END_TYPE

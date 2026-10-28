@@ -1,0 +1,606 @@
+﻿{
+    S7_BlockNumber := "10213";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "MotorCommand"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OperatorCommand : _.MotorCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ActuatorCmd : _.MotorCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ActuatorJog : _.MotorJog;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LocalControlRequest : _.LampCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LocalControlEnable : _.LampCommand;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        HmiMode : _.HmiMode;
+        HmiCommand : _.HmiCommand;
+        Settings : _.Drive2DSettings;
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+        Pu1 : _.MotorCmd;
+        Pu2 : _.MotorCmd;
+        Local : STRUCT
+            Key : Bool;
+            Pu : _.MotorCmd;
+        END_STRUCT;
+        AutoCmd : _.MotorCmd;
+        State : _.MotorState;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smMode : _.StateMachineWithOutHistory;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1Start1D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1Start2D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu2Start1D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu2Start2D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _localStart1D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _localStart2D_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1Start1D_N : F_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1Start2D_N : F_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _localKey_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _resetFault_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _cmd : Int;
+    END_VAR
+    VAR CONSTANT
+        NO_COMMAND : Int := 0;
+        STOP : Int := 1;
+        START1D : Int := 2;
+        START2D : Int := 3;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        REGION Активация локального управления
+            #_localKey_P(CLK := #Local.Key);
+            
+            IF NOT #Local.Key THEN
+                #HmiMode.Mode := #Group.Mode;
+                #HmiMode.Place := #Group.Place;
+            ELSIF #_localKey_P.Q
+                AND #Group.Mode <> "MODE_AUTO"
+            THEN
+                #HmiMode.Mode := "MODE_SERVICE";
+                #HmiMode.Place := "PLACE_LOCAL";
+            END_IF;
+            
+            // Индикация на локальном пульте управления (индикация разрешения работы с пульта)
+            #LocalControlEnable.Fast := #Local.Key AND #HmiMode.Place <> "PLACE_LOCAL" AND #Group.Mode = "MODE_AUTO";  // быстрое мигание - при включении ключ-бирки на локальном посту группа в атоматическом режиме
+            #LocalControlEnable.Slow := #Local.Key AND #HmiMode.Place <> "PLACE_LOCAL" AND #Group.Mode <> "MODE_AUTO"; // медленно мигание - при включенной ключ-бирке на локальном посту группа не в автоматическом режиме, но перехода в локальное место управление не произошло. Требуется переподключить ключ-бирку
+            #LocalControlEnable.Cont := #Local.Key AND #HmiMode.Place = "PLACE_LOCAL";                                 // постоянное горение - локальный пульт активен. Работа с пульта разрешена
+            
+            // Индикация на основном пульте управления (индикация запроса и работы локального пульта)
+            #LocalControlRequest.Fast := #Local.Key AND #HmiMode.Place <> "PLACE_LOCAL";
+            #LocalControlRequest.Cont := #Local.Key AND #HmiMode.Place = "PLACE_LOCAL";
+            
+            #_smMode(ChangeStateTo := #HmiMode.Mode);
+            
+            #State.Basic.Local := #HmiMode.Place = "PLACE_LOCAL";  // Активировано локальное управление
+            #State.Basic.Single := (#HmiMode.Mode = "MODE_MANUAL") OR (#HmiMode.Mode = "MODE_SERVICE");  // Индивидуальное управление (Manual or Local)   
+        END_REGION
+        
+        REGION Фронты
+            #_pu1Start1D_P(CLK := #Pu1.Start1D);
+            #_pu1Start2D_P(CLK := #Pu1.Start2D);
+            #_pu1Start1D_N(CLK := #Pu1.Start1D);
+            #_pu1Start2D_N(CLK := #Pu1.Start2D);
+            
+            #_pu2Start1D_P(CLK := #Pu2.Start1D);
+            #_pu2Start2D_P(CLK := #Pu2.Start2D);
+            
+            #_localStart1D_P(CLK := #Local.Pu.Start1D);
+            #_localStart2D_P(CLK := #Local.Pu.Start2D);
+        END_REGION
+        
+        REGION Если есть команды запуска одновременно в оба направления, формируем сообщение
+            IF (#Pu1.Start1D AND #Pu1.Start2D)
+                OR (#Pu2.Start1D AND #Pu2.Start2D)
+                OR (#Local.Pu.#Start1D AND #Local.Pu.Start2D)
+            THEN
+                #Notice(Name := #Name,
+                        Text := WSTRING#'Предупреждение. Команды запуска в оба направления');
+                #_event(Name := #Name,
+                        Text := WSTRING#'Предупреждение. Команды запуска в оба направления');
+            END_IF;
+        END_REGION
+        
+        // Инициализация выходных команд
+        #ActuatorCmd.Basic.QuickStop := false;
+        
+        IF #Group.QuickStop THEN
+            REGION События на визуализацию
+                IF #_pu1Start1D_P.Q OR #_pu1Start2D_P.Q
+                    OR #_pu2Start1D_P.Q OR #_pu2Start2D_P.Q
+                    OR #_localStart1D_P.Q OR #_localStart2D_P.Q
+                THEN
+                    #Notice(Name := #Name,
+                            Text := wstring#'Команда отклонена. Активен быстрый останов');
+                END_IF;
+            END_REGION
+            
+            #ActuatorJog.Start1D :=
+            #ActuatorJog.Start2D := false;
+            
+            #OperatorCommand.Start1D :=
+            #OperatorCommand.Start2D :=
+            #OperatorCommand.Fast :=
+            #OperatorCommand.Basic.Stop := false;
+            
+            #ActuatorCmd.Start1D :=
+            #ActuatorCmd.Start2D :=
+            #ActuatorCmd.Fast :=
+            #ActuatorCmd.SetSpeed :=
+            #ActuatorCmd.SetTorque :=
+            #ActuatorCmd.Basic.Stop := false;
+            #ActuatorCmd.Basic.QuickStop := true;
+            
+            #_cmd := #NO_COMMAND;
+        ELSE
+            IF #_smMode.StateChanged THEN
+                #ActuatorJog.Start1D :=
+                #ActuatorJog.Start2D := false;
+                
+                #OperatorCommand.Start1D :=
+                #OperatorCommand.Start2D :=
+                #OperatorCommand.Fast :=
+                #OperatorCommand.Basic.Stop := false;
+                
+                #ActuatorCmd.Start1D :=
+                #ActuatorCmd.Start2D :=
+                #ActuatorCmd.Fast :=
+                #ActuatorCmd.SetSpeed :=
+                #ActuatorCmd.SetTorque := false;
+                
+                #_cmd := #NO_COMMAND;
+            END_IF;
+            
+            CASE #_smMode.State OF
+                "MODE_DISABLE":
+                    REGION Выведен из работы
+                        REGION События на визуализацию
+                            IF #_pu1Start1D_P.Q OR #_pu1Start2D_P.Q
+                                OR #_pu2Start1D_P.Q OR #_pu2Start2D_P.Q
+                                OR #_localStart1D_P.Q OR #_localStart2D_P.Q
+                            THEN
+                                #Notice(Name := #Name,
+                                        Text := WSTRING#'Команда отклонена т.к. механизм выведен из работы');
+                                IF #Settings.EventOn THEN
+                                    #_event(Name := #Name,
+                                            Text := WSTRING#'Команда отклонена т.к. механизм выведен из работы');
+                                END_IF;
+                            END_IF;
+                        END_REGION
+                        
+                        #ActuatorJog.Start1D :=
+                        #ActuatorJog.Start2D := false;
+                        
+                        #OperatorCommand.Start1D :=
+                        #OperatorCommand.Start2D :=
+                        #OperatorCommand.Fast :=
+                        #OperatorCommand.Basic.Stop := false;
+                        
+                        #ActuatorCmd.Start1D :=
+                        #ActuatorCmd.Start2D :=
+                        #ActuatorCmd.Fast :=
+                        #ActuatorCmd.SetSpeed :=
+                        #ActuatorCmd.SetTorque := false;
+                        #ActuatorCmd.Basic.Stop := true;
+                        
+                        #_cmd := #NO_COMMAND;
+                    END_REGION
+                    
+                "MODE_SERVICE":
+                    REGION Операции с пульта Jog'aми
+                        #OperatorCommand.Start1D :=
+                        #OperatorCommand.Start2D :=
+                        #OperatorCommand.Fast :=
+                        #OperatorCommand.Basic.Stop := false;
+                        
+                        #ActuatorCmd.Start1D :=
+                        #ActuatorCmd.Start2D :=
+                        #ActuatorCmd.Fast :=
+                        #ActuatorCmd.SetSpeed :=
+                        #ActuatorCmd.SetTorque :=
+                        #ActuatorCmd.Basic.Stop := false;
+                        
+                        CASE #Group.Place OF
+                            "PLACE_PU1":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #_cmd := #STOP;
+                                        
+                                    #STOP:
+                                        #ActuatorJog.Start1D := false;
+                                        #ActuatorJog.Start2D := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        IF #_pu1Start1D_P.Q THEN
+                                            #_cmd := #START1D;
+                                        ELSIF #_pu1Start2D_P.Q AND #Settings.Control.Reversable THEN
+                                            #_cmd := #START2D;
+                                        END_IF;
+                                        
+                                    #START1D:
+                                        #ActuatorJog.Start1D := true;
+                                        #ActuatorJog.Start2D := false;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop OR NOT #Pu1.Start1D THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #START2D:
+                                        #ActuatorJog.Start1D := false;
+                                        #ActuatorJog.Start2D := true;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop OR NOT #Pu1.Start2D OR NOT #Settings.Control.Reversable THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            "PLACE_PU2":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #_cmd := #STOP;
+                                        
+                                    #STOP:
+                                        #ActuatorJog.Start1D := false;
+                                        #ActuatorJog.Start2D := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        IF #_pu2Start1D_P.Q THEN
+                                            #_cmd := #START1D;
+                                        ELSIF #_pu2Start2D_P.Q AND #Settings.Control.Reversable THEN
+                                            #_cmd := #START2D;
+                                        END_IF;
+                                        
+                                    #START1D:
+                                        #ActuatorJog.Start1D := true;
+                                        #ActuatorJog.Start2D := false;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.Start1D THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #START2D:
+                                        #ActuatorJog.Start1D := false;
+                                        #ActuatorJog.Start2D := true;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.Start2D OR NOT #Settings.Control.Reversable THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            "PLACE_DISPATCHER":
+                                ;
+                                
+                            "PLACE_LOCAL":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #_cmd := #STOP;
+                                        
+                                    #STOP:
+                                        #ActuatorJog.Start1D := false;
+                                        #ActuatorJog.Start2D := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        IF #_localStart1D_P.Q THEN
+                                            #_cmd := #START1D;
+                                        ELSIF #_localStart2D_P.Q AND #Settings.Control.Reversable THEN
+                                            #_cmd := #START2D;
+                                        END_IF;
+                                        
+                                    #START1D:
+                                        #ActuatorJog.Start1D := true;
+                                        #ActuatorJog.Start2D := false;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Local.Pu.Basic.Stop OR NOT #Local.Pu.Start1D THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                        
+                                    #START2D:
+                                        #ActuatorJog.Start1D := false;
+                                        #ActuatorJog.Start2D := true;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Local.Pu.Basic.Stop OR NOT #Local.Pu.Start2D OR NOT #Settings.Control.Reversable THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                        END_CASE;
+                    END_REGION
+                    
+                "MODE_MANUAL":
+                    REGION Операции в ручном режиме
+                        #ActuatorJog.Start1D :=
+                        #ActuatorJog.Start2D := false;
+                        
+                        #OperatorCommand.Start1D :=
+                        #OperatorCommand.Start2D :=
+                        #OperatorCommand.Fast :=
+                        #OperatorCommand.Basic.Stop := false;
+                        
+                        CASE #Group.Place OF
+                            "PLACE_PU1":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #ActuatorCmd.Start1D := false;
+                                        #ActuatorCmd.Start2D := false;
+                                        #ActuatorCmd.Fast := false;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1 THEN
+                                            #_cmd := #STOP;
+                                        ELSIF #_pu1Start1D_P.Q OR #HmiCommand.FromHMI.%X0 THEN
+                                            #_cmd := #START1D;
+                                        ELSIF (#_pu1Start2D_P.Q OR #HmiCommand.FromHMI.%X2) AND #Settings.Control.Reversable THEN
+                                            #_cmd := #START2D;
+                                        END_IF;
+                                        
+                                        // Если механизм с 3-х точечный управлением, то при команде установки скорости, формируем задание скорости
+                                        IF #Pu1.SetSpeed AND NOT #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #ActuatorCmd.SetSpeed := true;
+                                            #ActuatorCmd.Speed := #Pu1.Speed;
+                                        ELSE
+                                            #ActuatorCmd.SetSpeed := false;
+                                            #ActuatorCmd.Speed := 0;
+                                        END_IF;
+                                        
+                                    #STOP:
+                                        #ActuatorCmd.Start1D := false;
+                                        #ActuatorCmd.Start2D := false;
+                                        #ActuatorCmd.Fast := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        #ActuatorCmd.SetSpeed := false;
+                                        #ActuatorCmd.Speed := 0;
+                                        IF NOT #Pu1.Basic.Stop AND NOT #HmiCommand.FromHMI.%X1 THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #START1D:
+                                        #ActuatorCmd.Start1D := true;
+                                        #ActuatorCmd.Start2D := false;
+                                        #ActuatorCmd.Fast := #Pu1.Fast;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF (#Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1) OR (#Pu1.Start2D OR #HmiCommand.FromHMI.%X2) THEN
+                                            #_cmd := #STOP;
+                                            // при 2-х точечном управлении    
+                                        ELSIF NOT #Pu1.Start1D AND #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #_cmd := #STOP;
+                                            // при 3-х точечном управлении
+                                        ELSIF NOT #Pu1.Start1D AND NOT #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                        IF #Pu1.SetSpeed THEN
+                                            #ActuatorCmd.SetSpeed := true;
+                                            #ActuatorCmd.Speed := #Pu1.Speed;
+                                        ELSE
+                                            #ActuatorCmd.SetSpeed := false;
+                                            #ActuatorCmd.Speed := 0;
+                                        END_IF;
+                                        
+                                    #START2D:
+                                        #ActuatorCmd.Start1D := false;
+                                        #ActuatorCmd.Start2D := true;
+                                        #ActuatorCmd.Fast := #Pu1.Fast;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1 OR #HmiCommand.FromHMI.%X0 OR NOT #Settings.Control.Reversable THEN
+                                            #_cmd := #STOP;
+                                            // при 2-х точечном управлении        
+                                        ELSIF NOT #Pu1.Start2D AND #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #_cmd := #STOP;
+                                            // при 3-х точечном управлении
+                                        ELSIF NOT #Pu1.Start2D AND NOT #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                        IF #Pu1.SetSpeed THEN
+                                            #ActuatorCmd.SetSpeed := true;
+                                            #ActuatorCmd.Speed := #Pu1.Speed;
+                                        ELSE
+                                            #ActuatorCmd.SetSpeed := false;
+                                            #ActuatorCmd.Speed := 0;
+                                        END_IF;
+                                END_CASE;
+                                
+                            "PLACE_PU2":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #ActuatorCmd.Start1D := false;
+                                        #ActuatorCmd.Start2D := false;
+                                        #ActuatorCmd.Fast := false;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        #ActuatorCmd.SetSpeed := false;
+                                        #ActuatorCmd.Speed := 0;
+                                        IF #Pu2.Basic.Stop THEN
+                                            #_cmd := #STOP;
+                                        ELSIF #_pu1Start1D_P.Q THEN
+                                            #_cmd := #START1D;
+                                        ELSIF #_pu1Start2D_P.Q AND #Settings.Control.Reversable THEN
+                                            #_cmd := #START2D;
+                                        END_IF;
+                                        
+                                        // Если механизм с 3-х точечный управлением, то при команде установки скорости, формируем задание скорости
+                                        IF #Pu2.SetSpeed AND NOT #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #ActuatorCmd.SetSpeed := true;
+                                            #ActuatorCmd.Speed := #Pu2.Speed;
+                                        ELSE
+                                            #ActuatorCmd.SetSpeed := false;
+                                            #ActuatorCmd.Speed := 0;
+                                        END_IF;
+                                        
+                                    #STOP:
+                                        #ActuatorCmd.Start1D := false;
+                                        #ActuatorCmd.Start2D := false;
+                                        #ActuatorCmd.Fast := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        #ActuatorCmd.SetSpeed := false;
+                                        #ActuatorCmd.Speed := 0;
+                                        IF NOT #Pu2.Basic.Stop THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #START1D:
+                                        #ActuatorCmd.Start1D := true;
+                                        #ActuatorCmd.Start2D := false;
+                                        #ActuatorCmd.Fast := #Pu2.Fast;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu2.Basic.Stop OR #Pu2.Start2D THEN
+                                            #_cmd := #STOP;
+                                            // при 2-х точечном управлении     
+                                        ELSIF NOT #Pu2.Start1D AND #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #_cmd := #STOP;
+                                            // при 3-х точечном управлении    
+                                        ELSIF NOT #Pu2.Start1D AND NOT #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                        IF #Pu2.SetSpeed THEN
+                                            #ActuatorCmd.SetSpeed := true;
+                                            #ActuatorCmd.Speed := #Pu2.Speed;
+                                        ELSE
+                                            #ActuatorCmd.SetSpeed := false;
+                                            #ActuatorCmd.Speed := 0;
+                                        END_IF;
+                                        
+                                    #START2D:
+                                        #ActuatorCmd.Start1D := false;
+                                        #ActuatorCmd.Start2D := true;
+                                        #ActuatorCmd.Fast := #Pu2.Fast;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu2.Basic.Stop OR #Pu2.Start1D OR NOT #Settings.Control.Reversable THEN
+                                            #_cmd := #STOP;
+                                            // при 2-х точечном управлении       
+                                        ELSIF NOT #Pu2.Start2D AND #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #_cmd := #STOP;
+                                            // при 3-х точечном управлении
+                                        ELSIF NOT #Pu2.Start2D AND NOT #Settings.Control."TypeCmd_2/3_Point" THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                        IF #Pu2.SetSpeed THEN
+                                            #ActuatorCmd.SetSpeed := true;
+                                            #ActuatorCmd.Speed := #Pu2.Speed;
+                                        ELSE
+                                            #ActuatorCmd.SetSpeed := false;
+                                            #ActuatorCmd.Speed := 0;
+                                        END_IF;
+                                END_CASE;
+                                
+                            "PLACE_DISPATCHER":
+                                ;
+                        END_CASE;
+                    END_REGION
+                    
+                "MODE_AUTO", "MODE_SEMIAUTO":
+                    REGION Команды автоматики
+                        #ActuatorJog.Start1D := false;
+                        #ActuatorJog.Start2D := false;
+                        
+                        #ActuatorCmd := #AutoCmd;
+                        
+                        CASE #Group.Place OF
+                            "PLACE_PU1":
+                                #OperatorCommand := #Pu1;
+                            "PLACE_PU2":
+                                #OperatorCommand := #Pu2;
+                        END_CASE;
+                    END_REGION
+            END_CASE;
+        END_IF;
+        
+        REGION #Hmi
+            // Содержание слова управления с Hmi (аналогично с Dispatcher)
+            // #HmiCommand.FromHMI.%X0 - команда "Start 1D"
+            // #HmiCommand.FromHMI.%X1 - команда "СТОП" 
+            // #HmiCommand.FromHMI.%X2 - команда "Start 2D"
+            // Сброс слов управления с визуализации
+            #HmiCommand.FromHMI.%X0 := #HmiCommand.FromHMI.%X1 := #HmiCommand.FromHMI.%X2 := false;
+            #HmiCommand.FromDispatcher.%X0 := #HmiCommand.FromDispatcher.%X1 := #HmiCommand.FromDispatcher.%X2 := false;
+            
+            // #HmiCommand.FromHMI.%X15 - сброс аварий с HMI
+            // #HmiCommand.FromDispatcher.%X15 - сброс аварий с диспетчерской
+            #_resetFault_P(CLK := #HmiCommand.FromHMI.%X15 OR #HmiCommand.FromDispatcher.%X15);
+            IF (#_resetFault_P.Q AND NOT #Group.ControlKey) THEN
+                #Notice(Name := #Name,
+                        Text := wstring#'Команда отклонена. Включите ключ-бирку');
+            ELSIF #_resetFault_P.Q THEN
+                #Notice(Name := #Name,
+                        Text := WSTRING#'Сброс аварий');
+            END_IF;
+            
+            #ActuatorCmd.Basic.ResetFault := #Group.ResetFault
+            OR ((#HmiCommand.FromHMI.%X15 OR #HmiCommand.FromDispatcher.%X15) AND #Group.ControlKey);
+            
+            #HmiCommand.FromHMI.%X15 := #HmiCommand.FromDispatcher.%X15 := false;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

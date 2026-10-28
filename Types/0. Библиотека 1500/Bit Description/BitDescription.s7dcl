@@ -1,0 +1,8 @@
+﻿TYPE
+    BitDescription : STRUCT
+        { S7_MLC := "MLC_4SL" }
+        Active : Bool;
+        { S7_MLC := "MLC_4PV" }
+        Reason : WString[70];
+    END_STRUCT;
+END_TYPE

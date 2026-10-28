@@ -1,0 +1,23 @@
+﻿TYPE
+    GroupState : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Basic : _.BasicState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3bi";
+            S7_Visibility := "Hidden := External"
+        }
+        ReadyToAuto : _.BitDescription := (
+            Active := true
+        );
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4n4";
+            S7_Visibility := "Hidden := External"
+        }
+        Fault : _.BitDescription;
+    END_STRUCT;
+END_TYPE

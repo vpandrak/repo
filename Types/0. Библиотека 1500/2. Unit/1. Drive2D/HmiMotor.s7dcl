@@ -1,0 +1,7 @@
+﻿TYPE
+    HmiMotor : STRUCT
+        State : _.HmiState;
+        Speed : _.HmiMotorSpeed;
+        Motoresource : Real;
+    END_STRUCT;
+END_TYPE

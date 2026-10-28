@@ -1,0 +1,7 @@
+﻿MultiLingualTexts:
+  - id: MLC_4UR
+    ru-RU: реле собрано
+  - id: MLC_4jR
+    ru-RU: реле сработало
+  - id: MLC_4Sq
+    ru-RU: требуется сброс реле

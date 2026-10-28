@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: Interlock.s7dcl
+    Hash: sXajVgc65OifWclubccU4SvqVoi8UU0E+PVV56xHeU8=
+  - FileName: Interlock.s7res
+    Hash: PajvofIj7AU8Vy3mPvFBwKjOyuuLEvfxSPTdK4iLqbo=
+LibraryMetaFileHash: ujpFVXlDJqpIEIJi3h0Xfw7TWwmOlcmvkbloDRVmH6o=
+LibraryVersion:
+  Guid: 2534bbe6-e631-4011-ba00-a82b7d367d6f
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1

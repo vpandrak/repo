@@ -1,0 +1,92 @@
+﻿{
+    S7_BlockNumber := "10406";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PA_Warning"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Text : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        SET : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        RESET : Bool := true;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.BitDescription;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _message : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _warning : Program_Alarm;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _set : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_set : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_reset : R_TRIG;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        #_r_set(CLK := #SET);
+        #_r_reset(CLK := NOT #SET AND #RESET);
+        
+        IF #SET THEN
+            IF NOT #_set THEN
+                IF #Name <> wstring#'' THEN
+                    #_message := CONCAT_WSTRING(IN1 := CONCAT_WSTRING(IN1 := #Name, IN2 := WSTRING#'. '), IN2 := #Text);
+                ELSE
+                    #_message := #Text;
+                END_IF;
+                #State.Reason := #_message;
+            END_IF;
+            #_set := true;
+        ELSIF #RESET THEN
+            #_set := false;
+            #State.Reason := WSTRING#'';
+        END_IF;
+        
+        IF #_r_set.Q OR #_r_reset.Q THEN
+            #_warning(SIG := #_set,
+                      SD_1 := #_message);
+        END_IF;
+        
+        #State.Active := #_set;
+        
+        #SET := false;
+    END_NETWORK
+END_FUNCTION_BLOCK

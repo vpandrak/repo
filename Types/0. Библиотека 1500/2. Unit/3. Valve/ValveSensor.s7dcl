@@ -1,0 +1,7 @@
+﻿TYPE
+    ValveSensor : STRUCT
+        Feedback : Real;
+        Opened : Bool;
+        Closed : Bool;
+    END_STRUCT;
+END_TYPE

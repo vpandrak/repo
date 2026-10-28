@@ -1,0 +1,77 @@
+﻿{
+    S7_BlockNumber := "10102";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PA_Event_Mode"
+    VAR_IN_OUT
+        "Name" : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Mode : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Place : Int;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _prevMode : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _prevPlace : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        IF #_prevPlace <> #Place THEN
+            CASE #Place OF
+                "PLACE_PU1":
+                    #_event(Name := #Name,
+                            Text := WSTRING#'Установлено место управления - Пульт 1/ЧМИ');
+                "PLACE_PU2":
+                    #_event(Name := #Name,
+                            Text := WSTRING#'Установлено место управления - Пульт 2');
+                "PLACE_DISPATCHER":
+                    #_event(Name := #Name,
+                            Text := WSTRING#'Установлено место управления - Диспетчер');
+            END_CASE;
+            #_prevPlace := #Place;
+        END_IF;
+        
+        IF #_prevMode <> #Mode THEN
+            CASE #Mode OF
+                "MODE_DISABLE":
+                    #_event(Name := #Name,
+                            Text := WSTRING#'Выведена из работы');
+                "MODE_SERVICE":
+                    #_event(Name := #Name,
+                            Text := WSTRING#'Установлен режим - Сервис');
+                "MODE_MANUAL":
+                    #_event(Name := #Name,
+                            Text := WSTRING#'Установлен режим - Ручной');
+                "MODE_SEMIAUTO":
+                    #_event(Name := #Name,
+                            Text := WSTRING#'Установлен режим - Полуавтоматический');
+                "MODE_AUTO":
+                    #_event(Name := #Name,
+                            Text := WSTRING#'Установлен режим - Автоматический');
+            END_CASE;
+            #_prevMode := #Mode;
+        END_IF;
+    END_NETWORK
+END_FUNCTION_BLOCK

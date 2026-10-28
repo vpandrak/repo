@@ -1,0 +1,15 @@
+﻿TYPE
+    HmiValveUnit : STRUCT
+        "Name" : WString;
+        Mode : _.HmiMode;
+        Command : _.HmiCommandValve;
+        Control : _.HmiValve;
+        InterlockMovingToOpen : _.HmiInterlock;
+        InterlockMovingToClose : _.HmiInterlock;
+        InterlockMovingToPosition : _.HmiInterlock;
+        ReadyMoveToOpen : _.BitDescription;
+        ReadyMoveToClose : _.BitDescription;
+        ReadyMoveToPosition : _.BitDescription;
+        Fault : _.BitDescription;
+    END_STRUCT;
+END_TYPE

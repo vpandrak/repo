@@ -1,0 +1,9 @@
+﻿MultiLingualTexts:
+  - id: MLC_485
+    ru-RU: конечный автомат
+  - id: MLC_3LD
+    ru-RU: конечный автомат
+  - id: MLC_s9
+    ru-RU: новое состояние
+  - id: MLC_Xn
+    ru-RU: предыдущее состояниие

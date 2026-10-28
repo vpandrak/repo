@@ -1,0 +1,79 @@
+﻿{
+    S7_BlockNumber := "10333";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "_ex_OnOffControl"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Turn : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.OnOffState;
+    END_VAR
+    VAR_IN_OUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        FeedBack : Bool;
+        Fault : _.BitDescription;
+        Ready : _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        simulation : Bool;
+        Cmd : _.OnOffCmd;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _speed : Real;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        IF #Ready.Active THEN
+            #State.Basic.ReadyOperation := #State.ReadyToRun.Active := TRUE;
+            #State.ReadyToRun.Reason := WSTRING#'';
+        ELSE
+            #State.Basic.ReadyOperation := #State.ReadyToRun.Active := FALSE;
+            #State.ReadyToRun.Reason := #Ready.Reason;
+        END_IF;
+        
+        IF #Fault.Active THEN
+            #State.Basic.Fault := TRUE;
+            #State.Fault.Reason := #Fault.Reason;
+        ELSE
+            #State.Basic.Fault := FALSE;
+            #State.ReadyToRun.Reason := WSTRING#'';
+        END_IF;
+        
+        #State.Basic.Running := #FeedBack;
+        #State.Basic.Stopped := NOT #State.Basic.Running;
+        
+        #Turn := #Cmd.Start;
+        
+        REGION Симуляция работы
+            IF #simulation THEN
+                #State.Basic.ReadyOperation := #State.ReadyToRun.Active := TRUE;
+                #State.ReadyToRun.Reason := WSTRING#'';
+                
+                #State.Basic.Fault := FALSE;
+                #State.Fault.Reason := WSTRING#'';
+                
+                #State.Basic.Running := #Cmd.Start;
+                #State.Basic.Stopped := NOT #State.Basic.Running;
+            END_IF;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

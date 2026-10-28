@@ -1,0 +1,11 @@
+﻿TYPE
+    HmiGroupSettings : STRUCT
+        HornEnable : Bool;
+        HornTime : Time;
+        StartUpDelayTime : Time;
+        ShutDownDelayTime : Time;
+        StartFBTime : Time;
+        StopFBTime : Time;
+        RestartEnableTime : Time;
+    END_STRUCT;
+END_TYPE

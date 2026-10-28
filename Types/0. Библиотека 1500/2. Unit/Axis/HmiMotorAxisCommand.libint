@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: HmiMotorAxisCommand.s7dcl
+    Hash: oOVFXkhQgGgk+b9STbaEhnaIP9xt3I6GTr8Os3EW/kE=
+LibraryMetaFileHash: egLGCur3rmr1072FEX3WqkWux/WzuPJO3wEa7FeVb6I=
+LibraryVersion:
+  Guid: 24135334-7804-419c-8b07-103869283d0f
+  DependsOn:
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1

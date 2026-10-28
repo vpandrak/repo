@@ -1,0 +1,21 @@
+﻿TYPE
+    OnOffSettings : STRUCT
+        "Name" : WString[30];
+        { S7_MLC := "MLC_3bR" }
+        SimulationOn : Bool;
+        { S7_MLC := "MLC_39d" }
+        EventOn : Bool;
+        { S7_MLC := "MLC_4yn" }
+        Program_Alarm_Off : Bool;
+        DirectName : WString[20];
+        { S7_MLC := "MLC_39K" }
+        "TypeCmd_2/3_Point" : Bool;
+        StartUpDelayTime : Time;
+        ShutDownDelayTime : Time;
+        StartFBTime : Time := T#3s;
+        StopFBTime : Time := T#3s;
+        RestartEnableTime : Time;
+        { S7_MLC := "MLC_53s" }
+        LocalControlWithOutPLC : Bool;
+    END_STRUCT;
+END_TYPE

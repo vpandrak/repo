@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: HmiCylindricalABPosnSettings.s7dcl
+    Hash: uSC15i8mbepovf6IzzN+fdODIlVZ9r+rNMA80BcPOtc=
+  - FileName: HmiCylindricalABPosnSettings.s7res
+    Hash: O9uyBZYpWZZloqb9jjKo90fHwkE4+fKw1tHVBN3IBNQ=
+LibraryMetaFileHash: nbfVxwO7rIVa4zkl7rXbBzhzBsEAPFPjD3Ttebj7xyo=
+LibraryVersion:
+  Guid: 618d3ae5-d857-4a70-a439-2fdefb8b6938
+  DependsOn:
+    - TypeName: CylindricalABPosnSettings
+      VersionNumber: 0.0.2

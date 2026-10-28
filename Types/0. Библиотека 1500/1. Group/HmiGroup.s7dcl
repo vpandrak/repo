@@ -1,0 +1,14 @@
+﻿TYPE
+    HmiGroup : STRUCT
+        "Name" : WString;
+        Mode : _.HmiMode;
+        State : _.HmiState;
+        Command : _.HmiCommand;
+        Permit : _.HmiInterlock;
+        "Interlock" : _.HmiInterlock;
+        ProtectStart : _.HmiProtect;
+        ProtectGeneral : _.HmiProtect;
+        ReadyToAuto : _.BitDescription;
+        Fault : _.BitDescription;
+    END_STRUCT;
+END_TYPE

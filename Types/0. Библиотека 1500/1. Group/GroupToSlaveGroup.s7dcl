@@ -1,0 +1,19 @@
+﻿TYPE
+    GroupToSlaveGroup : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.BasicState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ToUnit : _.GroupToUnit;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Command : _.AutomaticCommand;
+    END_STRUCT;
+END_TYPE

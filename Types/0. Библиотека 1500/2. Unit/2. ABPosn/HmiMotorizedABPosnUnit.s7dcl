@@ -1,0 +1,16 @@
+﻿TYPE
+    HmiMotorizedABPosnUnit : STRUCT
+        "Name" : WString;
+        Mode : _.HmiMode;
+        Command : _.HmiCommand;
+        Control : _.HmiControl;
+        InterlockMovingToA : _.HmiInterlock;
+        InterlockMovingToB : _.HmiInterlock;
+        ProtectStart : _.HmiProtect;
+        ProtectGeneral : _.HmiProtect;
+        ReadyMoveToA : _.BitDescription;
+        ReadyMoveToB : _.BitDescription;
+        Fault : _.BitDescription;
+        Actuator : _.HmiMotor;
+    END_STRUCT;
+END_TYPE

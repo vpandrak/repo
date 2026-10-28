@@ -1,0 +1,10 @@
+﻿TYPE
+    HmiSafetyRelay : STRUCT
+        { S7_MLC := "MLC_4UR" }
+        Active : Bool;
+        { S7_MLC := "MLC_4jR" }
+        Tripped : Bool;
+        { S7_MLC := "MLC_4Sq" }
+        ResetRequired : Bool;
+    END_STRUCT;
+END_TYPE

@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: GroupToSlaveGroup.s7dcl
+    Hash: sK9MVtvExem5X6ax2IM/MUUYiJkgEz8WdlPA5eaLPJs=
+LibraryMetaFileHash: fNOt+W+Qdj4KB7m3CFKVyjgv77WrVFnfHVJQcpGlFQ8=
+LibraryVersion:
+  Guid: d187c555-70d7-4ceb-859e-592b2854508d
+  DependsOn:
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: AutomaticCommand
+      VersionNumber: 0.0.1
+    - TypeName: BasicState
+      VersionNumber: 0.0.14

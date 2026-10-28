@@ -1,0 +1,20 @@
+﻿TYPE
+    MotorSettings : STRUCT
+        "1DName" : WString[20];
+        "2DName" : WString[20];
+        { S7_MLC := "MLC_3yC" }
+        "TypeCmd_2/3_Point" : Bool;
+        { S7_MLC := "MLC_4XX" }
+        Reversable : Bool := true;
+        BipolarOutputRanges : Bool;
+        HornEnable : Bool;
+        SlowSpeed : Real;
+        FastSpeed : Real;
+        HornTime : Time;
+        StartUpDelayTime : Time;
+        ShutDownDelayTime : Time;
+        StartFBTime : Time := T#3s;
+        StopFBTime : Time := T#3s;
+        RestartEnableTime : Time;
+    END_STRUCT;
+END_TYPE

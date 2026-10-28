@@ -1,0 +1,395 @@
+﻿{
+    S7_BlockNumber := "10223";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "OnOffCommand"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OperatorCommand : _.OnOffCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ActuatorCmd : _.OnOffCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ActuatorJog : _.OnOffJog;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LocalControlRequest : _.LampCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LocalControlEnable : _.LampCommand;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+        HmiMode : _.HmiMode;
+        HmiCommand : _.HmiCommand;
+        Settings : _.OnOffSettings;
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+        Pu1 : _.OnOffCmd;
+        Pu2 : _.OnOffCmd;
+        Local : STRUCT
+            Key : Bool;
+            Pu : _.OnOffCmd;
+        END_STRUCT;
+        AutoCmd : _.OnOffCmd;
+        State : _.OnOffState;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smMode : _.StateMachineWithOutHistory;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1Start_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu2Start_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _localStart_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu1Start_N : F_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _pu2Start_N : F_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _localKey_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _resetFault_P : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _cmd : Int;
+    END_VAR
+    VAR CONSTANT
+        NO_COMMAND : Int := 0;
+        STOP : Int := 1;
+        START : Int := 2;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        REGION Активация локального управления
+            #_localKey_P(CLK := #Local.Key);
+            
+            IF NOT #Local.Key THEN
+                #HmiMode.Mode := #Group.Mode;
+                #HmiMode.Place := #Group.Place;
+            ELSIF #Settings.LocalControlWithOutPLC THEN  // Управление с локального поста без ПЛК
+                IF #Local.Key THEN                       // Ключ-бирка вставлена (или переключатель в положении "Локал.)
+                    #HmiMode.Mode := "MODE_SERVICE";
+                    #HmiMode.Place := "PLACE_LOCAL";
+                END_IF;
+            ELSIF NOT #Settings.LocalControlWithOutPLC THEN           // Управление с локального поста от ПЛК
+                IF #_localKey_P.Q AND #Group.Mode <> "MODE_AUTO" THEN // Передний фронт ключ-бирки (или переключателя в положении "Локал.)
+                    #HmiMode.Mode := "MODE_SERVICE";
+                    #HmiMode.Place := "PLACE_LOCAL";
+                END_IF;
+            END_IF;
+            
+            // Индикация на локальном пульте управления (индикация разрешения работы с пульта)
+            #LocalControlEnable.Fast := #Local.Key AND #HmiMode.Place <> "PLACE_LOCAL" AND #Group.Mode = "MODE_AUTO";  // быстрое мигание - при включении ключ-бирки на локальном посту группа в атоматическом режиме
+            #LocalControlEnable.Slow := #Local.Key AND #HmiMode.Place <> "PLACE_LOCAL" AND #Group.Mode <> "MODE_AUTO"; // медленно мигание - при включенной ключ-бирке на локальном посту группа не в автоматическом режиме, но перехода в локальное место управление не произошло. Требуется переподключить ключ-бирку
+            #LocalControlEnable.Cont := #Local.Key AND #HmiMode.Place = "PLACE_LOCAL";                                 // постоянное горение - локальный пульт активен. Работа с пульта разрешена
+            
+            // Индикация на основном пульте управления (индикация запроса и работы локального пульта)
+            #LocalControlRequest.Fast := #Local.Key AND #HmiMode.Place <> "PLACE_LOCAL";
+            #LocalControlRequest.Cont := #Local.Key AND #HmiMode.Place = "PLACE_LOCAL";
+            
+            #_smMode(ChangeStateTo := #HmiMode.Mode);
+            
+            #State.Basic.Local := #HmiMode.Place = "PLACE_LOCAL";  // Активировано локальное управление
+            #State.Basic.Single := (#HmiMode.Mode = "MODE_MANUAL") OR (#HmiMode.Mode = "MODE_SERVICE");  // Индивидуальное управление (Manual or Local)   
+        END_REGION
+        
+        REGION Фронты команд
+            #_pu1Start_P(CLK := #Pu1.Start);
+            #_pu2Start_P(CLK := #Pu2.Start);
+            #_localStart_P(CLK := #Local.Pu.Start);
+            
+            #_pu1Start_N(CLK := #Pu1.Start);
+            #_pu2Start_N(CLK := #Pu2.Start);
+        END_REGION
+        
+        // Инициализация выходных команд
+        #ActuatorCmd.Basic.QuickStop := false;
+        
+        IF #Group.QuickStop THEN
+            REGION События на визуализацию
+                IF #_pu1Start_P.Q
+                   OR #_pu2Start_P.Q
+                   OR #_localStart_P.Q
+                THEN
+                    #Notice(Name := #Name,
+                            Text := wstring#'Команда отклонена. Активен быстрый останов');
+                END_IF;
+            END_REGION
+            
+            #ActuatorJog.Start := false;
+            
+            #OperatorCommand.Start := false;
+            #OperatorCommand.Basic.Stop := false;
+            
+            #ActuatorCmd.Start := false;
+            #ActuatorCmd.Basic.Stop := false;
+            #ActuatorCmd.Basic.QuickStop := true;
+            
+            #_cmd := #NO_COMMAND;
+        ELSE
+            IF #_smMode.StateChanged THEN
+                #ActuatorJog.Start := false;
+                #OperatorCommand.Start := false;
+                #ActuatorCmd.Start := false;
+                
+                #_cmd := #NO_COMMAND;
+            END_IF;
+            
+            CASE #_smMode.State OF
+                "MODE_DISABLE":
+                    REGION Выведен из работы
+                        REGION События на визуализацию
+                            IF #_pu1Start_P.Q
+                                OR #_pu2Start_P.Q
+                                OR #_localStart_P.Q
+                            THEN
+                                #Notice(Name := #Name,
+                                        Text := WSTRING#'Команда отклонена т.к. механизм выведен из работы');
+                                IF #Settings.EventOn THEN
+                                    #_event(Name := #Name,
+                                            Text := WSTRING#'Команда отклонена т.к. механизм выведен из работы');
+                                END_IF;
+                            END_IF;
+                        END_REGION
+                        
+                        #ActuatorJog.Start := false;
+                        #OperatorCommand.Start := false;
+                        #OperatorCommand.Basic.Stop := false;
+                        #ActuatorCmd.Start := false;
+                        #ActuatorCmd.Basic.Stop := true;
+                        
+                        #_cmd := #NO_COMMAND;
+                    END_REGION
+                    
+                "MODE_SERVICE":
+                    REGION Операции с пульта Jog'aми
+                        #OperatorCommand.Start := false;
+                        #OperatorCommand.Basic.Stop := false;
+                        #ActuatorCmd.Start := false;
+                        #ActuatorCmd.Basic.Stop := false;
+                        
+                        CASE #Group.Place OF
+                            "PLACE_PU1":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #_cmd := #STOP;
+                                    #STOP:
+                                        #ActuatorJog.Start := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        IF #_pu1Start_P.Q THEN
+                                            #_cmd := #START;
+                                        END_IF;
+                                    #START:
+                                        #ActuatorJog.Start := true;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop OR NOT #Pu1.Start THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            "PLACE_PU2":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #_cmd := #STOP;
+                                    #STOP:
+                                        #ActuatorJog.Start := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        IF #_pu2Start_P.Q THEN
+                                            #_cmd := #START;
+                                        END_IF;
+                                        
+                                    #START:
+                                        #ActuatorJog.Start := true;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu2.Basic.Stop OR NOT #Pu2.Start THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                                
+                            "PLACE_DISPATCHER":
+                                ;
+                                
+                            "PLACE_LOCAL":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        IF NOT #Settings.LocalControlWithOutPLC THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                    #STOP:
+                                        #ActuatorJog.Start := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        IF #Settings.LocalControlWithOutPLC THEN
+                                            #_cmd := #NO_COMMAND;
+                                        ELSIF #_localStart_P.Q THEN
+                                            #_cmd := #START;
+                                        END_IF;
+                                        
+                                    #START:
+                                        #ActuatorJog.Start := true;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Settings.LocalControlWithOutPLC THEN
+                                            #_cmd := #NO_COMMAND;
+                                        ELSIF #Local.Pu.Basic.Stop OR NOT #Local.Pu.Start THEN
+                                            #_cmd := #STOP;
+                                        END_IF;
+                                END_CASE;
+                        END_CASE;
+                    END_REGION
+                    
+                "MODE_MANUAL":
+                    REGION Операции в ручном режиме
+                        #ActuatorJog.Start := false;
+                        #OperatorCommand.Start := false;
+                        #OperatorCommand.Basic.Stop := false;
+                        
+                        CASE #Group.Place OF
+                            "PLACE_PU1":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #ActuatorCmd.Start := false;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1 THEN
+                                            #_cmd := #STOP;
+                                        ELSIF #_pu1Start_P.Q OR #HmiCommand.FromHMI.%X0 THEN
+                                            #_cmd := #START;
+                                        END_IF;
+                                        
+                                    #STOP:
+                                        #ActuatorCmd.Start := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        IF NOT #Pu1.Basic.Stop AND NOT #HmiCommand.FromHMI.%X1 THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #START:
+                                        #ActuatorCmd.Start := true;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop OR #HmiCommand.FromHMI.%X1 THEN
+                                            #_cmd := #STOP;
+                                        ELSIF #_pu1Start_N.Q THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                END_CASE;
+                                
+                            "PLACE_PU2":
+                                CASE #_cmd OF
+                                    #NO_COMMAND:
+                                        #ActuatorCmd.Start := false;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop THEN
+                                            #_cmd := #STOP;
+                                        ELSIF #_pu2Start_P.Q THEN
+                                            #_cmd := #START;
+                                        END_IF;
+                                        
+                                    #STOP:
+                                        #ActuatorCmd.Start := false;
+                                        #ActuatorCmd.Basic.Stop := true;
+                                        IF NOT #Pu1.Basic.Stop THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                        
+                                    #START:
+                                        #ActuatorCmd.Start := true;
+                                        #ActuatorCmd.Basic.Stop := false;
+                                        IF #Pu1.Basic.Stop THEN
+                                            #_cmd := #STOP;
+                                        ELSIF NOT #Pu2.Start THEN
+                                            #_cmd := #NO_COMMAND;
+                                        END_IF;
+                                END_CASE;
+                                
+                            "PLACE_DISPATCHER":
+                                ;
+                        END_CASE;
+                    END_REGION
+                    
+                "MODE_AUTO", "MODE_SEMIAUTO":
+                    REGION Команды автоматики
+                        #ActuatorJog.Start := false;
+                        
+                        #ActuatorCmd := #AutoCmd;
+                        
+                        CASE #Group.Place OF
+                            "PLACE_PU1":
+                                #OperatorCommand := #Pu1;
+                            "PLACE_PU2":
+                                #OperatorCommand := #Pu2;
+                        END_CASE;
+                    END_REGION
+            END_CASE;
+        END_IF;
+        
+        REGION #Hmi
+            // Содержание слова управления с Hmi (аналогично с Dispatcher)
+            // #HmiCommand.FromHMI.%X0 - команда "Start"
+            // #HmiCommand.FromHMI.%X1 - команда "СТОП" 
+            // Сброс слов управления с визуализации
+            #HmiCommand.FromHMI.%X0 := #HmiCommand.FromHMI.%X1 := 0;
+            #HmiCommand.FromDispatcher.%X0 := #HmiCommand.FromDispatcher.%X1 := 0;
+            
+            // #HmiCommand.FromHMI.%X15 - сброс аварий с HMI
+            // #HmiCommand.FromDispatcher.%X15 - сброс аварий с диспетчерской
+            #_resetFault_P(CLK := #HmiCommand.FromHMI.%X15 OR #HmiCommand.FromDispatcher.%X15);
+            IF (#_resetFault_P.Q AND NOT #Group.ControlKey) THEN
+                #Notice(Name := #Name,
+                        Text := wstring#'Команда отклонена. Включите ключ-бирку');
+            ELSIF #_resetFault_P.Q THEN
+                #Notice(Name := #Name,
+                        Text := WSTRING#'Сброс аварий');
+            END_IF;
+            #ActuatorCmd.Basic.ResetFault := #Group.ResetFault
+            OR ((#HmiCommand.FromHMI.%X15 OR #HmiCommand.FromDispatcher.%X15) AND #Group.ControlKey);
+            
+            #HmiCommand.FromHMI.%X15 := #HmiCommand.FromDispatcher.%X15 := false;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

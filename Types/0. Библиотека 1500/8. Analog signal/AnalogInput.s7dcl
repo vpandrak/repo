@@ -1,0 +1,476 @@
+﻿{
+    S7_BlockNumber := "10801";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "AnalogInput"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4wb";
+            S7_Visibility := "Hidden := External"
+        }
+        PeripheralValue : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4Fw";
+            S7_Visibility := "Hidden := External"
+        }
+        NormalValue : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Mw";
+            S7_Visibility := "Hidden := External"
+        }
+        MeasuringType : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_p2";
+            S7_Visibility := "Hidden := External"
+        }
+        AckFault : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4JJ";
+            S7_Visibility := "Hidden := External"
+        }
+        Value : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OK : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_32K";
+            S7_Visibility := "Hidden := External"
+        }
+        LZ_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        HH_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        H_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        L_Alarm : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LL_Alarm : Bool;
+    END_VAR
+    VAR
+        Hmi : _.HmiAnalogSensor;
+    END_VAR
+    VAR RETAIN
+        Settings : _.HmiAnalogSensorSettings := (
+            Setpoints := (
+                Physh_HRange := 1.0
+            )
+        );
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ValueActual : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ValueActual_Prev : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4Lf";
+            S7_Visibility := "Hidden := External"
+        }
+        ValueSmoothed : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _status : _.AI_Status;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _settings : _.AI_Settings;
+    END_VAR
+    VAR RETAIN
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _limits : _.AI_Limits := (
+            PerhH_Limit := 27648,
+            PerhL_Limit := 0,
+            PerhLZH_Limit := 28672,
+            PerhLZL_Limit := -100
+        );
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _ACK : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            HH_Ack : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            H_Ack : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            L_Ack : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            LL_Ack : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            LZ_Ack : Bool;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _timer : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            HH_Alarm : IEC_TIMER;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            H_Alarm : IEC_TIMER;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            L_Alarm : IEC_TIMER;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            LL_Alarm : IEC_TIMER;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            LZ_Alarm : IEC_TIMER;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            AlarmAck : IEC_TIMER;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            WarningAck : IEC_TIMER;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_Programm : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _initialized : Bool;
+    END_VAR
+    VAR_TEMP
+        PerhRange : Real;
+        PhyshRange : Real;
+        TotalHyst : Real;
+        Value_Delta : Real;
+        HH_Alarm_Q : Bool;
+        H_Alarm_Q : Bool;
+        L_Alarm_Q : Bool;
+        LL_Alarm_Q : Bool;
+        LZ_Alarm_Q : Bool;
+        AlarmAck_Q : Bool;
+        WarningAck_Q : Bool;
+        getAlarmStateStatusByte : Byte;
+        getAlarmStateOutputError : Bool;
+        getAlarmStateOutputStatus : Word;
+        getAlarmStatus : STRUCT
+            Incoming : Bool;
+            Incoming_ACK : Bool;
+            Outgoing_ACK : Bool;
+            OverFlow_Incoming : Bool;
+            OverFlow_Outgoing : Bool;
+            res1 : Bool;
+            res2 : Bool;
+            Valid : Bool;
+        END_STRUCT;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        REGION Устанавливаем имя
+            IF NOT #_initialized THEN
+                #Hmi.Name := #Settings.Name;
+                #_initialized := true;
+            END_IF;
+        END_REGION
+        
+        REGION Настройки
+            SCATTER(IN := #Hmi.Settings,
+                    OUT => #_settings);
+        END_REGION
+        
+        REGION Квитирование аварий
+            IF #Hmi.Control.%X0 OR #AckFault THEN
+                #_ACK.HH_Ack := true;
+                #_ACK.H_Ack := true;
+                #_ACK.L_Ack := true;
+                #_ACK.LL_Ack := true;
+                #_ACK.LZ_Ack := true;
+                
+                #_status.AlarmIncLZ := false;
+                #_status.AlarmInc := false;
+                #_status.WarningInc := false;
+            END_IF;
+        END_REGION
+        
+        // Если симуляция включена, то сразу идем сглаживание
+        REGION Симуляция
+            IF #_settings.Sim_En THEN
+                #ValueActual := #Settings.Setpoints.Sim_Value;
+                #_status.OK := true;
+                #_status.SimulationActivated := true;
+                GOTO Smoothing;
+            ELSE
+                #_status.SimulationActivated := false;
+            END_IF;
+        END_REGION
+        
+        // Если тип измерения - нормализованный сигнал, то сразу идем сглаживание
+        REGION Тип измерения  
+            IF #MeasuringType THEN
+                #ValueActual := #NormalValue;
+                #_status.OK := true;
+                #_status.MeasuringTypeIsNormal := true;
+                GOTO Smoothing;
+            ELSE
+                #_status.MeasuringTypeIsNormal := false;
+            END_IF;
+        END_REGION
+        
+        REGION Проверка исправности датчика
+            #_timer.LZ_Alarm.TON(IN := ((#PeripheralValue > #_limits.PerhLZH_Limit) OR (#PeripheralValue < #_limits.PerhLZL_Limit)),
+                                   PT := #Settings.Delays.LZ_Del,
+                                   Q => #LZ_Alarm_Q);
+            IF #LZ_Alarm_Q THEN
+                IF NOT #_status.LZ_Alarm THEN
+                    #_status.AlarmIncLZ := true;
+                END_IF;
+                #_status.LZ_Alarm := true;
+                #_status.OK := false;
+                GOTO Message;
+            ELSE
+                #_status.LZ_Alarm := false;
+                #_status.OK := true;
+            END_IF;
+        END_REGION
+        
+        REGION Перевод в физическую величину
+            #PerhRange := DINT_TO_REAL(#_limits.PerhH_Limit - #_limits.PerhL_Limit);
+            #PhyshRange := #Settings.Setpoints.Physh_HRange - #Settings.Setpoints.Physh_LRange;
+            #TotalHyst := #PhyshRange * #Settings.Setpoints.Hysteresis;
+            #ValueActual := (#PeripheralValue - #_limits.PerhL_Limit) / #PerhRange * #PhyshRange + #Settings.Setpoints.Physh_LRange;
+        END_REGION
+        
+        Smoothing:
+        REGION Сглаживание / фильтрация
+            IF #_settings.Smoothing_En THEN
+                #_status.SmoothingActivated := true;
+                #Value_Delta := #ValueActual - #ValueActual_Prev;
+                #ValueSmoothed := #ValueActual_Prev + #Settings.Setpoints.K_Smoothing * #Value_Delta;
+            ELSE
+                #_status.SmoothingActivated := false;
+            END_IF;
+            #ValueActual_Prev := #ValueActual;
+        END_REGION
+        
+        LimitControl:
+        //Проверка предупредительных/аварийных пределов 
+        REGION Верхняя аварийная граница
+            #_timer.HH_Alarm.TON(IN := (#Value >= #Settings.FaultLimits.HH_Val AND #_settings.HH_En),
+                                 PT := #Settings.Delays.HH_Del,
+                                 Q => #HH_Alarm_Q);
+            IF #HH_Alarm_Q THEN
+                IF NOT #_status.HH_Alarm THEN
+                    #_status.AlarmInc := true;
+                END_IF;
+                #_status.HH_Alarm := true;
+                #_status.OK := false;
+            END_IF;
+            IF (#_status.HH_Alarm AND #Value < (#Settings.FaultLimits.HH_Val - #TotalHyst)) OR NOT #_settings.HH_En THEN
+                #_status.HH_Alarm := false;
+            END_IF;
+        END_REGION
+        REGION Верхняя предупредительная граница
+            #_timer.H_Alarm.TON(IN := ((#Value > #Settings.FaultLimits.H_Val) AND #_settings.H_En),
+                                  PT := #Settings.Delays.H_Del,
+                                  Q => #H_Alarm_Q);
+            IF #H_Alarm_Q THEN
+                IF NOT #_status.H_Alarm THEN
+                    #_status.WarningInc := true;
+                END_IF;
+                #_status.H_Alarm := true;
+                #_status.OK := false;
+            END_IF;
+            
+            IF (#_status.H_Alarm AND #Value < (#Settings.FaultLimits.H_Val - #TotalHyst)) OR NOT #_settings.H_En THEN
+                #_status.H_Alarm := false;
+            END_IF;
+        END_REGION
+        REGION Нижняя предупредительная граница
+            #_timer.L_Alarm.TON(IN := ((#Value < #Settings.FaultLimits.L_Val) AND #_settings.L_En),
+                                  PT := #Settings.Delays.L_Del,
+                                  Q => #L_Alarm_Q);
+            IF #L_Alarm_Q THEN
+                IF NOT #_status.L_Alarm THEN
+                    #_status.WarningInc := true;
+                END_IF;
+                #_status.L_Alarm := true;
+                #_status.OK := false;
+            END_IF;
+            IF (#_status.L_Alarm AND (#Value > #Settings.FaultLimits.L_Val + #TotalHyst)) OR NOT #_settings.L_En THEN
+                #_status.L_Alarm := false;
+            END_IF;
+        END_REGION
+        REGION Нижняя аварийная граница
+            #_timer.LL_Alarm.TON(IN := (#Value <= #Settings.FaultLimits.LL_Val AND #_settings.LL_En),
+                                   PT := #Settings.Delays.LL_Del,
+                                   Q => #LL_Alarm_Q);
+            IF #LL_Alarm_Q THEN
+                IF NOT #_status.LL_Alarm THEN
+                    #_status.AlarmInc := true;
+                END_IF;
+                #_status.LL_Alarm := true;
+                #_status.OK := false;
+            END_IF;
+            IF (#_status.LL_Alarm AND #Value > (#Settings.FaultLimits.LL_Val + #TotalHyst)) OR NOT #_settings.LL_En THEN
+                #_status.LL_Alarm := false;
+            END_IF;
+        END_REGION
+        
+        Message:
+        //Формирование программного сообщения по состоянию датчика на визуализацию
+        IF #_status.LZ_Alarm THEN
+            #_f_Programm.Text := wstring#'Неисправность датчика';
+            #_f_Programm.SET := TRUE;
+        ELSE
+            IF #_status.HH_Alarm THEN
+                #_f_Programm.Text := wstring#'Максимальный уровень';
+                #_f_Programm.SET := TRUE;
+            END_IF;
+            IF #_status.H_Alarm THEN
+                #_f_Programm.Text := wstring#'Субмаксимальный уровень';
+                #_f_Programm.SET := TRUE;
+            END_IF;
+            IF #_status.L_Alarm THEN
+                #_f_Programm.Text := wstring#'Субминимальный уровень';
+                #_f_Programm.SET := TRUE;
+            END_IF;
+            IF #_status.LL_Alarm THEN
+                #_f_Programm.Text := wstring#'Минимальный уровень';
+                #_f_Programm.SET := TRUE;
+            END_IF;
+        END_IF;
+        #_f_Programm(Name := #Hmi.Name,
+                     RESET := #Hmi.Control.%X0 OR #AckFault);
+        
+        REGION 5 секундный таймер сброса аварий
+            #_timer.AlarmAck.TON(IN := #_ACK.HH_Ack OR #_ACK.LL_Ack OR #_ACK.LZ_Ack,
+                                   PT := T#5s,
+                                   Q => #AlarmAck_Q);
+            IF #AlarmAck_Q THEN
+                #_status.AlarmInc := false;
+                #_ACK.HH_Ack := false;
+                #_ACK.LL_Ack := false;
+                #_ACK.LZ_Ack := false;
+            END_IF;
+        END_REGION
+        REGION 5 секундный таймер сброса предупреждений
+            #_timer.WarningAck.TON(IN := #_ACK.H_Ack OR #_ACK.L_Ack,
+                                     PT := T#5s,
+                                     Q => #WarningAck_Q);
+            IF #WarningAck_Q THEN
+                #_status.WarningInc := false;
+                #_ACK.H_Ack := false;
+                #_ACK.L_Ack := false;
+            END_IF;
+        END_REGION
+        
+        Hmi:
+        REGION Формирование данных для визуализации
+            #Hmi.Value := #Value;
+            GATHER(IN := #_status,
+                   OUT => #Hmi.Status);
+            
+            IF #_status.AlarmIncLZ THEN
+                #Hmi.State := 64;      // Входящая авария неисправности датчика  
+            ELSIF #_status.AlarmInc THEN
+                #Hmi.State := 32;      // Входящая авария выходы показаний за границы
+            ELSIF #_status.WarningInc THEN
+                #Hmi.State := 16;      // Входящее предупреждение выходы показаний за границы
+            ELSIF #_status.LZ_Alarm THEN
+                #Hmi.State := 8;       // Неисправность датчика
+            ELSIF #_status.HH_Alarm OR #_status.LL_Alarm THEN
+                #Hmi.State := 4;       // Авария
+            ELSIF #_status.H_Alarm OR #_status.L_Alarm THEN
+                #Hmi.State := 2;       // Предупреждение
+            ELSE
+                #Hmi.State := 1;       // OK
+            END_IF;
+            
+            // #Hmi.Common.Control.%X0 - Сброс аварий с Hmi
+            #Hmi.Control := 0;
+        END_REGION
+        
+        REGION Формирование выходов
+            #OK := #_status.OK;
+            
+            #HH_Alarm := #_status.HH_Alarm;
+            #H_Alarm := #_status.H_Alarm;
+            #L_Alarm := #_status.L_Alarm;
+            #LL_Alarm := #_status.LL_Alarm;
+            #LZ_Alarm := #_status.LZ_Alarm;
+            
+            IF #_status.SmoothingActivated THEN
+                #Value := #ValueSmoothed;
+            ELSE
+                #Value := #ValueActual;
+            END_IF;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

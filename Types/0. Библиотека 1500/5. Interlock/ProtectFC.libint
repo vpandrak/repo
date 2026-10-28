@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: ProtectFC.s7dcl
+    Hash: jg+5SguIHcnuMLaO8NBPE6oaAvUNtph8xxMGwQruHhk=
+  - FileName: ProtectFC.s7res
+    Hash: QmjzuOvaA6ClB71ZiN1I/m7Hf5pRmXSEeZukxxXyypo=
+LibraryMetaFileHash: gPot/aLO+Jx4OxFmbcOwGvIULiR5uq8yvprVyDvOMsE=
+LibraryVersion:
+  Guid: 7b0bb66b-219a-4584-8823-a43877b35e15
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: HmiProtect
+      VersionNumber: 0.0.1

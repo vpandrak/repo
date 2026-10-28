@@ -1,0 +1,11 @@
+﻿MultiLingualTexts:
+  - id: MLC_nH
+    en-US: delay of HH alarm
+  - id: MLC_3Bu
+    en-US: delay of H alarm
+  - id: MLC_4E5
+    en-US: delay of L alarm
+  - id: MLC_3Nq
+    en-US: delay of LL alarm
+  - id: MLC_4ME
+    en-US: delay of LV alarm

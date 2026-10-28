@@ -1,0 +1,136 @@
+﻿{
+    S7_BlockNumber := "10332";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "_ex_SiemensG120"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : _.MotorState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Qf : _.BitDescription := (
+            Active := true
+        );
+    END_VAR
+    VAR_IN_OUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3qt";
+            S7_Visibility := "Hidden := External"
+        }
+        HW_Identifier : HW_IO;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        TypeTelegramm : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pre_magnetize : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Magnetize : Bool;
+        QF_Description : WString;
+        UZ_Description : WString;
+        DriveSettings : STRUCT
+            { S7_MLC := "MLC_45k" }
+            NSpeed : Real;
+            { S7_MLC := "MLC_35G" }
+            NCurrent : Real;
+            { S7_MLC := "MLC_tf" }
+            NVoltage : Real;
+            { S7_MLC := "MLC_dZ" }
+            NPower : Real;
+            { S7_MLC := "MLC_3DH" }
+            NTorgue : Real;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Simulation : Bool;
+        Cmd : _.MotorCmd;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        PZD : _.PZD_PM_G120;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        // Обмен с UZ
+        #PZD(HW_Identifier := #HW_Identifier,
+             "Pre_magnetize":=#"Pre_magnetize",
+             TypeTelegram := #TypeTelegramm,
+             DriveSettings := #DriveSettings,
+             Magnetize := #Magnetize,
+             Turn1D := #Cmd.Start1D,
+             Turn2D := #Cmd.Start2D,
+             SetSpeed := #Cmd.Speed,
+             QuickStop := #Cmd.Basic.QuickStop,
+             Reset := #Cmd.Basic.ResetFault
+             );
+             
+        // Состояние 
+        IF #PZD.State.Ready THEN
+            #State.Basic.ReadyOperation := #State.ReadyToRun1D.Active := #State.ReadyToRun2D.Active := TRUE;
+            #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := WSTRING#'';
+        ELSE
+            #State.Basic.ReadyOperation := #State.ReadyToRun1D.Active := #State.ReadyToRun2D.Active := FALSE;
+            #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := CONCAT_WSTRING(IN1 := wstring#'Нет готовности ЧРП ', IN2 := #UZ_Description);
+        END_IF;
+        
+        IF #PZD.State.Fault THEN
+            #State.Basic.Fault := #State.Fault.Active := TRUE;
+            #State.Fault.Reason := CONCAT_WSTRING(IN1 := wstring#'Авария ЧРП ', IN2 := #UZ_Description);
+        ELSE
+            #State.Basic.Fault := #State.Fault.Active := FALSE;
+            #State.Fault.Reason := WSTRING#'';
+        END_IF;
+        
+        #State.ActualSpeed := #PZD.ActualValue.Speed;
+        
+        #State.Running1D := #PZD.State.Running1D;
+        #State.Running2D := #PZD.State.Running2D;
+        #State.Basic.Stopped := NOT #State.Running1D AND NOT #State.Running2D;
+        
+        #Qf.Active := #PZD.DI.DIO;
+        #Qf.Reason := #QF_Description;
+        
+        REGION Симуляция работы
+            IF #Simulation THEN
+                #State.Basic.ReadyOperation := #State.ReadyToRun1D.Active := #State.ReadyToRun2D.Active := TRUE;
+                #State.ReadyToRun1D.Reason := #State.ReadyToRun2D.Reason := WSTRING#'';
+                
+                #State.Basic.Fault := #State.Fault.Active := FALSE;
+                #State.Fault.Reason := WSTRING#'';
+                
+                #State.Running1D := #Cmd.Start1D;
+                #State.Running2D := #Cmd.Start2D;
+                #State.Basic.Stopped := NOT #State.Running1D AND NOT #State.Running2D;
+                
+                IF #State.Basic.Stopped THEN
+                    #State.ActualSpeed := 0;
+                ELSE
+                    #State.ActualSpeed := #Cmd.Speed;
+                END_IF;
+                
+                #Qf.Active := TRUE;
+            END_IF;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

@@ -1,0 +1,41 @@
+﻿{
+    S7_BlockNumber := "10401";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PA_Event"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Text : WString;
+    END_VAR
+    VAR_IN_OUT
+        "Name" : WString;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : Program_Alarm;
+    END_VAR
+    VAR_TEMP
+        _message : WString;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        IF #Name <> wstring#'' THEN
+            #_message := CONCAT_WSTRING(IN1 := CONCAT_WSTRING(IN1 := #Name, IN2 := WString#'. '), IN2 := #Text);
+        ELSE
+            #_message := #Text;
+        END_IF;
+        
+        #_event(SIG := TRUE,
+                SD_1 := #_message);
+        #_event(SIG := FALSE);
+    END_NETWORK
+END_FUNCTION_BLOCK

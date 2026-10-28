@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: Drive2DSettings.s7dcl
+    Hash: 8Q+CtM3LgdgI/OGm06sXgdKZWERJC8Y6SWuJ9NuAQno=
+  - FileName: Drive2DSettings.s7res
+    Hash: tbh4faJh0AzpJKiQGNujscnU0gCqy6YIOU0X7JuRZvs=
+LibraryMetaFileHash: elKjf2CZ0ewYYaWWQvhhlxRMf25GVlB2u84iN+ycdVw=
+LibraryVersion:
+  Guid: 90ce2cc6-16b0-431b-82e2-fec882c49aac
+  DependsOn:
+    - TypeName: MotorSettings
+      VersionNumber: 0.0.1

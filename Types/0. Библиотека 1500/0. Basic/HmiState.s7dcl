@@ -1,0 +1,14 @@
+﻿TYPE
+    HmiState : STRUCT
+        { S7_MLC := "MLC_3tQ" }
+        Status : UInt;
+        { S7_MLC := "MLC_3ah" }
+        Alarm : UInt;
+        { S7_MLC := "MLC_cX" }
+        Feature1 : UInt;
+        { S7_MLC := "MLC_54E" }
+        Feature2 : UInt;
+        { S7_MLC := "MLC_4TU" }
+        Feature3 : UInt;
+    END_STRUCT;
+END_TYPE

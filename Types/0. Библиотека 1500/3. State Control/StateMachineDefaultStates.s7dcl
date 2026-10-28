@@ -1,0 +1,117 @@
+﻿{
+    S7_BlockComment := "MLC_4JR";
+    S7_BlockNumber := "10302";
+    S7_BlockTitle := "MLC_4cX";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "StateMachineDefaultStates"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3zL";
+            S7_Visibility := "Hidden := External"
+        }
+        ChangeStateTo : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        FaultText : WString := WSTRING#'Состояние ошибки';
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "Name" : WString := WSTRING#'Автомат состояний';
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        StateTime : Time;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        StateChanged : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_aV";
+            S7_Visibility := "Hidden := External"
+        }
+        Done : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3zS";
+            S7_Visibility := "Hidden := External"
+        }
+        Busy : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3PR";
+            S7_Visibility := "Hidden := External"
+        }
+        Fault : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_5AG";
+            S7_Visibility := "Hidden := External"
+        }
+        Wait : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _fault : _.PA_Fault;
+    END_VAR
+    VAR CONSTANT
+        ST_WAIT : Int := 0;
+        ST_DONE : Int := 1000;
+        ST_FAULT : Int := 999;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+         #_sm(ChangeStateTo := #ChangeStateTo,
+             State => #State,
+             StateTime => #StateTime,
+             StateChanged => #StateChanged
+        );
+        
+        #Done :=
+        #Busy :=
+        #Fault :=
+        #Wait :=
+        FALSE;
+        
+        CASE #_sm.State OF
+            #ST_WAIT:
+                #Wait:= true;
+            #ST_DONE:
+                #Done := true;
+            #ST_FAULT:
+                #Fault := true;
+            ELSE
+                #Busy := true;
+        END_CASE;
+        
+        #_fault(SET := #Fault,
+                Name := #Name,
+                Text := #FaultText
+        );
+    END_NETWORK
+END_FUNCTION_BLOCK

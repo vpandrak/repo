@@ -1,0 +1,15 @@
+﻿TYPE
+    ABPosnCmd : STRUCT
+        Basic : _.BasicCmd;
+        { S7_MLC := "MLC_45v" }
+        MoveToA : Bool;
+        { S7_MLC := "MLC_425" }
+        MoveToLimitA : Bool;
+        HoldOnA : Bool;
+        { S7_MLC := "MLC_sL" }
+        MoveToB : Bool;
+        { S7_MLC := "MLC_453" }
+        MoveToLimitB : Bool;
+        HoldOnB : Bool;
+    END_STRUCT;
+END_TYPE

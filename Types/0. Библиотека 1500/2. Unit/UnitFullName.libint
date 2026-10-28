@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: UnitFullName.s7dcl
+    Hash: GTek1WpgH5LQ2UgAX8PEBvfmA46jSzdgTi/smf4pWZA=
+LibraryMetaFileHash: 4oXj9GquyDA2tIktAI+1iDi/OwOkYHrbpqTgulDRMac=
+LibraryVersion:
+  Guid: 3af78104-4eca-44aa-af42-78468f7abcda
+  DependsOn:
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1

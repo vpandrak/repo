@@ -1,0 +1,23 @@
+﻿DocumentHash:
+  - FileName: ABPosnCommand.s7dcl
+    Hash: 8XSIB4PMqyvhaiUkuuxqhbvZHg8l/NaX23hZ+znUTeo=
+LibraryMetaFileHash: sjXks+NCHF8DBLUqGNJ56bwkDzualDLpEPtVhxMSUD4=
+LibraryVersion:
+  Guid: aab8f973-093c-4b1b-a684-dae962bc0ced
+  DependsOn:
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnJog
+      VersionNumber: 0.0.1
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnCmd
+      VersionNumber: 0.0.1
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1

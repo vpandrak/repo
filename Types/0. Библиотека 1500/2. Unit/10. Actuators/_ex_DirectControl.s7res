@@ -1,0 +1,15 @@
+﻿MultiLingualTexts:
+  - id: MLC_3Ds
+    ru-RU: PQW [0...27648]
+  - id: MLC_ZB
+    ru-RU: REAL [об/мин]
+  - id: MLC_Pa
+    ru-RU: r2700 Номинальная скорость, об/мин
+  - id: MLC_X5
+    ru-RU: r2702 Номинальный ток, А
+  - id: MLC_4dW
+    ru-RU: r2701 Номинальное напряжение сети, В
+  - id: MLC_V3
+    ru-RU: r2704 Номинальная мощность, кВт
+  - id: MLC_4fG
+    ru-RU: r2703 Номинальный момент, Нм

@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: _ex_OnOffControl.s7dcl
+    Hash: zEbGnQNRepaKS5+/O4Mzvo79wSX87pOieGieDEF2Rcw=
+LibraryMetaFileHash: gZqUmEiZ4ie8WNMW9pbP97LV7UQOrZzWWlP868WzoBY=
+LibraryVersion:
+  Guid: 1a16202b-3292-4dd2-b6b4-b39417e764da
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: OnOffState
+      VersionNumber: 0.0.1
+    - TypeName: OnOffCmd
+      VersionNumber: 0.0.1

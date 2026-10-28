@@ -1,0 +1,11 @@
+﻿MultiLingualTexts:
+  - id: MLC_3cN
+    en-US: считанные сигналы
+  - id: MLC_52E
+    en-US: инвертировать сигналы
+  - id: MLC_4Ct
+    en-US: принудительно включить
+  - id: MLC_gn
+    en-US: принудительно выключить
+  - id: MLC_3a9
+    en-US: результат

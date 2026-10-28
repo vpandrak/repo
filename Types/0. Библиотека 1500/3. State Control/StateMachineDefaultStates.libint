@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: StateMachineDefaultStates.s7dcl
+    Hash: qs1nI851+HzbOs/oIoJ2pB5W6Fd2BAhs+DsD3qNSHOc=
+  - FileName: StateMachineDefaultStates.s7res
+    Hash: xR2HirZUOH+/FTX+Q3ohCOgT0yGjIct1EJY2Ky5VdXE=
+LibraryMetaFileHash: vg7XnP0WedUKANmVgOQvShKq+gxiXkwzNpX6Ru3o/P0=
+LibraryVersion:
+  Guid: b94eff03-c28f-4a01-bf10-8d97399de2a7
+  DependsOn:
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1

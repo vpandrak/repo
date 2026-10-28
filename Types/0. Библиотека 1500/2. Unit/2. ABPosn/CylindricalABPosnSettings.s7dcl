@@ -1,0 +1,40 @@
+﻿TYPE
+    CylindricalABPosnSettings : STRUCT
+        { S7_MLC := "MLC_3z6" }
+        APosnName : WString[20] := WSTRING#'А';
+        { S7_MLC := "MLC_3mN" }
+        BPosnName : WString[20] := WSTRING#'В';
+        { S7_MLC := "MLC_3zg" }
+        APosnLimitSwitch : Bool := true;
+        { S7_MLC := "MLC_3eK" }
+        MoveToAMaxTime : Time := T#10s;
+        { S7_MLC := "MLC_4Jy" }
+        MoveToAOnLSTime : Time;
+        { S7_MLC := "MLC_4LU" }
+        APosnLSLostControl : Bool;
+        { S7_MLC := "MLC_5By" }
+        APosnRepeatSupply : Bool;
+        { S7_MLC := "MLC_3GS" }
+        HoldOnA : Bool;
+        { S7_MLC := "MLC_49p" }
+        OneWaySolMoveToA : Bool;
+        { S7_MLC := "MLC_4iQ" }
+        BPosnLimitSwitch : Bool := true;
+        { S7_MLC := "MLC_3Av" }
+        MoveToBMaxTime : Time := T#10s;
+        { S7_MLC := "MLC_4xv" }
+        MoveToBOnLSTime : Time;
+        { S7_MLC := "MLC_i7" }
+        BPosnLSLostControl : Bool;
+        { S7_MLC := "MLC_3RQ" }
+        BPosnRepeatSupply : Bool;
+        { S7_MLC := "MLC_4zw" }
+        HoldOnB : Bool;
+        { S7_MLC := "MLC_VY" }
+        OneWaySolMoveToB : Bool;
+        { S7_MLC := "MLC_vN" }
+        RepeatSupplyTime : Time := T#5s;
+        { S7_MLC := "MLC_45e" }
+        RepeatSupplyPause : Time := T#1m;
+    END_STRUCT;
+END_TYPE

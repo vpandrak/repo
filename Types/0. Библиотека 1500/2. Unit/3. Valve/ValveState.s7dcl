@@ -1,0 +1,17 @@
+﻿TYPE
+    ValveState : STRUCT
+        Basic : _.BasicState;
+        ReadyOpen : _.BitDescription;
+        ReadyClose : _.BitDescription;
+        ReadyToPosition : _.BitDescription;
+        Fault : _.BitDescription;
+        Opening : Bool;
+        Closing : Bool;
+        Positioning : Bool;
+        Opened : Bool;
+        Closed : Bool;
+        InPosition : Bool;
+        Position : Real;
+        Target : Real;
+    END_STRUCT;
+END_TYPE

@@ -1,0 +1,19 @@
+﻿DocumentHash:
+  - FileName: HmiGroup.s7dcl
+    Hash: Tb8TdYNiMDCysCcihSpveqke06fF+388hxwn8W874KI=
+LibraryMetaFileHash: tPHIgNqsTqI9XOB+n7EsILnk3cyyiuF2rEJjs5ll0vQ=
+LibraryVersion:
+  Guid: d9f5c594-cb47-423a-a364-da17f385c1b0
+  DependsOn:
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: HmiState
+      VersionNumber: 0.0.1
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1
+    - TypeName: HmiProtect
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1

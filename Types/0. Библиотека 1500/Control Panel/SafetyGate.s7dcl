@@ -1,0 +1,201 @@
+﻿{
+    S7_BlockNumber := "10603";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "SafetyGate"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "Name" : WString := WSTRING#'Калитка';
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        GroupState : Array[0..#GROUP_UB] of _.BasicState;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        GroupData : Array[0..#GROUP_UB] of _.GroupToUnit;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Btn_OpenGate : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Btn_CloseGate : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ControlKey : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LS_GateClosed : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ToGroup : _.IGate;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampOpened : _.LampCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampClosed : _.LampCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Horn : Bool;
+    END_VAR
+    VAR
+        Hmi : _.HmiGate;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _smGate : _.StateMachine;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _f_Opened : _.PA_Fault;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _event : _.PA_Event;
+    END_VAR
+    VAR_TEMP
+        _resetFault : Bool;
+        "i" : Int;
+        _safeToEnater : Bool;
+    END_VAR
+    VAR CONSTANT
+        ST_INITIAL : Int := 0;
+        ST_OPENED : Int := 1;
+        ST_REQ_OPEN : Int := 2;
+        ST_CLOSED : Int := 3;
+        ST_FAULT_OPENED : Int := 4;
+        GROUP_UB : Int := 3;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        REGION Аварии
+            #_f_Opened(SET := false,
+                       RESET := false,
+                       Name := #Name,
+                       Text := wstring#'Открыта без запроса'
+            );
+            
+            FOR #i := 0 TO #GROUP_UB DO
+                IF #GroupData[#i].ResetFault THEN
+                    #_resetFault := true;
+                    EXIT;
+                ELSE
+                    #_resetFault := false;
+                END_IF;
+            END_FOR;
+        END_REGION
+        
+        REGION Безопасное открыте
+            FOR #i := 0 TO #GROUP_UB DO
+                IF NOT #GroupState[#i].SafeToEnter THEN
+                    #_safeToEnater := false;
+                    EXIT;
+                ELSE
+                    #_safeToEnater := true;
+                END_IF;
+            END_FOR;
+        END_REGION
+        
+        REGION Алгоритм работы
+            CASE #_smGate.State OF
+                #ST_INITIAL:
+                    IF #LS_GateClosed THEN
+                        #_smGate.ChangeStateTo := #ST_CLOSED;
+                    ELSE
+                        #_smGate.ChangeStateTo := #ST_OPENED;
+                    END_IF;
+                    
+                #ST_OPENED:
+                    IF #Btn_CloseGate THEN
+                        IF #LS_GateClosed THEN
+                            #_smGate.ChangeStateTo := #ST_CLOSED;
+                        END_IF;
+                    END_IF;
+                    
+                #ST_CLOSED:
+                    IF #Btn_OpenGate THEN
+                        #_smGate.ChangeStateTo := #ST_REQ_OPEN;
+                    ELSIF NOT #LS_GateClosed THEN
+                        #_smGate.ChangeStateTo := #ST_FAULT_OPENED;
+                    END_IF;
+                    
+                #ST_REQ_OPEN:
+                    IF #Btn_CloseGate THEN
+                        #_smGate.ChangeStateTo := #ST_CLOSED;
+                    ELSIF #_safeToEnater THEN
+                        #_smGate.ChangeStateTo := #ST_OPENED;
+                    ELSIF NOT #LS_GateClosed THEN
+                        #_smGate.ChangeStateTo := #ST_FAULT_OPENED;
+                    END_IF;
+                    
+                #ST_FAULT_OPENED:
+                    IF #Btn_CloseGate THEN
+                        IF #LS_GateClosed THEN
+                            #_smGate.ChangeStateTo := #ST_CLOSED;
+                        END_IF;
+                        
+                    ELSIF #Btn_OpenGate THEN
+                        #_smGate.ChangeStateTo := #ST_OPENED;
+                        
+                    ELSIF #_resetFault THEN
+                        #_smGate.ChangeStateTo := #ST_OPENED;
+                    END_IF;
+            END_CASE;
+            #_smGate();
+            #ToGroup.SafetyOk := false;
+            #ToGroup.RequestPause := false;
+            CASE #_smGate.State OF
+                #ST_CLOSED:
+                    #ToGroup.SafetyOk := true;
+                #ST_REQ_OPEN:
+                    #ToGroup.SafetyOk := true;
+                    #ToGroup.RequestPause := true;
+                    
+                #ST_OPENED:
+                    ;
+            END_CASE;
+        END_REGION
+        
+        REGION Hmi и лампочки
+            #Hmi.Closed := #_smGate.State = #ST_CLOSED;
+            #Hmi.Open := #_smGate.State = #ST_OPENED;
+            #Hmi.Fault := #_smGate.State = #ST_FAULT_OPENED;
+            
+            #LampClosed.Cont := #_smGate.State = #ST_CLOSED OR #_smGate.State = #ST_REQ_OPEN;
+            #LampClosed.Fast := NOT #LS_GateClosed AND #Btn_CloseGate;
+            
+            #LampOpened.Cont := #_smGate.State = #ST_OPENED;
+            #LampOpened.Fast := #_smGate.State = #ST_REQ_OPEN;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

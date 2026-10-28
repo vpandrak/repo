@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: PA_Warning.s7dcl
+    Hash: QPRT138ERczZspPETljeZ/Ey7oPGv4KcfkGZeIHJBf8=
+LibraryMetaFileHash: 3pbSGolFPYAMjR9cn+WybYnLLoAaoeidZsH63Rn/eFc=
+LibraryVersion:
+  Guid: 13b48289-cde3-4995-8e1e-4e1628970ec0
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1

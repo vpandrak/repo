@@ -1,0 +1,19 @@
+﻿DocumentHash:
+  - FileName: HmiOnOffUnit.s7dcl
+    Hash: lo0YXhQ4YwuIXPIdkPJJPGKPOu8nP4bQYmH0G2VYO1E=
+LibraryMetaFileHash: uvCui8whpBhWfDyHlJjpcyAO2pX2kM8HX7R806DTDAs=
+LibraryVersion:
+  Guid: 0a9da9dc-f154-4e52-a1f0-a29a2e599175
+  DependsOn:
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1
+    - TypeName: HmiState
+      VersionNumber: 0.0.1
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1
+    - TypeName: HmiProtect
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1

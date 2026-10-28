@@ -1,0 +1,35 @@
+﻿DocumentHash:
+  - FileName: CylindricalABPosnControl.s7dcl
+    Hash: kR2bS/E43J6f+tsEiVYwIe6qebrXrhhMGM1Rmr6q+r0=
+  - FileName: CylindricalABPosnControl.s7res
+    Hash: UoXc96obK28X2SjoNJp+mMH68SO6YE7IPcQBUP0g6Uo=
+LibraryMetaFileHash: ovtyCSCvaxRHBY0ttwSS2son1ZF0Z6xHZxTSEyq74Jg=
+LibraryVersion:
+  Guid: 8518a810-a52b-43da-974d-5487e9923f4d
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnSensor
+      VersionNumber: 0.0.1
+    - TypeName: HmiControl
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnCmd
+      VersionNumber: 0.0.1
+    - TypeName: LampCommand
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnState
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnJog
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: CylindricalABPosnSettings
+      VersionNumber: 0.0.2

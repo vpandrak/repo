@@ -1,0 +1,16 @@
+﻿TYPE
+    HmiMotorizedABPosnSettings : STRUCT
+        { S7_MLC := "MLC_3mz" }
+        APosnLimitSwitch : Bool := true;
+        { S7_MLC := "MLC_4B8" }
+        APosnLostControl : Bool;
+        { S7_MLC := "MLC_3YW" }
+        MoveToAMaxTime : Time := T#10s;
+        { S7_MLC := "MLC_pf" }
+        BPosnLimitSwitch : Bool := true;
+        { S7_MLC := "MLC_3MX" }
+        BPosnLostControl : Bool;
+        { S7_MLC := "MLC_39j" }
+        MoveToBMaxTime : Time := T#10s;
+    END_STRUCT;
+END_TYPE

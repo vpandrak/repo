@@ -1,0 +1,17 @@
+﻿TYPE
+    HmiDrive2D : STRUCT
+        "Name" : WString[70];
+        Mode : _.HmiMode;
+        Command : _.HmiCommand;
+        Control : _.HmiMotor;
+        PermitRunning1D : _.HmiInterlock;
+        InterlockRunning1D : _.HmiInterlock;
+        PermitRunning2D : _.HmiInterlock;
+        InterlockRunning2D : _.HmiInterlock;
+        ProtectStart : _.HmiProtect;
+        ProtectGeneral : _.HmiProtect;
+        ReadyToRun1D : _.BitDescription;
+        ReadyToRun2D : _.BitDescription;
+        Fault : _.BitDescription;
+    END_STRUCT;
+END_TYPE

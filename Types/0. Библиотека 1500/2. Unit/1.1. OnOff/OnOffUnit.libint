@@ -1,0 +1,37 @@
+﻿DocumentHash:
+  - FileName: OnOffUnit.s7dcl
+    Hash: vD4I8wmvAzsE5jIm4AhwOPbwvDoEJIJEj6OzbqHOrvM=
+  - FileName: OnOffUnit.s7res
+    Hash: +sYDDqs25zfT+iF8iUjCow/6tohESQ/G0MIpJEJXZQU=
+LibraryMetaFileHash: cVCwcpH1fq020LXz1QGRdxyjWmSxKlPgX156v0wu11U=
+LibraryVersion:
+  Guid: b5b69f2f-7d27-43ba-9126-a399c946f210
+  DependsOn:
+    - TypeName: OnOffInterface
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: OnOffCommand
+      VersionNumber: 0.0.1
+    - TypeName: OnOffActuator
+      VersionNumber: 0.0.1
+    - TypeName: _ex_OnOffControl
+      VersionNumber: 0.0.1
+    - TypeName: OnOffSettings
+      VersionNumber: 0.0.1
+    - TypeName: Lamp
+      VersionNumber: 0.0.1
+    - TypeName: UnitFullName
+      VersionNumber: 0.0.1
+    - TypeName: OnOffCmd
+      VersionNumber: 0.0.1
+    - TypeName: HmiOnOffUnit
+      VersionNumber: 0.0.2
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: InterlockFC
+      VersionNumber: 0.0.1
+    - TypeName: ProtectFC
+      VersionNumber: 0.0.1

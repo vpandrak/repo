@@ -1,0 +1,12 @@
+﻿TYPE
+    AI_FaultLimits : STRUCT
+        { S7_MLC := "MLC_382" }
+        HH_Val : Real;
+        { S7_MLC := "MLC_52f" }
+        H_Val : Real;
+        { S7_MLC := "MLC_WB" }
+        L_Val : Real;
+        { S7_MLC := "MLC_4gC" }
+        LL_Val : Real;
+    END_STRUCT;
+END_TYPE

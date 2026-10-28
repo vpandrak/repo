@@ -1,0 +1,22 @@
+﻿TYPE
+    AutomaticCommand : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3cR";
+            S7_Visibility := "Hidden := External"
+        }
+        StartAutomatic : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Sd";
+            S7_Visibility := "Hidden := External"
+        }
+        StopAutomatic : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_53i";
+            S7_Visibility := "Hidden := External"
+        }
+        QuickStopAutomatic : Bool;
+    END_STRUCT;
+END_TYPE

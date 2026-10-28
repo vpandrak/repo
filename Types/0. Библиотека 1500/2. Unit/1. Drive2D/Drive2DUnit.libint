@@ -1,0 +1,37 @@
+﻿DocumentHash:
+  - FileName: Drive2DUnit.s7dcl
+    Hash: wl1KkWsd+aE6+u//2SD/8POP3Z6VccmiA4z2OwDIwwA=
+  - FileName: Drive2DUnit.s7res
+    Hash: I8gfEB/ukS0cPwzz/ttXqldENIFPbICKButs7OJ3V7w=
+LibraryMetaFileHash: lJIlU0SN4daRRuMvi5p9a9f7QQPwCPEnI2zCPLRSZZw=
+LibraryVersion:
+  Guid: fce104ce-4139-4c94-9f14-724dcf54fee1
+  DependsOn:
+    - TypeName: MotorCmd
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: MotorCommand
+      VersionNumber: 0.0.1
+    - TypeName: MotorControl
+      VersionNumber: 0.0.1
+    - TypeName: _ex_DirectControl
+      VersionNumber: 0.0.1
+    - TypeName: Drive2DInterface
+      VersionNumber: 0.0.1
+    - TypeName: Lamp
+      VersionNumber: 0.0.1
+    - TypeName: UnitFullName
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: HmiDrive2D
+      VersionNumber: 0.0.15
+    - TypeName: Drive2DSettings
+      VersionNumber: 0.0.1
+    - TypeName: InterlockFC
+      VersionNumber: 0.0.1
+    - TypeName: ProtectFC
+      VersionNumber: 0.0.1

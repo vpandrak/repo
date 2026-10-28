@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: ValveSim.s7dcl
+    Hash: Y7RgNayNfDn4dnm/+3JfA8leyZqMGAwaUSaPtQ9lmro=
+LibraryMetaFileHash: vh+r7Tny84FB42r/DpgDdG9xwAOVidp3MAttIEV6ZbE=
+LibraryVersion:
+  Guid: 7153c3f5-46c2-4fd5-80f6-a55558a5c4b8
+  DependsOn:
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1

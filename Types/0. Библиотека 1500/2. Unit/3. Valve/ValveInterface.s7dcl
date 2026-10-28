@@ -1,0 +1,8 @@
+﻿TYPE
+    ValveInterface : STRUCT
+        "Name" : WString;
+        State : _.ValveState;
+        Cmd : _.ValveCmd;
+        OperatorCommand : _.ValveCmd;
+    END_STRUCT;
+END_TYPE

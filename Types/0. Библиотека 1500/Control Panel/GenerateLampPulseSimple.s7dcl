@@ -1,0 +1,23 @@
+﻿{
+    S7_BlockNumber := "10612";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "GenerateLampPulseSimple"
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pulse : _.LampPulse;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        #Pulse.Fast := "Clock_2Hz";
+        #Pulse.Medium := "Clock_1Hz";
+        #Pulse.Slow := "Clock_0.5Hz";
+        #Pulse.Blink := "Clock_1.25Hz";
+    END_NETWORK
+END_FUNCTION_BLOCK

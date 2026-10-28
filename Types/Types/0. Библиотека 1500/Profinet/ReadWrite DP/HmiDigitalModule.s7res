@@ -1,0 +1,15 @@
+﻿MultiLingualTexts:
+  - id: MLC_4bh
+    ru-RU: Control.0 - Disable dp operation
+  - id: MLC_mx
+    ru-RU: State.0 - Ok, .1 - disabled, .2 - fault
+  - id: MLC_fY
+    en-US: считанные сигналы
+  - id: MLC_58Z
+    en-US: инвертировать сигналы
+  - id: MLC_3UC
+    en-US: принудительно включить
+  - id: MLC_4z5
+    en-US: принудительно выключить
+  - id: MLC_3jV
+    en-US: результат

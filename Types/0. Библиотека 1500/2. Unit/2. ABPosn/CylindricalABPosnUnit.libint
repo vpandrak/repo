@@ -1,0 +1,35 @@
+﻿DocumentHash:
+  - FileName: CylindricalABPosnUnit.s7dcl
+    Hash: pRM79eriVO3jHdzHjV8Z6PVPbdoMYUbPrpLbOvv73m4=
+  - FileName: CylindricalABPosnUnit.s7res
+    Hash: 1z9OcB2kL7hh2aRJOCNVBIYx6EG4zPk8ULyhVlliEzY=
+LibraryMetaFileHash: yv8426yC05CK6jMSyAEVQKDbcBEjmExhQ+ubIGdJ5Bs=
+LibraryVersion:
+  Guid: b20e077f-d84e-4c25-bfa3-e73a4da0ab09
+  DependsOn:
+    - TypeName: ABPosnInterface
+      VersionNumber: 0.0.1
+    - TypeName: CylindricalABPosnControl
+      VersionNumber: 0.0.1
+    - TypeName: HmiCylindricalABPosnUnit
+      VersionNumber: 0.0.2
+    - TypeName: ABPosnCommand
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: Lamp
+      VersionNumber: 0.0.1
+    - TypeName: ABPosnSensor
+      VersionNumber: 0.0.1
+    - TypeName: HmiCylindricalABPosnSettings
+      VersionNumber: 0.0.2
+    - TypeName: ABPosnCmd
+      VersionNumber: 0.0.1
+    - TypeName: UnitFullName
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: InterlockFC
+      VersionNumber: 0.0.1

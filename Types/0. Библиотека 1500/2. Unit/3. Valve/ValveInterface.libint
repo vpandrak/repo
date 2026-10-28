@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: ValveInterface.s7dcl
+    Hash: qgetXfeeSK7YnXyeCVpBTAbxGfOYI9Kr0U0zjhfxyGk=
+LibraryMetaFileHash: vbYWM9kbm9XRgHTvhIHjaeqemdBfacqyzA/7Kd3+f3c=
+LibraryVersion:
+  Guid: 69a82407-9774-402b-b3c3-40b54ea426c4
+  DependsOn:
+    - TypeName: ValveCmd
+      VersionNumber: 0.0.1
+    - TypeName: ValveState
+      VersionNumber: 0.0.1

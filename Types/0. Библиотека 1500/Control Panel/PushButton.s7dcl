@@ -1,0 +1,77 @@
+﻿{
+    S7_BlockNumber := "10606";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PushButton"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pressed : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LongPress : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ShortPress : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachine;
+    END_VAR
+    VAR CONSTANT
+        ST_NOT_PRESSED : Int := 0;
+        ST_PRESSED : Int := 1;
+        ST_LONG_PRESS : Int := 2;
+        ST_SHORT_PRESS : Int := 3;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        CASE #_sm.State OF
+            #ST_NOT_PRESSED:
+                IF #Pressed THEN
+                    #_sm.ChangeStateTo := #ST_PRESSED;
+                END_IF;
+                
+            #ST_PRESSED:
+                IF NOT #Pressed THEN
+                    #_sm.ChangeStateTo := #ST_SHORT_PRESS;
+                ELSIF #_sm.StateTime > T#1s THEN
+                    #_sm.ChangeStateTo := #ST_LONG_PRESS;
+                END_IF;
+                
+            #ST_SHORT_PRESS:
+                #_sm.ChangeStateTo := #ST_NOT_PRESSED;
+                
+            #ST_LONG_PRESS:
+                IF NOT #Pressed THEN
+                    #_sm.ChangeStateTo := #ST_NOT_PRESSED;
+                END_IF;
+        END_CASE;
+        #_sm();
+        #LongPress := false;
+        #ShortPress := false;
+        
+        CASE #_sm.State OF
+            #ST_LONG_PRESS:
+                #LongPress := true;
+            #ST_SHORT_PRESS:
+                #ShortPress := true;
+        END_CASE;
+        
+        
+    END_NETWORK
+END_FUNCTION_BLOCK

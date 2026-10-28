@@ -1,0 +1,17 @@
+﻿TYPE
+    HmiProfinetDiag : STRUCT
+        "AC2_7-1A1" : Int;
+        "AC1_8-A100" : Int;
+        "AC2_7-A100" : Int;
+        "AC3_7-A100" : Int;
+        "PU1-A100" : Int;
+        "PU2-A100" : Int;
+        "PU3-A100" : Int;
+        "PU5-A100" : Int;
+        "PU6-A100" : Int;
+        "PU7-A100" : Int;
+        "PU8-A100" : Int;
+        "PU9-A100" : Int;
+        "PU10-A100" : Int;
+    END_STRUCT;
+END_TYPE

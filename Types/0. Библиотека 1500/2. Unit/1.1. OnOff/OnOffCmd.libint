@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: OnOffCmd.s7dcl
+    Hash: NAmHOAVkZUyp/TKa0TrWyr4/dQX1BHBlz4IVdZNkpaE=
+LibraryMetaFileHash: 1VIPtVOqx03tnsSALvyAa/XhLxLJe3lB5scMmmvq1hc=
+LibraryVersion:
+  Guid: f690c74d-e449-4963-8143-4222547a7232
+  DependsOn:
+    - TypeName: BasicCmd
+      VersionNumber: 0.0.2

@@ -1,0 +1,11 @@
+﻿DocumentHash:
+  - FileName: HmiMotor.s7dcl
+    Hash: Aa5rm6MXxVEWslbxEb/Oc1mxAyRrRLB6hFjUEOjlCaE=
+LibraryMetaFileHash: 7Gy8NEgBTlX36Ij+0dgB4gBP3/vyItjaT//Bcofddr0=
+LibraryVersion:
+  Guid: 0887495e-e9a3-41be-b02a-863c07e1b93f
+  DependsOn:
+    - TypeName: HmiState
+      VersionNumber: 0.0.1
+    - TypeName: HmiMotorSpeed
+      VersionNumber: 0.0.1

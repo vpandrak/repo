@@ -1,0 +1,8 @@
+﻿TYPE
+    TimePulseTemplate : STRUCT
+        "Time" : Array[0..4] of STRUCT
+            "On" : Time;
+            Off : Time;
+        END_STRUCT;
+    END_STRUCT;
+END_TYPE

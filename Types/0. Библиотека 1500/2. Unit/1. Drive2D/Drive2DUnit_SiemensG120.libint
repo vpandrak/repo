@@ -1,0 +1,37 @@
+﻿DocumentHash:
+  - FileName: Drive2DUnit_SiemensG120.s7dcl
+    Hash: pEru8DT+XNMnurEXPfccJxmGmP5l4Dh/ReP8HhJxhCA=
+  - FileName: Drive2DUnit_SiemensG120.s7res
+    Hash: DIVxQRsDNkjRizE9j9gARSE+F8hsPOLXsmdtJinTPys=
+LibraryMetaFileHash: lX9Z3D2gMz1MNJxdc3/4abphf5NFppzl5ooU1QPMyA0=
+LibraryVersion:
+  Guid: 15454aef-38df-4a74-a520-2fb190ab2257
+  DependsOn:
+    - TypeName: MotorCmd
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: MotorCommand
+      VersionNumber: 0.0.1
+    - TypeName: MotorControl
+      VersionNumber: 0.0.1
+    - TypeName: _ex_SiemensG120
+      VersionNumber: 0.0.1
+    - TypeName: Drive2DInterface
+      VersionNumber: 0.0.1
+    - TypeName: Lamp
+      VersionNumber: 0.0.1
+    - TypeName: UnitFullName
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: HmiDrive2D
+      VersionNumber: 0.0.15
+    - TypeName: Drive2DSettings
+      VersionNumber: 0.0.1
+    - TypeName: InterlockFC
+      VersionNumber: 0.0.1
+    - TypeName: ProtectFC
+      VersionNumber: 0.0.1

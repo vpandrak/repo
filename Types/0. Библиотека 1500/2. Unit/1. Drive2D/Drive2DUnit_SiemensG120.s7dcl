@@ -1,0 +1,263 @@
+﻿{
+    S7_BlockNumber := "10212";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "Drive2DUnit_SiemensG120"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "Name" : WString;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pu1 : _.MotorCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Pu2 : _.MotorCmd;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Local : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Key : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Pu : _.MotorCmd;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        QF_Description : WString[30];
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        UZ_Description : WString[30];
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        InterlockRunning1D : Array[0..3] of _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        InterlockRunning2D : Array[0..3] of _.BitDescription;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        ProtectGeneral : Array[0..3] of _.BitDescription;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampRunning1D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampRunning2D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampLocalRequest : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        LampLocalEnable : Bool;
+    END_VAR
+    VAR_IN_OUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3SE";
+            S7_Visibility := "Hidden := External"
+        }
+        HW_identifier : HW_IO;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        TypeTelegram : Int;
+        Group : _.GroupToUnit;
+        Notice : _.PA_Notice;
+    END_VAR
+    VAR
+        Hmi : _.HmiDrive2D;
+    END_VAR
+    VAR RETAIN
+        Settings : _.Drive2DSettings;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        Unit : _.Drive2DInterface;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _name : _.UnitFullName;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _command : _.MotorCommand;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _actuator : _.MotorControl;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _executor : _._ex_SiemensG120;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampRunning1D : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampRunning2D : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampLocalRequest : _.Lamp;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _lampLocalEnable : _.Lamp;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        "InterlockFC"(Hmi := #Hmi.InterlockRunning1D,
+                     Conditions := #InterlockRunning1D,
+                     First := #_actuator.Interlock1D,
+                     MaskOn := #Hmi.Control.State.Feature2.%X6
+        );
+        "InterlockFC"(Hmi := #Hmi.InterlockRunning2D,
+                     Conditions := #InterlockRunning2D,
+                     First := #_actuator.Interlock2D,
+                     MaskOn := #Hmi.Control.State.Feature2.%X7
+        );
+        "ProtectFC"(Hmi := #Hmi.ProtectGeneral,
+                    Conditions := #ProtectGeneral,
+                    First := #_actuator.ProtectGeneral,
+                    DeLockAll := #_command.ActuatorCmd.Basic.ResetFault,
+                    NotCheck := FALSE,
+                    MaskOn := #Hmi.Control.State.Feature2.%X8
+        );
+        
+        #_name(Group := #Group,
+               Name := #Name,
+               HmiName := #Hmi.Name
+        );
+        
+        #_command(Name := #_name.Full,
+                  HmiMode := #Hmi.Mode,
+                  HmiCommand := #Hmi.Command,
+                  Settings := #Settings,
+                  Group := #Group,
+                  Notice := #Notice,
+                  Local := #Local,
+                  Pu1 := #Pu1,
+                  Pu2 := #Pu2,
+                  AutoCmd := #Unit.Cmd,
+                  State := #Unit.State,
+                  OperatorCommand => #Unit.OperatorCommand
+        );
+        
+        #_actuator.Qf := #_executor.Qf;
+        #_actuator(Name := #_name.Full,
+                   Hmi := #Hmi.Control,
+                   Settings := #Settings.Control,
+                   Group := #Group,
+                   Notice := #Notice,
+                   Cmd := #_command.ActuatorCmd,
+                   Jog := #_command.ActuatorJog,
+                   EventOn := #Settings.EventOn,
+                   Program_Alarm_Off := #Settings.Program_Alarm_Off,
+                   ActuatorState := #_executor.State,
+                   State => #Unit.State
+        );
+        
+        #_executor(HW_Identifier := #HW_identifier,
+                   TypeTelegramm := #TypeTelegram,
+                   QF_Description := #QF_Description,
+                   UZ_Description := #UZ_Description,
+                   Cmd := #_actuator.ActuatorCmd,
+                   DriveSettings:= #Settings.Drive,
+                   Simulation := #Settings.SimulationOn
+        );
+        
+        #_lampRunning1D(Control := #_actuator.Lamp1D,
+                        Pulse := #Group.HLPulses,
+                        TestLamp := #Group.TestLamp,
+                        TurnLamp => #LampRunning1D);
+        #_lampRunning2D(Control := #_actuator.Lamp2D,
+                        Pulse := #Group.HLPulses,
+                        TestLamp := #Group.TestLamp,
+                        TurnLamp => #LampRunning2D);
+        #_lampLocalRequest(Control := #_command.LocalControlRequest,
+                           Pulse := #Group.HLPulses,
+                           TestLamp := #Group.TestLamp,
+                           TurnLamp => #LampLocalRequest);
+        #_lampLocalEnable(Control := #_command.LocalControlEnable,
+                          Pulse := #Group.HLPulses,
+                          TestLamp := #Group.TestLamp,
+                          TurnLamp => #LampLocalEnable);
+        
+        REGION #Hmi
+            IF #Unit.State.ReadyToRun1D.Active THEN
+                IF NOT #Hmi.ReadyToRun1D.Active THEN
+                    #Hmi.ReadyToRun1D.Reason := WSTRING#'';
+                END_IF;
+                #Hmi.ReadyToRun1D.Active := TRUE;
+            ELSE
+                #Hmi.ReadyToRun1D := #Unit.State.ReadyToRun1D;
+            END_IF;
+            IF #Unit.State.ReadyToRun2D.Active THEN
+                IF NOT #Hmi.ReadyToRun2D.Active THEN
+                    #Hmi.ReadyToRun2D.Reason := WSTRING#'';
+                END_IF;
+                #Hmi.ReadyToRun2D.Active := TRUE;
+            ELSE
+                #Hmi.ReadyToRun2D := #Unit.State.ReadyToRun2D;
+            END_IF;
+            IF NOT #Unit.State.Fault.Active THEN
+                IF #Hmi.Fault.Active THEN
+                    #Hmi.Fault.Reason := WSTRING#'';
+                END_IF;
+                #Hmi.Fault.Active := FALSE;
+            ELSE
+                #Hmi.Fault := #Unit.State.Fault;
+            END_IF;
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

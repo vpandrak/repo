@@ -1,0 +1,23 @@
+﻿DocumentHash:
+  - FileName: SafetyGate.s7dcl
+    Hash: ixCbxqU1s2ltMA0fRi3Gsc2aeMGWBelxykpOevbV5lU=
+LibraryMetaFileHash: xr0ycdLVBf2kcf6nnPu9PKz+WUCt/QRPxfgexkS277Y=
+LibraryVersion:
+  Guid: 6969f268-e990-4959-89d7-795748cd5e30
+  DependsOn:
+    - TypeName: BasicState
+      VersionNumber: 0.0.14
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: IGate
+      VersionNumber: 0.0.1
+    - TypeName: LampCommand
+      VersionNumber: 0.0.1
+    - TypeName: HmiGate
+      VersionNumber: 0.0.1
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1

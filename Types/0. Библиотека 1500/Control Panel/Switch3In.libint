@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: Switch3In.s7dcl
+    Hash: 2xAbvDj/V/++AQTJBUSDi0+s5NS0n0PjzeGAdR58hO0=
+LibraryMetaFileHash: SquoDvvRwlc9rDyQfqeq2+RZ4yx4uTNDeH9iGr3vegk=
+LibraryVersion:
+  Guid: 3ee1620c-264d-45fc-adaf-0abe1506b0a7
+  DependsOn:
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1

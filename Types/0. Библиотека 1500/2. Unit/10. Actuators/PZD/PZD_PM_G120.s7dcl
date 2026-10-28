@@ -1,0 +1,1505 @@
+﻿{
+    S7_BlockNumber := "13241";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "PZD_PM_G120"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4hh";
+            S7_Visibility := "Hidden := External"
+        }
+        HW_Identifier : HW_IO;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Yu";
+            S7_Visibility := "Hidden := External"
+        }
+        TypeTelegram : Int;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Ri";
+            S7_Visibility := "Hidden := External"
+        }
+        Pre_magnetize : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_53h";
+            S7_Visibility := "Hidden := External"
+        }
+        Magnetize : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3SR";
+            S7_Visibility := "Hidden := External"
+        }
+        Turn1D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4hE";
+            S7_Visibility := "Hidden := External"
+        }
+        Turn2D : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_nE";
+            S7_Visibility := "Hidden := External"
+        }
+        SetSpeed : Real;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3yc";
+            S7_Visibility := "Hidden := External"
+        }
+        Reset : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_bs";
+            S7_Visibility := "Hidden := External"
+        }
+        QuickStop : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        State : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Running1D : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Running2D : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Fault : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Warning : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Ready : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            Magnetized : Bool;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Tn";
+            S7_Visibility := "Hidden := External"
+        }
+        StatusWord : Word;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_ax";
+            S7_Visibility := "Hidden := External"
+        }
+        ControlWord : Word;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3km";
+            S7_Visibility := "Hidden := External"
+        }
+        FaultCode : UInt;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        WarningCode : UInt;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_3Wm";
+            S7_Visibility := "Hidden := External"
+        }
+        ActualValue : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_MLC := "MLC_3Pj";
+                S7_Visibility := "Hidden := External"
+            }
+            Speed : Real;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_MLC := "MLC_4fM";
+                S7_Visibility := "Hidden := External"
+            }
+            Position : Real;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_MLC := "MLC_4mg";
+                S7_Visibility := "Hidden := External"
+            }
+            Current : Real;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_MLC := "MLC_44z";
+                S7_Visibility := "Hidden := External"
+            }
+            DCVoltage : Real;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_MLC := "MLC_wa";
+                S7_Visibility := "Hidden := External"
+            }
+            Voltage : Real;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_MLC := "MLC_49U";
+                S7_Visibility := "Hidden := External"
+            }
+            ActivePower : Real;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_MLC := "MLC_4W2";
+                S7_Visibility := "Hidden := External"
+            }
+            Torgue : Real;
+        END_STRUCT;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        "DI" : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            DIO : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            DI1 : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            DI2 : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            DI3 : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "4" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "5" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "6" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "7" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "8" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "9" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "10" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "11" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "12" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "13" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "14" : Bool;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            "15" : Bool;
+        END_STRUCT;
+    END_VAR
+    VAR_IN_OUT
+        { S7_MLC := "MLC_4Fj" }
+        DriveSettings : STRUCT
+            { S7_MLC := "MLC_3iU" }
+            NSpeed : Real;
+            { S7_MLC := "MLC_4Zz" }
+            NCurrent : Real;
+            { S7_MLC := "MLC_46V" }
+            NVoltage : Real;
+            { S7_MLC := "MLC_3rJ" }
+            NPower : Real;
+            { S7_MLC := "MLC_XY" }
+            NTorgue : Real;
+        END_STRUCT;
+    END_VAR
+    VAR
+        Hmi : _.HmiPZD_G120;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        PM : STRUCT
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            StandartTelegramm1 : STRUCT
+                {
+                    S7_Access := "ReadOnly := External";
+                    S7_Visibility := "Hidden := External"
+                }
+                Send : STRUCT
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    STW1 : STRUCT
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_0 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_1 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ControlByPLC : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        SetpointInversion : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorizedSPRaise : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorizedSPLower : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_37G";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ON_OFF1 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_4sF";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OFF2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_4NN";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OFF3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableOperation : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableRamp : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        StartRamp : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableSetpoint : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Ack : Bool;
+                    END_STRUCT;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_sE";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    NSOLL_A : Int;
+                END_STRUCT;
+                {
+                    S7_Access := "ReadOnly := External";
+                    S7_Visibility := "Hidden := External"
+                }
+                Recieve : STRUCT
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_cr";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    ZSW1 : STRUCT
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        DeviationSpActual : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ControlRequest : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MaximumSpeedReached : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        IMPLimitReached : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorHoldingBrakeOpen : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        AlarmMotorOverTemperature : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorRotatesFwd : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ConverterOverload : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ReadyForSwitchingOn : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Ready : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OperationEnabled : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        FaultActive : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        CoastDownActive_OFF2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        QuickStopActive_OFF3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        SwithingOnInhibited : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        AlarmActive : Bool;
+                    END_STRUCT;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3As";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    NIST_A : Int;
+                END_STRUCT;
+            END_STRUCT;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            StandartTelegramm20 : STRUCT
+                {
+                    S7_Access := "ReadOnly := External";
+                    S7_Visibility := "Hidden := External"
+                }
+                Send : STRUCT
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    STW1 : STRUCT
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_0 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_1 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ControlByPLC : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        SetpointInversion : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorizedSPRaise : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorizedSPLower : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_Nr";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ON_OFF1 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_3F7";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OFF2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_4cv";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OFF3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableOperation : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableRamp : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        StartRamp : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableSetpoint : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Ack : Bool;
+                    END_STRUCT;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3hL";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    NSOLL_A : Int;
+                END_STRUCT;
+                {
+                    S7_Access := "ReadOnly := External";
+                    S7_Visibility := "Hidden := External"
+                }
+                Recieve : STRUCT
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3B9";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    ZSW1 : STRUCT
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        DeviationSpActual : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ControlRequest : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MaximumSpeedReached : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        IMPLimitReached : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorHoldingBrakeOpen : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        AlarmMotorOverTemperature : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorRotatesFwd : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ConverterOverload : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ReadyForSwitchingOn : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Ready : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OperationEnabled : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        FaultActive : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        CoastDownActive_OFF2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        QuickStopActive_OFF3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        SwithingOnInhibited : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        AlarmActive : Bool;
+                    END_STRUCT;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3vs";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    NIST_A_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4dX";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    IAIST_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4pX";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    MIST_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3ad";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    PIST_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    "<6>" : Word;
+                END_STRUCT;
+            END_STRUCT;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            StandartTelegramm350 : STRUCT
+                {
+                    S7_Access := "ReadOnly := External";
+                    S7_Visibility := "Hidden := External"
+                }
+                Send : STRUCT
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    STW1 : STRUCT
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_0 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_1 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ControlByPLC : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        SetpointInversion : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorizedSPRaise : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorizedSPLower : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_3E8";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ON_OFF1 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_be";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OFF2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_Xh";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OFF3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableOperation : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableRamp : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        StartRamp : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableSetpoint : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Ack : Bool;
+                    END_STRUCT;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4LD";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    NSOLL_A : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4ue";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    M_LIM : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    STW3 : Word;
+                END_STRUCT;
+                {
+                    S7_Access := "ReadOnly := External";
+                    S7_Visibility := "Hidden := External"
+                }
+                Recieve : STRUCT
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4XL";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    ZSW1 : STRUCT
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        DeviationSpActual : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ControlRequest : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MaximumSpeedReached : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        IMPLimitReached : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorHoldingBrakeOpen : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        AlarmMotorOverTemperature : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorRotatesFwd : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ConverterOverload : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ReadyForSwitchingOn : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Ready : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OperationEnabled : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        FaultActive : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        CoastDownActive_OFF2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        QuickStopActive_OFF3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        SwithingOnInhibited : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        AlarmActive : Bool;
+                    END_STRUCT;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3u8";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    NIST_A_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4PB";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    IAIST_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3Zd";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    ZSW3 : Word;
+                END_STRUCT;
+            END_STRUCT;
+            {
+                S7_Access := "ReadOnly := External";
+                S7_Visibility := "Hidden := External"
+            }
+            StandartTelegramm352 : STRUCT
+                {
+                    S7_Access := "ReadOnly := External";
+                    S7_Visibility := "Hidden := External"
+                }
+                Send : STRUCT
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    STW1 : STRUCT
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_0 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_1 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ControlByPLC : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        SetpointInversion : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorizedSPRaise : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorizedSPLower : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Spare_3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_3Pf";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ON_OFF1 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_4ek";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OFF2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_MLC := "MLC_3e5";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OFF3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableOperation : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableRamp : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        StartRamp : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        EnableSetpoint : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Ack : Bool;
+                    END_STRUCT;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_46h";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    NSOLL_A : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    "<3>" : Word;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    "<4>" : Word;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    "<5>" : Word;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    "<6>" : Word;
+                END_STRUCT;
+                {
+                    S7_Access := "ReadOnly := External";
+                    S7_Visibility := "Hidden := External"
+                }
+                Recieve : STRUCT
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3gy";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    ZSW1 : STRUCT
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        DeviationSpActual : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ControlRequest : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MaximumSpeedReached : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        IMPLimitReached : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorHoldingBrakeOpen : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        AlarmMotorOverTemperature : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        MotorRotatesFwd : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ConverterOverload : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        ReadyForSwitchingOn : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        Ready : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        OperationEnabled : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        FaultActive : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        CoastDownActive_OFF2 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        QuickStopActive_OFF3 : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        SwithingOnInhibited : Bool;
+                        {
+                            S7_Access := "ReadOnly := External";
+                            S7_Visibility := "Hidden := External"
+                        }
+                        AlarmActive : Bool;
+                    END_STRUCT;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_3tQ";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    NIST_A_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4Wc";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    IAIST_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4NQ";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    MIST_GL : Int;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_xE";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    WARN_CODE : Word;
+                    {
+                        S7_Access := "ReadOnly := External";
+                        S7_MLC := "MLC_4Cq";
+                        S7_Visibility := "Hidden := External"
+                    }
+                    FAULT_CODE : Word;
+                END_STRUCT;
+            END_STRUCT;
+        END_STRUCT;
+    END_VAR
+    VAR_TEMP
+        Ret_value : Int;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        // ------------------------------------------------------------------------------------------------------------------
+        // Обмен с PM (power module)
+        // TypeTelegram:
+        // 0   - не задана
+        // 1   - Standart telegram 1    2/2
+        // 20  - Standart telegram 20   6/2 
+        // 350 - Standart telegram 350  4/4
+        // 352 - Standart telegram 352  6/6
+        // 
+        // ------------------------------------------
+        // Телеграмма - Standart telegram 1: 2/2
+        // Recieve:
+        // ZSW1      status word 1          PZD1
+        // NIST_A    actual speed           PZD2
+        
+        // Send:
+        // STW1      control word 1         PZD1
+        // NSOLL_A   speed setpoint         PZD2
+        
+        // ------------------------------------------
+        // Телеграмма - Standart telegram 20: 6/2
+        // Recieve:
+        // ZSW1      status word 1          PZD1
+        // NIST_A_GL actual speed           PZD2
+        // IAIST_GL  actual current         PZD3
+        // MIST_GL   actual torque          PZD4
+        // PIST_GL   power factor           PZD5
+        // <6>       -                      PZD6
+        
+        // Send:
+        // STW1      control word 1         PZD1
+        // NSOLL_A   speed setpoint         PZD2
+        
+        // ------------------------------------------
+        // Телеграмма - Standart telegram 350: 4/4
+        // Recieve:
+        // ZSW1      status word 1          PZD1
+        // NIST_A_GL actual speed           PZD2
+        // IAIST_GL  actual current         PZD3
+        // ZSW3      status word 3          PZD4
+        
+        // Send:
+        // STW1      control word 1         PZD1
+        // NSOLL_A   speed setpoint         PZD2
+        // M_LIM     torque limit           PZD3
+        // STW3      control word 3         PZD4
+        
+        // ------------------------------------------------------------------------------------------------------------------
+        // Описание данных обмена
+        // ZSW1       r2089[0]             Status word 1                                     U16
+        // ZSW2       r2089[1]             Status word 2                                     U16 
+        // ZSW3       r0053                Status word 3                                     U16
+        // NIST_A     r0063[0]             Actual speed A (16 bit)                           I16     4000hex = 100%  (p2000)
+        // NIST_A_GL  r0063[1]             Actual speed, smoothed                            I16     4000hex = 100%  (p2000)
+        
+        // IAIST_GL   r0068[1]             Absolute actual current, smoothed                 I16     4000hex = 100%  (p2002)
+        // MIST_GL    r0080[1]             Actual torque smoothed                            I16     4000hex = 100%  (p2003)  
+        // PIST_GL    r0082[1]             Power factor, smoothed                            I16     4000hex = 100%  (p2004)
+        
+        // WARN_CODE  r2131                Fault code                                        U16
+        // FAULT_CODE r2132                Fault code                                        U16
+        // E_DIGTAL   r2089[2]             Digital inputs                                    U16  
+         
+        // STW1                            Control word 1
+        // NSOLL_A    p1070                Speed setpoint A     (16-bit)                     I16     4000hex = 100%
+        // M_LIM      p1552, p1554         Torque limit                                      U16     4000hex = 100%
+         
+        // The reference quantity corresponds to 100% or 4000hex (word) or 40000000hex (double word).
+        
+        REGION Управление
+            CASE #TypeTelegram OF
+                1: REGION Телеграмма типа 1
+                        // Слово управления 1 (STW1)
+                        
+                        // Двигатель держим предварительно намагниченным для быстрого запуска
+                        IF #Pre_magnetize THEN
+                            #PM.#StandartTelegramm1.Send.STW1.ON_OFF1 := #Magnetize AND #PM.StandartTelegramm1.Recieve.ZSW1.ReadyForSwitchingOn;
+                            #PM.#StandartTelegramm1.Send.STW1.EnableOperation := #Turn1D OR #Turn2D;
+                            // Двигатель намагничивается по командам запуска 1D или 2D
+                        ELSE
+                            #PM.#StandartTelegramm1.Send.STW1.ON_OFF1 := #Turn1D OR #Turn2D;
+                            #PM.#StandartTelegramm1.Send.STW1.EnableOperation := TRUE;
+                        END_IF;
+                        
+                        // #PM.#StandartTelegramm1.Send.STW1.ON_OFF1
+                        #PM.#StandartTelegramm1.Send.STW1.OFF2 := TRUE;
+                        #PM.#StandartTelegramm1.Send.STW1.OFF3 := NOT #QuickStop;
+                        // #PM.#StandartTelegramm1.Send.STW1.EnableOperation
+                        #PM.#StandartTelegramm1.Send.STW1.EnableRamp := TRUE;
+                        #PM.#StandartTelegramm1.Send.STW1.StartRamp := TRUE;
+                        #PM.#StandartTelegramm1.Send.STW1.EnableSetpoint := TRUE;
+                        #PM.#StandartTelegramm1.Send.STW1.Ack := #Reset;
+                        #PM.#StandartTelegramm1.Send.STW1.ControlByPLC := TRUE;
+                        #PM.#StandartTelegramm1.Send.STW1.SetpointInversion := #Turn2D;
+                        
+                        // преобразование посылаемых данных
+                        IF #Turn1D OR #Turn2D THEN
+                            #PM.#StandartTelegramm1.Send.NSOLL_A := LIMIT(MN := 0, IN := REAL_TO_INT(#SetSpeed / #DriveSettings.NSpeed * 16#4000), MX := 16#8000);
+                        ELSE
+                            #PM.#StandartTelegramm1.Send.NSOLL_A := 0;
+                        END_IF;
+                        
+                        // посылка данных в привод
+                        #Ret_value := DPWR_DAT(LADDR := #HW_Identifier, RECORD := #PM.#StandartTelegramm1.Send);
+                    END_REGION
+        
+                20: REGION Телеграмма типа 20
+                        // Слово управления 1 (STW1)
+                        
+                        // Двигатель держим предварительно намагниченным для быстрого запуска
+                        IF #Pre_magnetize THEN
+                            #PM.#StandartTelegramm20.Send.STW1.ON_OFF1 := #Magnetize AND #PM.StandartTelegramm20.Recieve.ZSW1.ReadyForSwitchingOn;
+                            #PM.#StandartTelegramm20.Send.STW1.EnableSetpoint := #Turn1D OR #Turn2D;
+                        // Двигатель намагничивается по командам запуска 1D или 2D
+                        ELSE
+                            #PM.#StandartTelegramm20.Send.STW1.ON_OFF1 := #Turn1D OR #Turn2D;
+                            #PM.#StandartTelegramm20.Send.STW1.EnableSetpoint := TRUE;
+                        END_IF;
+                        
+                        // #PM.#StandartTelegramm20.Send.STW1.ON_OFF1
+                        #PM.#StandartTelegramm20.Send.STW1.OFF2 := TRUE;
+                        #PM.#StandartTelegramm20.Send.STW1.OFF3 := NOT #QuickStop;
+                        #PM.#StandartTelegramm20.Send.STW1.EnableOperation := TRUE;
+                        #PM.#StandartTelegramm20.Send.STW1.EnableRamp := TRUE;
+                        #PM.#StandartTelegramm20.Send.STW1.StartRamp := TRUE;
+                        //#PM.#StandartTelegramm20.Send.STW1.EnableSetpoint := TRUE;
+                        #PM.#StandartTelegramm20.Send.STW1.Ack := #Reset;
+                        #PM.#StandartTelegramm20.Send.STW1.ControlByPLC := TRUE;
+                        #PM.#StandartTelegramm20.Send.STW1.SetpointInversion := #Turn2D;
+                        
+                        // преобразование посылаемых данных
+                        IF #Turn1D OR #Turn2D THEN
+                            #PM.#StandartTelegramm20.Send.NSOLL_A := LIMIT(MN:=0, IN:=REAL_TO_INT(#SetSpeed / #DriveSettings.NSpeed * 16#4000), MX:=16#8000);
+                        ELSE
+                            #PM.#StandartTelegramm20.Send.NSOLL_A := 0;
+                        END_IF;
+                        
+                        // посылка данных в привод
+                        #Ret_value := DPWR_DAT(LADDR := #HW_Identifier, RECORD := #PM.#StandartTelegramm20.Send);
+                    END_REGION
+                    
+                352: REGION Телеграмма типа 352
+                        // Слово управления 1 (STW1)
+                        
+                        // Двигатель держим предварительно намагниченным для быстрого запуска
+                        IF #Pre_magnetize THEN
+                            #PM.#StandartTelegramm352.Send.STW1.ON_OFF1 := #Magnetize AND #PM.StandartTelegramm352.Recieve.ZSW1.ReadyForSwitchingOn;
+                            #PM.#StandartTelegramm352.Send.STW1.EnableOperation := #Turn1D OR #Turn2D;
+                            // Двигатель намагничивается по командам запуска 1D или 2D
+                        ELSE
+                            #PM.#StandartTelegramm352.Send.STW1.ON_OFF1 := #Turn1D OR #Turn2D;
+                            #PM.#StandartTelegramm352.Send.STW1.EnableOperation := TRUE;
+                        END_IF;
+                        
+                        // #PM.#StandartTelegramm352.Send.STW1.ON_OFF1
+                        #PM.#StandartTelegramm352.Send.STW1.OFF2 := TRUE;
+                        #PM.#StandartTelegramm352.Send.STW1.OFF3 := NOT #QuickStop;
+                        // #PM.#StandartTelegramm352.Send.STW1.EnableOperation
+                        #PM.#StandartTelegramm352.Send.STW1.EnableRamp := TRUE;
+                        #PM.#StandartTelegramm352.Send.STW1.StartRamp := TRUE;
+                        #PM.#StandartTelegramm352.Send.STW1.EnableSetpoint := TRUE;
+                        #PM.#StandartTelegramm352.Send.STW1.Ack := #Reset;
+                        #PM.#StandartTelegramm352.Send.STW1.ControlByPLC := TRUE;
+                        #PM.#StandartTelegramm352.Send.STW1.SetpointInversion := #Turn2D;
+                        
+                        // преобразование посылаемых данных
+                        IF #Turn1D OR #Turn2D THEN
+                            #PM.#StandartTelegramm352.Send.NSOLL_A := LIMIT(MN := 0, IN := REAL_TO_INT(#SetSpeed / #DriveSettings.NSpeed * 16#4000), MX := 16#8000);
+                        ELSE
+                            #PM.#StandartTelegramm352.Send.NSOLL_A := 0;
+                        END_IF;
+                        
+                        // посылка данных в привод
+                        #Ret_value := DPWR_DAT(LADDR := #HW_Identifier, RECORD := #PM.#StandartTelegramm352.Send);
+                    END_REGION
+                    
+                ELSE 
+                    ;
+            END_CASE;
+            
+        END_REGION
+        
+        REGION Состояние
+            REGION Инициализация выходных переменных
+                #StatusWord  := 0;
+                #ControlWord := 0;
+                #FaultCode := 0;
+                #WarningCode := 0;
+                
+                #State.Running1D   := FALSE;
+                #State.Running2D   := FALSE;
+                #State.Fault       := FALSE;
+                #State.Warning     := FALSE;
+                #State.Ready       := FALSE;
+                #State.Magnetized  := FALSE;
+                
+                #ActualValue.Speed       := 0;
+                #ActualValue.Position    := 0;
+                #ActualValue.Current     := 0;
+                #ActualValue.DCVoltage   := 0;
+                #ActualValue.Voltage     := 0;
+                #ActualValue.ActivePower := 0;
+                #ActualValue.Torgue      := 0;
+                
+                #DI.DIO := FALSE;
+                #DI.DI1 := FALSE;
+            END_REGION
+            
+            CASE #TypeTelegram OF
+                1: REGION Телеграмма типа 1
+                        // Читаем данные из привода
+                        #Ret_value := DPRD_DAT(LADDR := #HW_Identifier, RECORD => #PM.#StandartTelegramm1.Recieve);
+                        
+                        // Преобразование принятых данных
+                        #ActualValue.Speed := INT_TO_REAL(#PM.#StandartTelegramm1.Recieve.NIST_A) / 16#4000 * #DriveSettings.NSpeed;
+                        
+                        #State.Fault := #PM.#StandartTelegramm1.Recieve.ZSW1.FaultActive;
+                        #State.Ready := #PM.StandartTelegramm1.Recieve.ZSW1.ReadyForSwitchingOn;
+                        #State.Running1D := #Turn1D AND #PM.#StandartTelegramm1.Recieve.ZSW1.OperationEnabled;
+                        #State.Running2D := #Turn2D AND #PM.#StandartTelegramm1.Recieve.ZSW1.OperationEnabled;
+                        
+                        // Формирование выходных данных
+                        GATHER(IN := #PM.StandartTelegramm1.Recieve.ZSW1,
+                               OUT => #StatusWord);
+                        GATHER(IN := #PM.StandartTelegramm1.Send.STW1,
+                               OUT => #ControlWord);
+                    END_REGION
+                    
+                20:REGION Телеграмма типа 20
+                        // Читаем данные из привода
+                        #Ret_value := DPRD_DAT(LADDR := #HW_Identifier, RECORD => #PM.#StandartTelegramm20.Recieve);
+                        
+                        // Преобразование принятых данных
+                        #ActualValue.Speed := INT_TO_REAL(#PM.#StandartTelegramm20.Recieve.NIST_A_GL) / 16#4000 * #DriveSettings.NSpeed;
+                        #ActualValue.Current := INT_TO_REAL(#PM.#StandartTelegramm20.Recieve.IAIST_GL) / 16#4000 * #DriveSettings.NCurrent;
+                        #ActualValue.Torgue := INT_TO_REAL(#PM.#StandartTelegramm20.Recieve.MIST_GL) / 16#4000 * #DriveSettings.NTorgue;
+                        #ActualValue.ActivePower := INT_TO_REAL(#PM.#StandartTelegramm20.Recieve.PIST_GL) / 16#4000 * #DriveSettings.NPower;
+                        
+                        #State.Fault := #PM.#StandartTelegramm20.Recieve.ZSW1.FaultActive;
+                        #State.Ready := #PM.StandartTelegramm20.Recieve.ZSW1.ReadyForSwitchingOn;
+                        #State.Running1D := #Turn1D AND #PM.#StandartTelegramm20.Recieve.ZSW1.OperationEnabled;
+                        #State.Running2D := #Turn2D AND #PM.#StandartTelegramm20.Recieve.ZSW1.OperationEnabled;
+                        
+                        // Формирование выходных данных
+                        GATHER(IN := #PM.StandartTelegramm20.Recieve.ZSW1,
+                               OUT => #StatusWord);
+                        GATHER(IN := #PM.StandartTelegramm20.Send.STW1,
+                               OUT => #ControlWord);
+                        
+                        #DI.DIO := #PM.StandartTelegramm20.Recieve."<6>".%X0;
+                        #DI.DI1 := #PM.StandartTelegramm20.Recieve."<6>".%X1;
+                        #DI.DI2 := #PM.StandartTelegramm20.Recieve."<6>".%X2;
+                    END_REGION
+                    
+                352: REGION Телеграмма типа 352
+                        // Читаем данные из привода
+                        #Ret_value := DPRD_DAT(LADDR := #HW_Identifier, RECORD => #PM.#StandartTelegramm352.Recieve);
+                        
+                        // Преобразование принятых данных
+                        #ActualValue.Speed := INT_TO_REAL(#PM.#StandartTelegramm352.Recieve.NIST_A_GL) / 16#4000 * #DriveSettings.NSpeed;
+                        #ActualValue.Current := INT_TO_REAL(#PM.#StandartTelegramm352.Recieve.IAIST_GL) / 16#4000 * #DriveSettings.NCurrent;
+                        #ActualValue.Torgue := INT_TO_REAL(#PM.#StandartTelegramm352.Recieve.MIST_GL) / 16#4000 * #DriveSettings.NTorgue;
+                        
+                        #State.Fault := #PM.#StandartTelegramm352.Recieve.ZSW1.FaultActive;
+                        #State.Warning := #PM.StandartTelegramm352.Recieve.ZSW1.AlarmActive;
+                        #State.Running1D := #Turn1D AND #PM.#StandartTelegramm352.Recieve.ZSW1.OperationEnabled;
+                        #State.Running2D := #Turn2D AND #PM.#StandartTelegramm352.Recieve.ZSW1.OperationEnabled;
+                        
+                        // Формирование выходных данных
+                        GATHER(IN := #PM.StandartTelegramm352.Recieve.ZSW1,
+                               OUT => #StatusWord);
+                        GATHER(IN := #PM.StandartTelegramm352.Send.STW1,
+                               OUT => #ControlWord);
+                        
+                        #Hmi.WarningCode := #WarningCode := #PM.StandartTelegramm352.Recieve.WARN_CODE;
+                        #Hmi.FaultCode := #FaultCode := #PM.StandartTelegramm352.Recieve.FAULT_CODE;
+                    END_REGION
+        
+                ELSE  
+                    ;
+            END_CASE;
+            
+        END_REGION
+        
+        REGION Визуализация
+            #Hmi.StatusWord  := #StatusWord;
+            #Hmi.ControlWord := #ControlWord;
+            
+            #Hmi.Setpoint := #SetSpeed;
+            #Hmi.ActualSpeed := #ActualValue.Speed;
+            
+            #Hmi.Current     := #ActualValue.Current;
+            #Hmi.ActivePower := #ActualValue.ActivePower;
+            
+            #Hmi.WarningCode := #WarningCode;
+            #Hmi.FaultCode := #FaultCode;
+            
+            GATHER(IN := #DI,
+                   OUT => #Hmi.DIState);
+        END_REGION
+    END_NETWORK
+END_FUNCTION_BLOCK

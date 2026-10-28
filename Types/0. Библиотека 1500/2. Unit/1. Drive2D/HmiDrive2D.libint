@@ -1,0 +1,19 @@
+﻿DocumentHash:
+  - FileName: HmiDrive2D.s7dcl
+    Hash: 84J6TLm2uvHHhK6ymLO9dX5awXjPZpyUXuHVo3oWBAQ=
+LibraryMetaFileHash: rlQVpYTfbKQlzWV5rUe7XFh/RLVD3aoV43aT2ogzqyc=
+LibraryVersion:
+  Guid: fb60bd9f-9bf2-4f4e-a291-3fe92cb7c41b
+  DependsOn:
+    - TypeName: HmiMode
+      VersionNumber: 0.0.2
+    - TypeName: HmiCommand
+      VersionNumber: 0.0.1
+    - TypeName: HmiMotor
+      VersionNumber: 0.0.1
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1
+    - TypeName: HmiProtect
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1

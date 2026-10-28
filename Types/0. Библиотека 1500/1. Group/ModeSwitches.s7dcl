@@ -1,0 +1,28 @@
+﻿TYPE
+    ModeSwitches : STRUCT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_Qz";
+            S7_Visibility := "Hidden := External"
+        }
+        ControlKey : Bool := true;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4im";
+            S7_Visibility := "Hidden := External"
+        }
+        ToManual : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4cj";
+            S7_Visibility := "Hidden := External"
+        }
+        ToAuto : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_MLC := "MLC_4WM";
+            S7_Visibility := "Hidden := External"
+        }
+        ToSemiAuto : Bool;
+    END_STRUCT;
+END_TYPE

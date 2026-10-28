@@ -1,0 +1,121 @@
+﻿MultiLingualTexts:
+  - id: MLC_4hh
+    ru-RU: Идентификатор посылки
+  - id: MLC_Yu
+    ru-RU: Тип телеграммы
+  - id: MLC_Ri
+    ru-RU: 0- без удержания двигателя намагниченным / 1-двигатель держиться намагниченным
+  - id: MLC_53h
+    ru-RU: Намагнитить двигатель
+  - id: MLC_3SR
+    ru-RU: Запустить привод вперед
+  - id: MLC_4hE
+    ru-RU: Запустить привод назад
+  - id: MLC_nE
+    ru-RU: Задать скорость
+  - id: MLC_3yc
+    ru-RU: Сброс ошибок
+  - id: MLC_bs
+    ru-RU: Экстренная остановка
+  - id: MLC_Tn
+    ru-RU: Текущее слово состояния 1
+  - id: MLC_ax
+    ru-RU: Текущее слово управления 1
+  - id: MLC_3km
+    ru-RU: Код ошибки
+  - id: MLC_3Wm
+    ru-RU: 'Актуальные значения параметров:'
+  - id: MLC_3Pj
+    ru-RU: текщуее значение скорости, об/мин
+  - id: MLC_4fM
+    ru-RU: текщуее значение датчика положения, градусы
+  - id: MLC_4mg
+    ru-RU: полное значение переменного тока, А
+  - id: MLC_44z
+    ru-RU: напряжение в звене постоянного тока, В
+  - id: MLC_wa
+    ru-RU: напряжение в сети переменного тока, B
+  - id: MLC_49U
+    ru-RU: активная мощность в сети, кВт
+  - id: MLC_4W2
+    ru-RU: момент, Нм
+  - id: MLC_4Fj
+    ru-RU: Номинальные параметры двигателя
+  - id: MLC_3iU
+    ru-RU: r2700 Номинальная скорость, об/мин
+  - id: MLC_4Zz
+    ru-RU: r2702 Номинальный ток, А
+  - id: MLC_46V
+    ru-RU: r2701 Номинальное напряжение сети, В
+  - id: MLC_3rJ
+    ru-RU: r2704 Номинальная мощность, кВт
+  - id: MLC_XY
+    ru-RU: r2703 Номинальный момент, Нм
+  - id: MLC_37G
+    ru-RU: включение
+  - id: MLC_4sF
+    ru-RU: откл. на выбеге
+  - id: MLC_4NN
+    ru-RU: быстрый останов
+  - id: MLC_sE
+    ru-RU: p1070                 Speed setpoint A     (16-bit)                   I16     4000hex = 100%
+  - id: MLC_cr
+    ru-RU: r2089[0]             Status word 1                                           U16
+  - id: MLC_3As
+    ru-RU: r0063[0]             Actual speed A (16 bit)                           I16     4000hex = 100%  (p2000)
+  - id: MLC_Nr
+    ru-RU: включение
+  - id: MLC_3F7
+    ru-RU: откл. на выбеге
+  - id: MLC_4cv
+    ru-RU: быстрый останов
+  - id: MLC_3hL
+    ru-RU: p1070                 Speed setpoint A     (16-bit)                   I16     4000hex = 100%
+  - id: MLC_3B9
+    ru-RU: r2089[0]             Status word 1                                           U16
+  - id: MLC_3vs
+    ru-RU: r0063[1]             Actual speed, smoothed                        I16     4000hex = 100%  (p2000)
+  - id: MLC_4dX
+    ru-RU: r0068[1]             Absolute actual current, smoothed     I16     4000hex = 100%  (p2002)
+  - id: MLC_4pX
+    ru-RU: r0080[1]             Actual torque smoothed                        I16     4000hex = 100%  (p2003)
+  - id: MLC_3ad
+    ru-RU: r0082[1]             Power factor, smoothed                         I16     4000hex = 100%  (p2004)
+  - id: MLC_3E8
+    ru-RU: включение
+  - id: MLC_be
+    ru-RU: откл. на выбеге
+  - id: MLC_Xh
+    ru-RU: быстрый останов
+  - id: MLC_4LD
+    ru-RU: p1070                 Speed setpoint A     (16-bit)                   I16     4000hex = 100%
+  - id: MLC_4ue
+    ru-RU: p1552, p1554   Torque limit                                             U16     4000hex = 100%
+  - id: MLC_4XL
+    ru-RU: r2089[0]             Status word 1                                           U16
+  - id: MLC_3u8
+    ru-RU: r0063[1]             Actual speed, smoothed                        I16     4000hex = 100%  (p2000)
+  - id: MLC_4PB
+    ru-RU: r0068[1]             Absolute actual current, smoothed     I16     4000hex = 100%  (p2002)
+  - id: MLC_3Zd
+    ru-RU: r0053                  Status word 3                                           U16
+  - id: MLC_3Pf
+    ru-RU: включение
+  - id: MLC_4ek
+    ru-RU: откл. на выбеге
+  - id: MLC_3e5
+    ru-RU: быстрый останов
+  - id: MLC_46h
+    ru-RU: p1070                 Speed setpoint A     (16-bit)                   I16     4000hex = 100%
+  - id: MLC_3gy
+    ru-RU: r2089[0]             Status word 1                                           U16
+  - id: MLC_3tQ
+    ru-RU: r0063[1]             Actual speed, smoothed                        I16     4000hex = 100%  (p2000)
+  - id: MLC_4Wc
+    ru-RU: r0068[1]             Absolute actual current, smoothed     I16     4000hex = 100%  (p2002)
+  - id: MLC_4NQ
+    ru-RU: r0080[1]             Actual torque smoothed                        I16     4000hex = 100%  (p2003)
+  - id: MLC_xE
+    ru-RU: r2131                  Warning code                                           U16
+  - id: MLC_4Cq
+    ru-RU: r2132                  Fault code                                                 U16

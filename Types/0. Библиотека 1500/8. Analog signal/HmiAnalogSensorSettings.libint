@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: HmiAnalogSensorSettings.s7dcl
+    Hash: fzCeDoRNWfo5qo9wxBY7yc6KZajFLihbzeeC2AxIW0s=
+LibraryMetaFileHash: ZYSZdL/GTAabkpe/fo/DInSsHo9ZiqG6luO+8LV5eLI=
+LibraryVersion:
+  Guid: d6ae1d6f-d378-4323-b9c1-c1cd145a7f03
+  DependsOn:
+    - TypeName: AI_Setpoints
+      VersionNumber: 0.0.1
+    - TypeName: AI_FaultLimits
+      VersionNumber: 0.0.1
+    - TypeName: AI_Delays
+      VersionNumber: 0.0.1

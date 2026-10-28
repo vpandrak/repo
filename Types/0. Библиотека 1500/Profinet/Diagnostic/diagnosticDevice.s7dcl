@@ -1,0 +1,9 @@
+﻿TYPE
+    diagnosticDevice : STRUCT
+        configured : Array[0..1023] of Bool;
+        faulty : Array[0..1023] of Bool;
+        disabled : Array[0..1023] of Bool;
+        exist : Array[0..1023] of Bool;
+        occurred : Array[0..1023] of Bool;
+    END_STRUCT;
+END_TYPE

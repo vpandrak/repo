@@ -1,0 +1,122 @@
+﻿{
+    S7_BlockNumber := "10605";
+    S7_EditorMode := "SCL";
+    S7_Optimized := "TRUE";
+    S7_Version := "0.1"
+}
+FUNCTION_BLOCK "Switch3In"
+    VAR_INPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        IN1 : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        IN2 : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        IN3 : Bool;
+    END_VAR
+    VAR_OUTPUT
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OUT1 : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OUT2 : Bool;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        OUT3 : Bool;
+    END_VAR
+    VAR
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_in1 : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_in2 : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _r_in3 : R_TRIG;
+        {
+            S7_Access := "ReadOnly := External";
+            S7_Visibility := "Hidden := External"
+        }
+        _sm : _.StateMachine;
+    END_VAR
+    VAR CONSTANT
+        ST_NO_OUT : Int := 0;
+        ST_OUT1 : Int := 1;
+        ST_OUT2 : Int := 2;
+        ST_OUT3 : Int := 3;
+        ST_SWITCHING : Int := 4;
+    END_VAR
+
+    { S7_Language := "SCL" }
+    NETWORK
+        //Переключатель на 3 сигнала. Позволяет переключать сигналы без потери сигнала при переключении.
+        //На выход будет подан только один из сигналов.
+        
+        #_r_in1(CLK:= #IN1);
+        #_r_in2(CLK := #IN2);
+        #_r_in3(CLK := #IN3);
+        
+        
+        CASE #_sm.State OF
+            #ST_NO_OUT:
+                IF #IN1 THEN
+                    #_sm.ChangeStateTo := #ST_OUT1;
+                ELSIF #IN2 THEN
+                    #_sm.ChangeStateTo := #ST_OUT2;
+                ELSIF #IN3 THEN
+                    #_sm.ChangeStateTo := #ST_OUT3;
+                END_IF;
+                
+            #ST_OUT1:
+                ;
+            #ST_OUT2:
+                ;
+            #ST_OUT3:
+                ;
+        END_CASE;
+        
+        #_sm();
+        
+        CASE #_sm.State OF
+            #ST_NO_OUT:
+                #OUT1 := FALSE;
+                #OUT2 := false;
+                #OUT3 := false;
+                
+            #ST_OUT1:
+                #OUT1 := true;
+                #OUT2 := false;
+                #OUT3 := false;
+            #ST_OUT2:
+                #OUT1 := FALSE;
+                #OUT2 := true;
+                #OUT3 := false;
+            #ST_OUT3:
+                #OUT1 := FALSE;
+                #OUT2 := false;
+                #OUT3 := true;
+        END_CASE;
+    END_NETWORK
+END_FUNCTION_BLOCK

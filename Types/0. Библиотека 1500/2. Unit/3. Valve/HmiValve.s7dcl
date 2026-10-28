@@ -1,0 +1,9 @@
+﻿TYPE
+    HmiValve : STRUCT
+        State : _.HmiState;
+        Position : STRUCT
+            Actual : Real;
+            Target : Real;
+        END_STRUCT;
+    END_STRUCT;
+END_TYPE

@@ -1,0 +1,13 @@
+﻿DocumentHash:
+  - FileName: InterlockFC.s7dcl
+    Hash: bZUkCB9CvJfpZFxC0hv6r32ysnZUMwlKphaJWOHOrsk=
+  - FileName: InterlockFC.s7res
+    Hash: biB0+bKiA9dfUP8H6MjIn2LUxvJYQMqp4FsqCpJ0TSo=
+LibraryMetaFileHash: RZ1j9rp2WXkhXe8GpUgNzy5ksRePAQ2IpWnMTPtvprI=
+LibraryVersion:
+  Guid: 35925f19-81c1-499c-b743-17f1dc7cdffd
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: HmiInterlock
+      VersionNumber: 0.0.1

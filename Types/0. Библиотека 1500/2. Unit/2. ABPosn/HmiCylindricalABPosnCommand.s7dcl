@@ -1,0 +1,8 @@
+﻿TYPE
+    HmiCylindricalABPosnCommand : STRUCT
+        MoveToA : Bool;
+        Stop : Bool;
+        MoveToB : Bool;
+        ResetFault : Bool;
+    END_STRUCT;
+END_TYPE

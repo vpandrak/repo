@@ -1,0 +1,9 @@
+﻿DocumentHash:
+  - FileName: HmiValve.s7dcl
+    Hash: 1dWU2A5NPx1XcLCTr3FDvW6X8lHL6/R+RaK3O/0YIiU=
+LibraryMetaFileHash: Vydza8fXhtkL8ImNZKjfubtRmErXL+TND9cteU4/JjQ=
+LibraryVersion:
+  Guid: f61f8da7-823d-4495-8055-b9ae6365107e
+  DependsOn:
+    - TypeName: HmiState
+      VersionNumber: 0.0.1

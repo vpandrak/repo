@@ -1,0 +1,37 @@
+﻿DocumentHash:
+  - FileName: ValveUnit.s7dcl
+    Hash: W+nrjQzgn8N6QNuWAjebGT+0pKs8DNpMerq06lJTcGU=
+  - FileName: ValveUnit.s7res
+    Hash: LTRb9PB3Oq8ba0+WSNrtmpKa3oFTfMUWFHfDKnCMfTA=
+LibraryMetaFileHash: gSCm8xOmcaOY2i1Y69yHgvzyqCTEgUtfYdQZIQFWIgY=
+LibraryVersion:
+  Guid: e87926ce-af92-4358-b275-24bdef28396c
+  DependsOn:
+    - TypeName: ValveInterface
+      VersionNumber: 0.0.1
+    - TypeName: ValveControl
+      VersionNumber: 0.0.1
+    - TypeName: HmiValveUnit
+      VersionNumber: 0.0.1
+    - TypeName: ValveCommand
+      VersionNumber: 0.0.1
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: Lamp
+      VersionNumber: 0.0.1
+    - TypeName: ValveSensor
+      VersionNumber: 0.0.1
+    - TypeName: ValveCmd
+      VersionNumber: 0.0.1
+    - TypeName: ValveState
+      VersionNumber: 0.0.1
+    - TypeName: HmiValveSettings
+      VersionNumber: 0.0.1
+    - TypeName: UnitFullName
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: InterlockFC
+      VersionNumber: 0.0.1

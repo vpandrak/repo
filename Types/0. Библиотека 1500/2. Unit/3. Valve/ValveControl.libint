@@ -1,0 +1,35 @@
+﻿DocumentHash:
+  - FileName: ValveControl.s7dcl
+    Hash: PlHa1CHzGSKex8z8zvs5dVLF+d76PBlEVu6XND3cBgc=
+  - FileName: ValveControl.s7res
+    Hash: O9Yi24qoa14tAl3eBSMG9sPWjpPlB3ZkeziiXyj3dOQ=
+LibraryMetaFileHash: n0zAzSj5Ft1inhbpXsLeB3tAo9dJR+e0vSFrVrWQT8s=
+LibraryVersion:
+  Guid: 8191698e-db3d-4be7-b206-d8d4e4f9594c
+  DependsOn:
+    - TypeName: BitDescription
+      VersionNumber: 0.0.1
+    - TypeName: ValveSensor
+      VersionNumber: 0.0.1
+    - TypeName: HmiValve
+      VersionNumber: 0.0.1
+    - TypeName: ValveCmd
+      VersionNumber: 0.0.1
+    - TypeName: LampCommand
+      VersionNumber: 0.0.1
+    - TypeName: GroupToUnit
+      VersionNumber: 0.0.1
+    - TypeName: ValveSettings
+      VersionNumber: 0.0.1
+    - TypeName: ValveJog
+      VersionNumber: 0.0.1
+    - TypeName: PA_Notice
+      VersionNumber: 0.0.1
+    - TypeName: ValveState
+      VersionNumber: 0.0.1
+    - TypeName: PA_Fault
+      VersionNumber: 0.0.1
+    - TypeName: StateMachine
+      VersionNumber: 0.0.1
+    - TypeName: PA_Event
+      VersionNumber: 0.0.1
